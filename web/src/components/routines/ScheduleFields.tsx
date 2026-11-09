@@ -8,7 +8,7 @@ import * as routinesApi from "../../api/routines";
 import type { SchedulePreview, ScheduleIn } from "../../api/routines";
 import { DEFAULT_TIME, PREVIEW_DEBOUNCE_MS, WEEKDAY_CHIPS } from "./constants";
 import { zoneStamp } from "./zoneTime";
-import { useAppTimeZone, zoneCity } from "../../lib/timeZone";
+import { useAppTimeZone } from "../../lib/timeZone";
 
 const KINDS = [{ id: "times", label: "Times" }, { id: "cron", label: "Custom" }] as const;
 
@@ -71,7 +71,7 @@ function TimesFields({ value, onChange }: { value: Extract<ScheduleIn, { kind: "
 // and under it the live preview.
 export function ScheduleFields({ value, onChange }: ScheduleFieldsProps) {
   const { preview, problem } = usePreview(value);
-  const zone = useAppTimeZone();
+  useAppTimeZone(); // a zone change shows the preview on the new clock
   const pick = (kind: ScheduleIn["kind"]) => {
     if (kind === value.kind) return;
     onChange(kind === "cron" ? { kind: "cron", expr: "" } : { kind: "times", days: [1, 2, 3, 4, 5], times: [DEFAULT_TIME] });
@@ -92,7 +92,6 @@ export function ScheduleFields({ value, onChange }: ScheduleFieldsProps) {
           <>
             <p className="schedule__words">{preview.words}</p>
             <ul>{preview.next.map((time) => <li key={time}>{zoneStamp(time)}</li>)}</ul>
-            <p className="schedule__zone">{`Times are in ${zoneCity(zone)} time.`}</p>
           </>
         ) : null}
       </div>

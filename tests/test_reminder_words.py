@@ -24,26 +24,26 @@ def test_an_advance_reminder_the_same_day_says_how_long(minutes, when):
 
 
 def test_an_advance_reminder_for_tomorrow_says_tomorrow_and_the_madrid_time():
-    assert _words(base=NOW + timedelta(days=1)) == "Heads-up: Reply to Jin Hu is tomorrow at 10:00 Madrid."
+    assert _words(base=NOW + timedelta(days=1)) == "Heads-up: Reply to Jin Hu is tomorrow at 10:00."
 
 
 def test_an_advance_reminder_further_out_names_the_day():
-    assert _words(base=NOW + timedelta(days=2)) == "Heads-up: Reply to Jin Hu is on Friday 23 October at 10:00 Madrid."
+    assert _words(base=NOW + timedelta(days=2)) == "Heads-up: Reply to Jin Hu is on Friday 23 October at 10:00."
 
 
 def test_the_reminder_with_no_due_date_says_it_is_time():
-    assert _words() == "It's time: Reply to Jin Hu (10:00 Madrid)."
+    assert _words() == "It's time: Reply to Jin Hu (10:00)."
 
 
 def test_the_reminder_at_the_due_time_says_it_is_time():
-    assert _words(due="2026-10-21T10:00") == "It's time: Reply to Jin Hu (10:00 Madrid)."
+    assert _words(due="2026-10-21T10:00") == "It's time: Reply to Jin Hu (10:00)."
 
 
 @pytest.mark.parametrize(("due", "when"), [
     ("2026-10-21", "today"),
-    ("2026-10-21T17:30", "today at 17:30 Madrid"),
+    ("2026-10-21T17:30", "today at 17:30"),
     ("2026-10-22", "tomorrow"),
-    ("2026-10-22T09:00", "tomorrow at 09:00 Madrid"),
+    ("2026-10-22T09:00", "tomorrow at 09:00"),
     ("2026-10-26", "on Monday 26 October"),
 ])
 def test_the_reminder_before_a_later_due_says_when_it_is_due(due, when):
@@ -68,7 +68,7 @@ def test_a_heads_up_before_an_evening_reminder_names_tomorrows_due():
     fire = datetime(2026, 10, 31, 18, 30, tzinfo=UTC)          # 19:30 Madrid
     base = datetime(2026, 10, 31, 20, 30, tzinfo=UTC)          # the reminder, 21:30 Madrid
     words = _words(fire=fire, base=base, due="2026-11-01T12:30:00+01:00", title="Baptism ceremony")
-    assert words == "Heads-up: Baptism ceremony is tomorrow at 12:30 Madrid."
+    assert words == "Heads-up: Baptism ceremony is tomorrow at 12:30."
 
 
 def test_a_heads_up_for_a_due_later_today_says_how_long_until_the_due():

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../profile/format.dart';
 import '../theme/tokens.dart';
-import '../util/app_time.dart';
 import '../widgets/profile_kit.dart';
 import 'routines_repo.dart';
 import 'watch_fields.dart';
@@ -187,7 +186,7 @@ class _RoutineEditorState extends ConsumerState<RoutineEditor> {
           TextField(
               controller: _cron,
               decoration: InputDecoration(
-                  labelText: 'Cron (${zoneCity()} time)', hintText: '0 9 * * 1-5'))
+                  labelText: 'Cron', hintText: '0 9 * * 1-5'))
         else
           _daysAndTimes(),
         TextButton(onPressed: _check, child: const Text('Check the times')),

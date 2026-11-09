@@ -41,7 +41,7 @@ from roost.routines.reports import post_report, with_headline
 from roost.routines.runs import RoutineRunStore, SlotAlreadyRecorded, iso
 from roost.routines.store import DAY_SUMMARY_BUILTIN, RoutineStore
 from roost.routines.texts import clip
-from roost.timezones import local_tz, zone_city
+from roost.timezones import local_tz
 from roost.tasks.day_summary import build_day_summary, day_summary_text
 from roost.tasks.models import Task
 from roost.tasks.reminders import parse_iso_datetime, parse_offset_against
@@ -214,7 +214,7 @@ def _reminder(fire: _Fire) -> ReportBody:
 
 
 def _missed(fires: tuple[_Fire, ...]) -> ReportBody:
-    lines = [MISSED_LEAD, *(f"- {f.task.title} (was {madrid_words(f.at)} {zone_city()} time)" for f in fires)]
+    lines = [MISSED_LEAD, *(f"- {f.task.title} (was {madrid_words(f.at)})" for f in fires)]
     return ReportBody(
         source="reminder", headline=MISSED_HEADLINE, text=clip("\n".join(lines), REPORT_TEXT_MAX_CHARS),
         tainted=any(f.task.tainted for f in fires))

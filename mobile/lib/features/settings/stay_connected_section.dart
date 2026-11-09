@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../notify/notify_prefs.dart';
 import '../../notify/notify_providers.dart';
-import '../../util/app_time.dart';
 import '../../widgets/grouped_card.dart';
 
 const stayConnectedCaption =
@@ -47,7 +46,7 @@ class _StayConnectedSectionState extends ConsumerState<StayConnectedSection> {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: minute ~/ 60, minute: minute % 60),
-      helpText: from ? 'Quiet from (${zoneCity()})' : 'Quiet until (${zoneCity()})',
+      helpText: from ? 'Quiet from' : 'Quiet until',
     );
     if (picked == null) return;
     final value = picked.hour * 60 + picked.minute;
@@ -100,7 +99,7 @@ class _StayConnectedSectionState extends ConsumerState<StayConnectedSection> {
       ]),
       GroupedCard(
         label: 'Quiet hours',
-        caption: '${zoneCity()} time. Your task reminders still come.',
+        caption: 'Your task reminders still come.',
         children: [
           SwitchRow(
               switchKey: const Key('quiet-on'),

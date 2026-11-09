@@ -9,7 +9,7 @@ from roost.timezones import zone_city
 VOICE_RULE_TEMPLATE = (
     "You are on a voice call: the user hears you and does not read. Answer in one to three short spoken "
     "sentences in plain words; no lists, headings, links, code or markdown; name a site instead of pasting an "
-    "address; say numbers, dates and times the way you would aloud, in {city} time; when you must look something "
+    "address; say numbers, dates and times the way you would aloud, on the user's own clock ({city} time) with no place name; when you must look something "
     "up, first say in one short sentence what you are doing, then do it."
 )
 

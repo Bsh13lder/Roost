@@ -24,7 +24,7 @@ describe("RoutineEditor", () => {
     api.previewSchedule.mockResolvedValue(PREVIEW);
     render(<RoutineEditor botId="bot-1" routine={null} onClose={vi.fn()} onSaved={vi.fn()} />);
     expect(await screen.findByText("Wed 21 Oct 09:00")).toBeInTheDocument();
-    expect(screen.getByText("Times are in Madrid time.")).toBeInTheDocument();
+    expect(screen.queryByText(/Madrid/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Mon" })).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(screen.getByRole("button", { name: "Custom" }));
     const cron = screen.getByLabelText("Cron");
@@ -84,13 +84,13 @@ describe("RoutineEditor", () => {
   });
 });
 
-// The account's zone (owner, 2026-11-09): the preview says which clock its times are on.
+// The account's zone (owner, 2026-11-09): the preview is on its clock, with no place name.
 describe("RoutineEditor on another zone", () => {
-  it("shows the next runs on the account's clock and names its city", async () => {
+  it("shows the next runs on the account's clock with no place name", async () => {
     setAppTimeZone("America/New_York");
     api.previewSchedule.mockResolvedValue(PREVIEW);
     render(<RoutineEditor botId="bot-1" routine={null} onClose={vi.fn()} onSaved={vi.fn()} />);
     expect(await screen.findByText("Wed 21 Oct 03:00")).toBeInTheDocument();
-    expect(screen.getByText("Times are in New York time.")).toBeInTheDocument();
+    expect(screen.queryByText(/New York/)).not.toBeInTheDocument();
   });
 });

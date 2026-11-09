@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "roost"
-version = "2.0.0b1"
+version = "2.0.0b2"
 description = "Personal AI team for Claude users: each bot gets its own computer. Self-hosted, encrypted at rest."
 readme = "README.md"
 license = { text = "MIT" }

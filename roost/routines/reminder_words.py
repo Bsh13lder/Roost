@@ -2,20 +2,20 @@
 
 Which line a reminder gets depends only on which reminder it is, so the same reminder always reads the same:
 
-- an advance reminder (before the task's reminder time): "Heads-up: <title> is in 2 h." / "… tomorrow at 10:00 Madrid.",
+- an advance reminder (before the task's reminder time): "Heads-up: <title> is in 2 h." / "… tomorrow at 10:00.",
   counted to the task's due when it has one (owner, 2026-10-31), else to the reminder time;
-- the reminder itself, with a later due: "Quick reminder: <title> is due today at 18:00 Madrid.";
-- the reminder itself at the due time, or with no due: "It's time: <title> (10:00 Madrid).";
+- the reminder itself, with a later due: "Quick reminder: <title> is due today at 18:00.";
+- the reminder itself at the due time, or with no due: "It's time: <title> (10:00).";
 - a reminder after the reminder time or past the due: "Gentle nudge: <title> is still open."
 
-Times are the install's zone's and name its place ("Madrid", "New York"). Nothing here reads the clock or the database."""
+Times are the install's zone's, with no place name (owner, 2026-11-09). Nothing here reads the clock or the database."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 
-from roost.timezones import local_tz, zone_city
+from roost.timezones import local_tz
 
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -50,14 +50,14 @@ def _span(delta: timedelta) -> str:
 
 
 def _day_and_clock(day: date, clock: time | None, today: date) -> str:
-    """"today", "tomorrow at 09:00 Madrid", "on Monday 26 October"."""
+    """"today", "tomorrow at 09:00", "on Monday 26 October"."""
     if day == today:
         lead = "today"
     elif day == today + timedelta(days=1):
         lead = "tomorrow"
     else:
         lead = f"on {day_words(day)}"
-    return lead if clock is None else f"{lead} at {_hhmm(clock)} {zone_city()}"
+    return lead if clock is None else f"{lead} at {_hhmm(clock)}"
 
 
 def _parse_due(due_date: str | None) -> _Due | None:
@@ -77,7 +77,7 @@ def _on_time(title: str, base: datetime, due: _Due | None) -> str:
     """The reminder itself: due later is a quick reminder, due now (or never) is "It's time", past due a nudge."""
     today, now_clock = base.date(), base.time().replace(second=0, microsecond=0)
     if due is None or (due.day == today and due.clock == now_clock):
-        return f"It's time: {title} ({_hhmm(now_clock)} {zone_city()})."
+        return f"It's time: {title} ({_hhmm(now_clock)})."
     past = due.day < today or (due.day == today and due.clock is not None and due.clock < now_clock)
     if past:
         return nudge(title)
@@ -90,7 +90,7 @@ def nudge(title: str) -> str:
 
 def _ahead(fire: datetime, base: datetime, due: _Due | None) -> str:
     """When the task is, seen from an advance reminder (owner, 2026-10-31): its due when it has one that is not
-    before the reminder time ("in 3 h", "tomorrow at 12:30 Madrid", "tomorrow"), else the reminder time itself."""
+    before the reminder time ("in 3 h", "tomorrow at 12:30", "tomorrow"), else the reminder time itself."""
     if due is not None and due.clock is None and due.day >= base.date():
         return _day_and_clock(due.day, None, fire.date())
     target = base

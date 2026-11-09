@@ -24,7 +24,7 @@ _BOT = Bot(
 def test_the_voice_section_says_how_to_talk():
     text = voice_section()
     for words in ("voice call", "one to three short spoken sentences", "no lists", "name a site",
-                  "Madrid time", "first say in one short sentence what you are doing"):
+                  "(Madrid time) with no place name", "first say in one short sentence what you are doing"):
         assert words in text, words
 
 

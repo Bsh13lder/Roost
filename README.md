@@ -7,7 +7,7 @@ bookkeeper or a social media bot. Each bot has its own small Linux computer with
 things: look up suppliers, fill in forms, check your orders, keep your tasks and money in order, and report back.
 Every click that spends money, sends a message or deletes something waits for your **Yes**.
 
-> **Status: public beta, version 2.0.0-beta.** Roost is used every day by its author, but it is young. Expect rough
+> **Status: public beta, version 2.0.0-beta.2.** Roost is used every day by its author, but it is young. Expect rough
 > edges, read the [limits](#known-limits) below, and please open an issue when something breaks.
 
 ![Chat with a bot](docs/screenshots/chat.png)

@@ -249,7 +249,7 @@ async def test_the_paused_report_is_posted_once_per_reset_window(cfg, clock, use
 
     texts = await rig.paused_reports(user_id, bot)
     assert len(texts) == 1 and texts[0].startswith("Held: Morning news\n\nPaused my routines: the usage limit is nearly used up")
-    assert "Madrid" in texts[0]
+    assert "Madrid" not in texts[0] and "19:00" in texts[0]
 
     rig.usage.reading = UsageReading(0.05, reset + timedelta(days=1))   # a new reset window
     clock.now = NOW + timedelta(days=1, minutes=9)

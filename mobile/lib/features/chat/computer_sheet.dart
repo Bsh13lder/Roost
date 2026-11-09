@@ -203,8 +203,8 @@ class _StepsTitle extends StatelessWidget {
           const Spacer(),
           Text(
             hidden > 0
-                ? 'Newest ${run.steps.length} of ${run.count} · ${zoneCity()} time'
-                : '${run.count} · ${zoneCity()} time',
+                ? 'Newest ${run.steps.length} of ${run.count}'
+                : '${run.count}',
             style: const TextStyle(
               color: Tokens.textFaint,
               fontSize: Tokens.fsCaption,

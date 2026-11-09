@@ -165,9 +165,6 @@
   font-weight: 600;
 }
 
-.schedule__zone {
-  margin: var(--space-1) 0 0;
-}
 
 .routine-history__run {
   display: flex;

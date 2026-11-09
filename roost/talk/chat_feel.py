@@ -58,7 +58,7 @@ DONE_RULE = (
     "Otherwise say drafted, waiting or blocked, and say plainly when something failed."
 )
 # The install's zone by its place (owner, 2026-11-09): "Madrid time ... 12:16 Madrid", "New York time ...".
-TIME_RULE_TEMPLATE = "Write times in {city} time with the label, like 12:16 {city}."
+TIME_RULE_TEMPLATE = "Write times on the user's own clock ({city} time) with no place name, like 12:16."
 LINK_RULE = "Put a link on the words it belongs to, like [the booking page](url); never a bare or long address."
 
 # Owner, 2026-11-03: "the bot just does what you ask"; 2026-11-04: "when we agree on something, just do it, don't
@@ -108,7 +108,7 @@ def chat_feel_section() -> str:
 
 
 def time_rule() -> str:
-    """How the bot writes a time: in the install's zone, labelled with its place (read at call time)."""
+    """How the bot writes a time: in the install's zone, with no place name (owner, 2026-11-09; read at call time)."""
     return TIME_RULE_TEMPLATE.format(city=zone_city())
 
 

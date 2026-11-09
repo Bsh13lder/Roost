@@ -50,7 +50,6 @@ from roost.work.models import WorkState
 from roost.work.queue import WorkQueue
 from roost.work.runs import madrid_today, seconds_until_madrid_midnight
 from roost.talk.limits import LimitState
-from roost.timezones import zone_city
 
 logger = logging.getLogger(__name__)
 _ONE_SECOND = timedelta(seconds=1)
@@ -317,5 +316,5 @@ def _pause(limit: LimitState, now: datetime) -> tuple[str, str]:
         reset = limit.reading.resets_at if limit.reading is not None and limit.reading.resets_at else None
         if reset is None:
             reset = now + timedelta(seconds=seconds_until_madrid_midnight(now))
-        return f"reserve {reset.isoformat()}", paused_for_reserve(f"{madrid_words(reset)} {zone_city()} time")
+        return f"reserve {reset.isoformat()}", paused_for_reserve(madrid_words(reset))
     return f"cap {madrid_today(now)}", paused_for_cap(limit.cap)

@@ -38,7 +38,7 @@ async def test_a_reminder_fires_once_at_its_time(rig):
     await job.run(rig.user_id, later + timedelta(minutes=1))
     sent = await rig.reports(rig.main)
     assert [r.headline for r in sent] == ["Reminder: Call Ana"]
-    assert sent[0].source == "reminder" and "Madrid" in sent[0].text
+    assert sent[0].source == "reminder" and "Madrid" not in sent[0].text
 
 
 async def test_advance_reminders_fire_before_it(rig):
@@ -179,7 +179,7 @@ async def test_a_reminder_reads_like_a_friendly_chat_message(rig):
         created_by_bot=None, tainted=False)
     await job.run(rig.user_id, NOW)
     [report] = await rig.reports(rig.main)
-    assert report.text == "Quick reminder: Reply to Jin Hu is due today at 18:00 Madrid."
+    assert report.text == "Quick reminder: Reply to Jin Hu is due today at 18:00."
     assert report.task_title == "Reply to Jin Hu" and report.task_id == task.id
 
 
@@ -189,4 +189,4 @@ async def test_advance_and_on_time_reminders_are_worded_by_which_they_are(rig):
     await job.run(rig.user_id, NOW)                              # 10:00: the -2h one
     await job.run(rig.user_id, NOW + timedelta(minutes=121))     # 12:01: the reminder itself
     texts = [r.text for r in await rig.reports(rig.main)]
-    assert sorted(texts) == ["Heads-up: Dentist is in 2 h.", "It's time: Dentist (12:00 Madrid)."]
+    assert sorted(texts) == ["Heads-up: Dentist is in 2 h.", "It's time: Dentist (12:00)."]
