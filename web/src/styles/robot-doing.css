@@ -1,0 +1,91 @@
+/* ---------------------------------------------------------------------
+   A working robot acts out what it is doing (owner, 2026-10-27): data-doing
+   on the Lensbot (components/robot/moments.ts RobotDoing). Thinking keeps
+   the dots and a program the scanning bar (their glyphs); the others show
+   the pupils, which move: searching scans side to side, reading sweeps
+   along lines and drops to the next, the computer looks down at a screen
+   and taps, writing follows the pen, records glance down and nod.
+   The pupils move by `translate` and the face by `rotate`/`translate`,
+   so the pointer's transform and the events' animations still compose.
+   Live robots only, behind the reduced-motion query and Calm robots.
+   --------------------------------------------------------------------- */
+
+.robot[data-doing]:is([data-doing="read"], [data-doing="write"], [data-doing="computer"]) { --lt: -9.6; }
+.robot[data-doing="search"] { --lz: 1.06; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.calm) .robot--live[data-doing="search"] .robot__pupil { animation: robot-doing-scan 1.6s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="search"] .robot__face { animation: robot-doing-sway 3.2s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="read"] .robot__pupil { animation: robot-doing-read 2.4s linear infinite; }
+  html:not(.calm) .robot--live[data-doing="read"] .robot__face { animation: robot-doing-lean 2.4s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="computer"] .robot__pupil { animation: robot-doing-tap 1.4s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="computer"] .robot__face { animation: robot-doing-peer 2.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="write"] .robot__pupil { animation: robot-doing-write 1.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="write"] .robot__face { animation: robot-doing-lean 1.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="records"] .robot__pupil { animation: robot-doing-glance 2.2s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="records"] .robot__face { animation: robot-doing-nod 2.2s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-doing="think"] .robot__face { animation: robot-doing-ponder 3.6s ease-in-out infinite; }
+}
+
+@keyframes robot-doing-scan {
+  0%, 100% { translate: -2.6px 0; }
+  35%, 50% { translate: 2.6px -0.4px; }
+  85% { translate: -2.6px 0.2px; }
+}
+
+@keyframes robot-doing-sway {
+  0%, 100% { rotate: -2deg; }
+  50% { rotate: 2deg; }
+}
+
+/* left to right along a line, a quick return, the next line, then back up */
+@keyframes robot-doing-read {
+  0% { translate: -2.4px -0.8px; }
+  40% { translate: 2.4px -0.8px; }
+  46% { translate: -2.4px 0.6px; }
+  86% { translate: 2.4px 0.6px; }
+  92%, 100% { translate: -2.4px -0.8px; }
+}
+
+@keyframes robot-doing-lean {
+  0%, 100% { translate: 0 0.4px; rotate: -1deg; }
+  50% { translate: 0 0.7px; rotate: 1deg; }
+}
+
+@keyframes robot-doing-tap {
+  0%, 100% { translate: -1px 1.6px; }
+  30% { translate: 1.4px 1.8px; }
+  45% { translate: 1.4px 2.3px; }
+  60% { translate: 1.4px 1.8px; }
+}
+
+@keyframes robot-doing-peer {
+  0%, 100% { translate: 0 0.5px; }
+  50% { translate: 0 0.9px; }
+}
+
+/* the pen: small strokes left to right, low in the eye */
+@keyframes robot-doing-write {
+  0%, 100% { translate: -2px 1.8px; }
+  20% { translate: -1px 2.2px; }
+  40% { translate: 0 1.7px; }
+  60% { translate: 1px 2.2px; }
+  80% { translate: 2px 1.8px; }
+}
+
+@keyframes robot-doing-glance {
+  0%, 100% { translate: 0 0; }
+  25%, 55% { translate: 0.6px 2px; }
+  70% { translate: 0 -0.4px; }
+}
+
+@keyframes robot-doing-nod {
+  0%, 60%, 100% { rotate: 0deg; translate: 0 0; }
+  70% { rotate: 0deg; translate: 0 0.9px; }
+  80% { rotate: 0deg; translate: 0 0; }
+}
+
+@keyframes robot-doing-ponder {
+  0%, 100% { rotate: -3deg; translate: 0 -0.3px; }
+  50% { rotate: 2deg; translate: 0 0; }
+}

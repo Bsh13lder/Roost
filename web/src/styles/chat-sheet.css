@@ -1,0 +1,144 @@
+/* ---------------------------------------------------------------------
+   The Earlier conversations sheet and the read-only dock (split from chat.css).
+   --------------------------------------------------------------------- */
+
+/* ---- Past conversations: a bottom sheet on a phone, a dialog on a desktop */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--color-scrim);
+}
+
+.sheet {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(560px, calc(100dvh - 64px));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-50%, -50%);
+}
+
+.sheet:focus {
+  outline: none;
+}
+
+.sheet__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 8px 6px 20px;
+}
+
+.sheet__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.sheet__head .icon-btn {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-title);
+}
+
+.sheet__list {
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px 10px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.sheet__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-body);
+  text-align: left;
+}
+
+.sheet__row:hover,
+.sheet__row:focus-visible {
+  background: var(--color-raised);
+}
+
+.sheet__row[aria-current="true"] {
+  color: var(--color-accent-soft);
+  font-weight: 600;
+}
+
+.sheet__row-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet__row-time {
+  flex: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .sheet {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 75dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-width: 1px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transform: none;
+  }
+}
+
+/* The dock of an earlier conversation: read-only, with the way back (one chat per bot). */
+.sheet__empty {
+  margin: 0;
+  padding: 12px 20px 20px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.chat-readonly {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-2);
+}
+
+.chat-readonly__text {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.chat-readonly__back {
+  color: var(--color-accent-strong);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}

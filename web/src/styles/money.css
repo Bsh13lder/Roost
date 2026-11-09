@@ -1,0 +1,686 @@
+/* ---------------------------------------------------------------------
+   The Money tab (Board redesign G8+): month nav, four summary cards, the
+   two-column frame, Pinned, the tools row and the budgets side column.
+   Colours and sizes come from tokens.css; a project's own colour comes
+   from data as --pc.
+   --------------------------------------------------------------------- */
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.month-nav__month {
+  min-width: 140px;
+  margin: 0;
+  font-size: var(--fs-heading);
+  font-weight: 600;
+  text-align: center;
+}
+
+.month-nav__end {
+  margin-left: auto;
+}
+
+/* The period dropdown beside the arrows, and its list of periods. */
+.period {
+  margin-left: var(--space-2);
+}
+
+.period__options {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+  min-width: 168px;
+}
+
+.period__options .chip {
+  justify-content: flex-start;
+}
+
+.money-export {
+  text-decoration: none;
+}
+
+.money-card {
+  --pc: var(--color-text-faint);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+
+.money-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0 var(--space-6);
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.kpi__v {
+  display: block;
+  margin: var(--space-1) 0;
+  font-size: var(--fs-title);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi__v--danger {
+  color: var(--color-danger);
+}
+
+.kpi__v--ok {
+  color: var(--color-ok);
+}
+
+.kpi__v--faint {
+  color: var(--color-text-faint);
+}
+
+.kpi__v--project {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.kpi__v--project > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpi__more {
+  color: var(--color-text-faint);
+  font-size: var(--fs-body);
+  font-weight: 500;
+}
+
+.kpi__s {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.kpi__today {
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi__apart + .kpi__change::before,
+.kpi__apart + .kpi__apart::before {
+  content: " · ";
+}
+
+.kpi__change--up {
+  color: var(--color-warn);
+}
+
+.kpi__change--down {
+  color: var(--color-ok);
+}
+
+.money-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pc, var(--color-text-faint));
+}
+
+.money-dot--lg {
+  width: 10px;
+  height: 10px;
+}
+
+.money-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.money-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  container: money-main / inline-size;
+}
+
+.money-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.money-side__card {
+  padding: var(--space-4);
+}
+
+.money-side__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.money-side__none {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+/* ---- A budget row ---- */
+
+.bud {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.bud:last-child {
+  margin-bottom: 0;
+}
+
+.bud__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+}
+
+.bud__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bud__r {
+  display: inline-flex;
+  gap: var(--space-1);
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bud__cap {
+  color: var(--color-text-faint);
+}
+
+.bud__sub {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.bud__sub--danger {
+  color: var(--color-danger);
+}
+
+.bud__pin {
+  opacity: 0;
+}
+
+.bud:hover .bud__pin,
+.bud__pin:focus-visible,
+.bud__pin[aria-pressed="true"] {
+  opacity: 1;
+}
+
+/* ---- Pinned ---- */
+
+.pinned__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.pinned__title {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.pinned__count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.pinned__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--space-3);
+}
+
+.pin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+}
+
+.pin__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--fs-label);
+}
+
+.pin__note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pin__mark,
+.pin__star {
+  margin-left: auto;
+  color: var(--color-warn);
+}
+
+.pin__star {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.pin__amt {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.pin__sub {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.pin .bud {
+  margin: 0;
+}
+
+/* ---- The tools row ---- */
+
+.mtools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* The budgets go under the money once the Board is narrower than both side by side (a laptop with the
+   sidebar open, a phone). */
+@container board (max-width: 959px) {
+  .money-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .money-cards {
+    grid-template-columns: repeat(4, 72%);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .money-cards > * {
+    scroll-snap-align: start;
+  }
+
+  .money-export {
+    display: none;
+  }
+
+  .month-nav__month {
+    min-width: 0;
+    font-size: var(--fs-lead);
+  }
+
+  .pinned__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---- Expenses by day (G9) ---- */
+
+.xp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.xp-day {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.xp-day .num {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.xp {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 8px minmax(0, 1fr) auto 104px 56px;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.xp:hover,
+.xp:focus-within {
+  background: var(--color-panel);
+}
+
+.xp__what {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.xp__n {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xp__vendor {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.xp__tag {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.xp__amt {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.xp--income .xp__amt {
+  color: var(--color-ok);
+}
+
+.xp--other .xp__amt {
+  color: var(--color-text-secondary);
+}
+
+.xp.is-void .xp__amt,
+.xp.is-void .xp__n {
+  color: var(--color-text-faint);
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.star {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.star.on {
+  color: var(--color-warn);
+  opacity: 1;
+}
+
+.xp:hover .star,
+.xp:focus-within .star,
+.star:focus-visible {
+  opacity: 1;
+}
+
+.xp__actions {
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+}
+
+.xp:hover .xp__actions,
+.xp:focus-within .xp__actions {
+  opacity: 1;
+}
+
+.xp--edit {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--space-3) var(--space-2);
+}
+
+.xp-edit__fields {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1fr) 150px minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.xp-edit__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.xp-edit__problem {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .xp {
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+  }
+
+  .xp > .star,
+  .xp__tag,
+  .xp > span:empty {
+    display: none;
+  }
+
+  /* Note over vendor: two lines at most, each cut with an ellipsis. */
+  .xp__what {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .xp__vendor {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* The menu stays in place for a long press on the row to open; it is not drawn. */
+  .xp__actions {
+    position: absolute;
+    right: var(--space-2);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .xp-edit__fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .xp--edit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- The date filter, its summary and By days (G10) ---- */
+
+.rangebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rsum {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.rsum__scope {
+  color: var(--color-text-faint);
+}
+
+.range-pick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(272px, 100%);
+}
+
+.range-pick__line {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.range-pick__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.dnote {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.dstrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  padding: var(--space-2) 0 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dbar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dbar__fill {
+  display: block;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-accent-strong);
+  opacity: 0.55;
+}
+
+.dbar.is-today .dbar__fill {
+  opacity: 1;
+}
+
+.dbar.is-sel .dbar__fill {
+  opacity: 1;
+  box-shadow: 0 0 0 1px var(--color-text);
+}
+
+.dbar:hover .dbar__fill {
+  opacity: 0.85;
+}
+
+.dbar:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.dlabels {
+  display: flex;
+  gap: 3px;
+  margin-bottom: var(--space-3);
+}
+
+.dlabels span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-align: center;
+}
+
+.dlabels span.today {
+  color: var(--color-accent-soft);
+  font-weight: 600;
+}
+
+button.dayrow {
+  width: 100%;
+  padding-top: var(--space-3);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.dayrow:hover,
+button.dayrow.is-sel {
+  background: var(--color-panel);
+}
+
+button.dayrow.is-sel {
+  box-shadow: inset 2px 0 0 var(--color-accent-strong);
+}
+
+.bydays__day {
+  margin-top: var(--space-4);
+}
+
+.bydays__pick {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}

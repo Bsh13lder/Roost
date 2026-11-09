@@ -1,0 +1,122 @@
+/* Board toggles (2026-10-26): the Show switches (Routines · Done · Made by bots), a routine's runs on a calendar
+   as a quiet line, and the bot's name on a task it made. Tokens only. */
+
+.show-toggles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-left: auto;
+}
+
+/* Show finished sits inside the group now: the group, not the switch, takes the row's end. */
+.show-toggles .show-finished {
+  margin-left: 0;
+}
+
+.show-toggles__count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.wcal__toggles {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+/* A routine run: no fill and no project wash, a dashed faint edge, so it never reads as a task. */
+.rchip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  text-decoration: none;
+}
+
+.rchip:hover {
+  background: var(--color-hover);
+}
+
+.rchip:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.rchip__mark {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-faint);
+}
+
+.rchip__mark svg {
+  width: 12px;
+  height: 12px;
+}
+
+.rchip__time {
+  flex: none;
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.rchip__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rchip__bot,
+.tchip__by {
+  flex: none;
+  max-width: 7em;
+  overflow: hidden;
+  color: var(--color-text-faint);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rchip__bot::before,
+.tchip__by::before {
+  content: "· ";
+}
+
+.rchip__more {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.wcal__item--routine {
+  padding: var(--space-1) 0;
+  border-left-style: dashed;
+}
+
+.wcal__by {
+  color: var(--color-text-faint);
+}
+
+/* A day a routine runs: a hollow ring after the task dots. */
+.wcal__rdot {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--color-text-faint);
+  border-radius: 50%;
+}
+
+.plan-day__routines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}

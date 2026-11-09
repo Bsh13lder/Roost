@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!-- The computer's desktop, calm and Linux-like: JWM draws the graphite wallpaper, flat graphite windows
+     (minimize, maximize, close) and one small dock in the middle with the apps and, as icons, the open windows
+     (hover shows a name). No desktop icons, no clock. The Browser button
+     runs roost-browser, which only asks the supervised Brave (with its proxy flags) for a new window; closing
+     every browser window makes roost-computerd open it again. No root menu and no way to quit the session. -->
+<JWM>
+  <IconPath>/usr/share/icons/Papirus-Dark/48x48/apps</IconPath>
+  <IconPath>/usr/share/icons/Papirus-Dark/48x48/places</IconPath>
+  <IconPath>/usr/share/icons/hicolor/48x48/apps</IconPath>
+
+  <Desktops width="1" height="1">
+    <Background type="image">/usr/share/roost/wallpaper.png</Background>
+  </Desktops>
+
+  <WindowStyle decorations="flat">
+    <Font>Sans-10</Font>
+    <Width>3</Width>
+    <Height>30</Height>
+    <Corner>8</Corner>
+    <Foreground>#a4a9b3</Foreground>
+    <Background>#1c1f25</Background>
+    <Outline>#2b2f37</Outline>
+    <Opacity>1.0</Opacity>
+    <Active>
+      <Foreground>#f1f3f6</Foreground>
+      <Background>#272b33</Background>
+      <Outline>#3f7f7a</Outline>
+      <Opacity>1.0</Opacity>
+    </Active>
+  </WindowStyle>
+
+  <TrayStyle decorations="flat">
+    <Font>Sans-10</Font>
+    <Background>#16181d</Background>
+    <Foreground>#e6e8ef</Foreground>
+    <Opacity>0.88</Opacity>
+  </TrayStyle>
+
+  <TaskListStyle list="all" group="false">
+    <Font>Sans-10</Font>
+    <Foreground>#a4a9b3</Foreground>
+    <Background>#16181d</Background>
+    <Active>
+      <Foreground>#f1f3f6</Foreground>
+      <Background>#2c3a3a</Background>
+    </Active>
+  </TaskListStyle>
+
+  <Tray x="0" y="-10" width="340" halign="center" height="50" autohide="off" layout="horizontal">
+    <Spacer width="8"/>
+    <TrayButton icon="brave-browser" popup="Browser">exec:roost-browser</TrayButton>
+    <TrayButton icon="system-file-manager" popup="Files">exec:pcmanfm /home/comp</TrayButton>
+    <TrayButton icon="utilities-terminal" popup="Terminal">exec:lxterminal</TrayButton>
+    <Spacer width="10"/>
+    <TaskList maxwidth="48" labeled="false"/>
+    <Spacer width="8"/>
+  </Tray>
+
+  <Key mask="A" key="F9">minimize</Key>
+  <Key mask="A" key="F10">maximize</Key>
+  <Key mask="A" key="F4">close</Key>
+  <Key mask="A" key="Tab">nextstacked</Key>
+  <Key mask="4" key="d">showdesktop</Key>
+  <Key mask="4" key="t">exec:lxterminal</Key>
+  <Key mask="4" key="b">exec:roost-browser</Key>
+  <Key mask="4" key="e">exec:pcmanfm /home/comp</Key>
+</JWM>

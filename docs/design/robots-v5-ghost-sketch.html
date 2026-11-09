@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Ghosts v5</title>
+<meta name="description" content="Round five of Roost's bot avatars: the Ghost family alone, with much bigger eyes and a full set of cool, calm animations.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost avatars, round five: Ghosts only. Self-contained: no fonts, images
+   or scripts from anywhere else. Dark only (V4). The :root values are copied
+   from web/src/styles/tokens.css; the --new-* values are round two's cozy kit.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-accent-soft: #c4b5fd;
+  --color-danger: #f87171;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px #b2a6f6;
+
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-fs-menu: 0.8125rem;
+  --new-gap: 4px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: 0.8em; color: var(--color-accent-soft); word-break: break-word; }
+.lede { color: var(--color-text-secondary); max-width: 72ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 74ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; align-items: flex-end; }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--color-panel); border-radius: 14px; padding: 14px; box-shadow: var(--new-edge-inner); display: grid; gap: 6px; align-content: start; }
+.rule b { font-family: var(--font-round); font-size: var(--fs-body); }
+.rule p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.rule .no { color: var(--color-danger); font-weight: 600; }
+
+/* ---- Playground ------------------------------------------------------- */
+.pg { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+@media (max-width: 900px) { .pg { grid-template-columns: minmax(0, 1fr); } }
+.pg-controls { display: grid; gap: 14px; align-content: start; }
+.ctl { display: grid; gap: 6px; }
+.pg-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { font: inherit; font-size: var(--fs-label); font-weight: 600; height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip:hover { background: #26262f; }
+.chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.chip[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.chip.ev { background: var(--color-bg); }
+.chip.ev:hover { background: var(--color-raised); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, 38px); gap: var(--new-gap); touch-action: none; }
+.tile { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.tile:hover { background: var(--new-hover); }
+.tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tile[aria-pressed="true"] { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-dot { width: 22px; height: 22px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.sw-dot:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.sw-dot[aria-pressed="true"] { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--color-panel), 0 0 0 3.5px var(--color-text); }
+.pg-stage { background: var(--color-bg); border-radius: 14px; padding: 28px 16px 20px; display: grid; justify-items: center; align-content: center; gap: 22px; min-height: 420px; }
+.pg-stage .neighbours { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.pg-stage small { color: var(--color-text-faint); font-size: var(--fs-caption); text-align: center; }
+.sw { display: inline-flex; align-items: center; gap: 10px; font: inherit; font-size: var(--fs-label); color: var(--color-text); background: none; border: 0; padding: 0; cursor: pointer; }
+.sw:focus-visible { outline: none; border-radius: 999px; box-shadow: var(--focus-ring); }
+.sw i { width: 34px; height: 20px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); position: relative; transition: background .2s; flex: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--color-text); transition: transform .2s; }
+.sw[aria-checked="true"] i { background: var(--new-accent); }
+.sw[aria-checked="true"] i::after { transform: translateX(14px); }
+.hint { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.evgroups { display: grid; gap: 8px; }
+.evgroup { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px; align-items: start; }
+.evgroup h4 { padding-top: 8px; }
+
+/* ---- Cards and blocks ---------------------------------------------------- */
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 20px; }
+.blocks { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.blk { grid-column: span 6; background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.blk.full { grid-column: 1 / -1; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.grid12 { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 12px 8px; }
+.cell { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.cell > small { font-size: var(--fs-caption); color: var(--color-text-faint); text-align: center; }
+.sizes { display: flex; gap: 8px; align-items: flex-end; }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+@media (max-width: 860px) { .blk { grid-column: 1 / -1; } }
+
+/* ---- The avatar: a stateful SVG ------------------------------------------
+   data-s     the status: rest · onit · ask · stuck · off
+   data-face  the eyes: open · wide · narrow · lines · closed
+   .live      32 px and up: tracks the pointer and plays every motion. .xs: blinks only.
+   .ev-*      a transient event; .poked a click; .hello / .bye the first and last frames.
+   Groups, outside in: pose (status posture) · float (idle bob) · evt (events) ·
+   lean (pointer tilt, hover). The hem waves by animating the `d` of the skin
+   between three paths kept in CSS variables (--d0 rest, --d1 and --d2 two phases).
+   --ex/--ey/--lx/--lr/--dtx come from the shared pointer loop (see the script). */
+.bot { display: block; overflow: visible; flex: none; --glow: .5; }
+.bot.live { cursor: pointer; }
+.bot.live:focus-visible { outline: none; border-radius: 50%; box-shadow: var(--focus-ring); }
+.pose, .float, .evt, .lean { transform-box: view-box; transform-origin: 24px var(--oy, 28px); }
+.pose { transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .45s; }
+.bot[data-s="ask"] .pose { transform: translateY(-1.4px) scale(1.06); }
+.bot[data-s="off"] .pose { transform: translateY(1.4px); opacity: .68; }
+.bot[data-s="off"] .skin { filter: saturate(.4); }
+.bot[data-s="stuck"] .pose { transform: translateY(.8px) rotate(-2deg); }
+.lean { transform: translate(calc(var(--lx, 0) * 1px), 0) rotate(calc(var(--lr, 0) * 1deg)) scale(var(--hs, 1)); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.bot.live:hover .lean { --hs: 1.04; }
+.bot.live:hover { --hv: 1; }
+.halo { opacity: calc(var(--glow) + var(--hv, 0) * .35); transition: opacity .35s; transform-box: fill-box; transform-origin: center; }
+.bot[data-s="off"] { --glow: .12; }
+.bot[data-s="ask"] { --glow: .7; }
+.bot[data-s="stuck"] { --glow: .3; }
+.skin { d: var(--d0); paint-order: stroke; }
+.rim, .split, .clipd { d: var(--d0); }
+.shadow, .ring, .orbit, .q, .z, .scan { transform-box: fill-box; transform-origin: center; }
+.scan { transform-origin: top; }
+.lid, .blink, .gaze, .pupil, .hl { transform-box: fill-box; transform-origin: center; }
+.lid { transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.gaze { transition: transform .35s cubic-bezier(.2, .8, .2, 1); }
+.pupil { transform: translate(calc(var(--ex, 0) * 1px), calc(var(--ey, 0) * 1px)) scale(var(--ps, 1)); transition: transform .12s linear; }
+.hl { transform: translate(calc(var(--ex, 0) * -.4px), calc(var(--ey, 0) * -.4px)); }
+.bot[data-face="wide"] { --ps: 1.16; }
+.bot[data-face="narrow"] .lid { transform: scaleY(.58); }
+.bot[data-face="lines"] .lid { transform: scaleY(.07); }
+.bot[data-face="closed"] .lid, .f-closed { display: none; }
+.bot[data-face="closed"] .f-closed { display: inline; }
+.bot[data-face="closed"] .erim { opacity: 0; }
+.bot[data-s="onit"] .gaze { transform: translateY(1.1px); }
+.blink { animation: blink var(--blink-dur, 5.6s) ease-in-out var(--blink-delay, 0s) infinite; }
+.bot[data-face="lines"] .blink, .bot[data-face="closed"] .blink, .bot[data-face="narrow"] .blink, .bot.ev-stuck .blink, .bot.ev-done .blink { animation: none; }
+html.calm .blink { animation-duration: 9s; }
+.ring, .orbit, .scan, .split { display: none; }
+.q, .dots { opacity: 0; transition: opacity .4s; }
+.zeds { display: none; }
+.bot[data-s="ask"] .q { opacity: 1; }
+.bot[data-s="onit"] .dots { opacity: 1; }
+.bot[data-s="off"] .zeds { display: inline; }
+.bot[data-s="stuck"] .split { display: inline; opacity: 0; }
+.split.r { transform: translateX(-.9px); }
+.split.c { transform: translateX(.9px); }
+.bot.offscreen * { animation-play-state: paused !important; }
+.bot.hidden { visibility: hidden; }
+
+/* Motion, only for people who have not asked for less (html.calm is set from
+   prefers-reduced-motion or the Calm robots setting) and only on live sizes. */
+html:not(.calm) .bot.live[data-s="rest"] .float, html:not(.calm) .bot.live[data-s="ask"] .float { animation: floatBob 4.4s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="rest"] .shadow, html:not(.calm) .bot.live[data-s="ask"] .shadow { animation: shadowBob 4.4s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="off"] .float { animation: floatSlow 8s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="off"] .shadow { animation: shadowSlow 8s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .float { animation: floatBusy 1.7s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .shadow { animation: shadowBusy 1.7s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .float { animation: glitchLoop 5s steps(1, end) infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .lid { animation: rebootLoop 5s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .split { animation: splitLoop 5s steps(1, end) infinite; }
+html:not(.calm) .bot.live[data-s="rest"] :is(.skin, .rim), html:not(.calm) .bot.live[data-s="ask"] :is(.skin, .rim) { animation: hem 4.6s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="off"] :is(.skin, .rim) { animation: hem 9s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] :is(.skin, .rim) { animation: hem 1.3s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .halo { animation: glowPulse 1.8s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="ask"] .halo { animation: glowBreathe 2.6s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="ask"] .q { animation: qBreathe 2.6s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .dots circle { animation: dot 1.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * .2s); }
+html:not(.calm) .bot.live[data-s="off"] .z { animation: zrise 3.6s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="off"] .z2 { animation-delay: 1.8s; }
+/* events */
+html:not(.calm) .bot.live.ev-created .evt { animation: rise 1.3s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-created .halo { animation: glowFlash 1.2s ease-out; }
+html:not(.calm) .bot.live.ev-created .ring { display: inline; animation: ringOut 1.1s ease-out .12s both; }
+html:not(.calm) .bot.live.ev-done .evt { animation: nod 1.2s cubic-bezier(.3, .7, .2, 1); }
+html:not(.calm) .bot.live.ev-done .lid { animation: slowBlink 1.3s ease-in-out .2s; }
+html:not(.calm) .bot.live.ev-msg .evt { animation: perk .7s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-msg .gaze { animation: sideGlance 1s ease-in-out; }
+html:not(.calm) .bot.live.ev-think .gaze { animation: scan 2.8s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-think .orbit { display: inline; animation: orbit 1.6s linear infinite; }
+html:not(.calm) .bot.live.ev-think .orbit circle { animation: orbitDepth 1.6s linear infinite; }
+html:not(.calm) .bot.live.ev-think .scan { display: inline; animation: scanDown 1.4s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-stuck .evt { animation: glitch .5s steps(1, end); }
+html:not(.calm) .bot.live.ev-stuck .split { display: inline; animation: splitOnce .5s steps(1, end); }
+html:not(.calm) .bot.live.ev-stuck .lid { animation: rebootOnce 2.6s ease-in-out both; }
+html:not(.calm) .bot.live.ev-dbl .gaze { animation: doubleTake .7s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-around .gaze { animation: lookAround 1.7s ease-in-out; }
+html:not(.calm) .bot.live.ev-dblblink .lid { animation: dblBlink .7s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .evt { animation: cameraTilt 1.8s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .hl { animation: glint 1.8s ease-in-out; }
+html:not(.calm) .bot.live.ev-tilt .evt { animation: tiltIdle 2.6s ease-in-out; }
+html:not(.calm) .bot.live.ev-hem :is(.skin, .rim) { animation: hem 1.1s ease-in-out infinite; }
+html:not(.calm) .bot.live.poked .evt { animation: squash .75s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.poked .gaze { animation: dart .75s ease-out; }
+.bot.hello { animation: helloIn .9s ease-out both; }
+.bot.hello .lid { animation: eyesOpen 1s cubic-bezier(.2, .8, .2, 1) .3s both; }
+.bot.bye { animation: byeOut .8s ease-in both; }
+.bot.morph :is(.skin, .rim) { animation: none !important; }
+html.calm .lean { transition: none; transform: none; }
+html.calm .pupil { transform: scale(var(--ps, 1)); }
+html.calm .bot[data-s="stuck"] .split { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .float, .shadow, .evt, .gaze, .lid, .halo, .skin, .rim, .ring, .orbit, .orbit circle, .scan, .z, .q, .dots circle, .split, .hl, .bot.hello, .bot.bye { animation: none !important; }
+  .lean { transform: none !important; transition: none !important; }
+  .pupil { transform: scale(var(--ps, 1)) !important; }
+}
+
+@keyframes blink { 0%, 100% { transform: scaleY(1); } 2%, 3.5% { transform: scaleY(.06); } 5.5%, 60% { transform: scaleY(1); } 62%, 63% { transform: scaleY(.06); } 65% { transform: scaleY(1); } 67%, 68% { transform: scaleY(.06); } 70% { transform: scaleY(1); } }
+@keyframes floatBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.2px); } }
+@keyframes floatSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.1px); } }
+@keyframes floatBusy { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-1.3px) scale(.99, 1.01); } }
+@keyframes shadowBob { 0%, 100% { transform: scale(1); opacity: .34; } 50% { transform: scale(.8); opacity: .22; } }
+@keyframes shadowSlow { 0%, 100% { transform: scale(1); opacity: .3; } 50% { transform: scale(.9); opacity: .24; } }
+@keyframes shadowBusy { 0%, 100% { transform: scale(1); opacity: .34; } 50% { transform: scale(.88); opacity: .27; } }
+@keyframes hem { 0%, 50%, 100% { d: var(--d0); } 25% { d: var(--d1); } 75% { d: var(--d2); } }
+@keyframes glowPulse { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }
+@keyframes glowBreathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+@keyframes glowFlash { 0% { opacity: .5; } 18% { opacity: 1; } 100% { opacity: .5; } }
+@keyframes ringOut { 0% { transform: scale(.85); opacity: .75; } 100% { transform: scale(2.1); opacity: 0; } }
+@keyframes rise { 0% { transform: translateY(0); } 28% { transform: translateY(-6px) scale(1.03); } 55% { transform: translateY(1.2px) scale(.985, 1.01); } 75% { transform: translateY(-.6px); } 100% { transform: translateY(0); } }
+@keyframes nod { 0% { transform: translateY(0) rotate(0); } 30% { transform: translateY(2.2px) rotate(2deg); } 60% { transform: translateY(-.8px) rotate(-.5deg); } 100% { transform: translateY(0) rotate(0); } }
+@keyframes slowBlink { 0% { transform: scaleY(1); } 30%, 55% { transform: scaleY(.06); } 100% { transform: scaleY(1); } }
+@keyframes perk { 0% { transform: translateY(0) scale(1); } 25% { transform: translateY(-3px) scale(.98, 1.04); } 55% { transform: translateY(.8px) scale(1.03, .97); } 100% { transform: translateY(0) scale(1); } }
+@keyframes sideGlance { 0%, 100% { transform: translate(0, 0); } 25%, 70% { transform: translate(1.5px, -.4px); } }
+@keyframes scan { 0%, 100% { transform: translate(0, 0); } 20%, 35% { transform: translate(-1.4px, -.3px); } 55%, 70% { transform: translate(1.4px, -.3px); } 85% { transform: translate(0, -.5px); } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes orbitDepth { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes scanDown { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .55; } 85% { opacity: .55; } 100% { transform: translateY(var(--sh, 30px)); opacity: 0; } }
+@keyframes glitch { 0% { transform: translate(0, 0); } 10% { transform: translate(-1.2px, .4px) skewX(6deg); } 20% { transform: translate(1px, -.3px); } 30% { transform: translate(-.6px, 0) skewX(-4deg); } 40% { transform: translate(.4px, .2px); } 50%, 100% { transform: translate(0, 0); } }
+@keyframes glitchLoop { 0%, 100% { transform: translate(0, 0); } 2% { transform: translate(-1px, .3px) skewX(5deg); } 4% { transform: translate(.8px, -.2px); } 6%, 62% { transform: translate(0, 0); } 63% { transform: translate(.9px, 0) skewX(-4deg); } 65% { transform: translate(0, 0); } }
+@keyframes splitOnce { 0%, 40% { opacity: .9; } 45%, 100% { opacity: 0; } }
+@keyframes splitLoop { 0%, 5% { opacity: .85; } 6%, 62% { opacity: 0; } 63%, 64% { opacity: .85; } 65%, 100% { opacity: 0; } }
+@keyframes rebootOnce { 0% { transform: scaleY(1); } 8%, 50% { transform: scaleY(.07); } 56% { transform: scaleY(.5); } 60% { transform: scaleY(.07); } 68% { transform: scaleY(.7); } 72% { transform: scaleY(.3); } 85% { transform: scaleY(1.08); } 100% { transform: scaleY(1); } }
+@keyframes rebootLoop { 0%, 60% { transform: scaleY(.07); } 65% { transform: scaleY(.55); } 68% { transform: scaleY(.1); } 72% { transform: scaleY(.6); } 76%, 100% { transform: scaleY(.07); } }
+@keyframes doubleTake { 0% { transform: translateX(0); } 25%, 45% { transform: translateX(calc(var(--dtx, 1.4) * -1px)); } 65% { transform: translateX(calc(var(--dtx, 1.4) * .4px)); } 100% { transform: translateX(0); } }
+@keyframes lookAround { 0% { transform: translate(0, 0); } 22% { transform: translate(-1.6px, -.4px); } 48% { transform: translate(1.6px, -.5px); } 72% { transform: translate(.4px, .9px); } 100% { transform: translate(0, 0); } }
+@keyframes dblBlink { 0%, 100% { transform: scaleY(1); } 15%, 25% { transform: scaleY(.06); } 40% { transform: scaleY(1); } 60%, 70% { transform: scaleY(.06); } 85% { transform: scaleY(1); } }
+@keyframes cameraTilt { 0%, 100% { transform: rotate(0); } 25%, 75% { transform: rotate(-3deg) translateY(-.6px); } }
+@keyframes glint { 0%, 100% { transform: scale(1); } 30%, 70% { transform: scale(1.35); } }
+@keyframes tiltIdle { 0%, 100% { transform: rotate(0); } 35%, 65% { transform: rotate(3.5deg); } }
+@keyframes squash { 0% { transform: scale(1, 1); } 20% { transform: scale(1.18, .82) translateY(1.5px); } 45% { transform: scale(.92, 1.1) translateY(-1px); } 65% { transform: scale(1.05, .96); } 82% { transform: scale(.98, 1.02); } 100% { transform: scale(1, 1); } }
+@keyframes dart { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-1.5px, .3px); } 40% { transform: translate(1.5px, -.3px); } 60% { transform: translate(-.8px, -.5px); } 80% { transform: translate(.5px, .3px); } }
+@keyframes qBreathe { 0%, 100% { opacity: .75; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-.6px); } }
+@keyframes dot { 0%, 100% { opacity: .15; } 50% { opacity: .85; } }
+@keyframes zrise { 0% { transform: translate(0, 1px); opacity: 0; } 25% { opacity: .9; } 80% { transform: translate(1.4px, -4px); opacity: .7; } 100% { transform: translate(1.6px, -5px); opacity: 0; } }
+@keyframes helloIn { 0% { opacity: 0; transform: translateY(4px) scale(.96); } 100% { opacity: 1; transform: none; } }
+@keyframes eyesOpen { 0% { transform: scaleY(.06); } 100% { transform: scaleY(1); } }
+@keyframes byeOut { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(5px) scale(.97); } }
+
+/* ---- The cozy kit pieces (from round two) -------------------------------- */
+.kit { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+.kit-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.kit-slot { background: var(--color-bg); border-radius: 14px; padding: 16px; display: grid; gap: 10px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; }
+@media (max-width: 860px) { .kit-row { grid-template-columns: minmax(0, 1fr); } }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14); }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { flex: 1; height: 26px; padding: 0 8px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-secondary); font-weight: 600; white-space: nowrap; }
+.cz-tab.on { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-pop { width: 284px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: grid; grid-template-columns: repeat(5, 36px); gap: var(--new-gap); }
+.cz-tile { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+.cz-tile.on { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-side { width: 260px; max-width: 100%; background: var(--color-panel); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { display: grid; justify-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; text-align: center; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin b { font-weight: 600; color: var(--color-text); display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cz-pin small { color: var(--color-text-faint); font-size: 0.6875rem; display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cz-pin .unread { position: absolute; top: 8px; right: 12px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row:hover { background: var(--new-hover); }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; font-size: var(--new-fs-menu); display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 320px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-panel); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); }
+.cz-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+.cz-bar { width: 420px; max-width: 100%; height: 48px; padding: 0 10px 0 8px; border-radius: var(--new-radius-surface); background: var(--color-panel); box-shadow: var(--new-edge-inner); display: flex; align-items: center; gap: 8px; }
+.cz-pill { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-weight: 600; min-width: 0; }
+.cz-pill small { color: var(--color-text-faint); font-weight: 500; font-size: var(--fs-caption); white-space: nowrap; }
+.cz-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--new-accent-strong); }
+.cz-bar .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-setting { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--new-radius-item); background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 440px; }
+.cz-setting div { flex: 1; min-width: 0; }
+.cz-setting b { display: block; font-size: var(--new-fs-menu); }
+.cz-setting small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+
+/* ---- Notes ------------------------------------------------------------- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 520px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td .bot { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 76ch; }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="inkG" cx=".5" cy=".42" r=".62"><stop offset="0" stop-color="#2b2848"/><stop offset=".65" stop-color="#17152a"/><stop offset="1" stop-color="#0d0c19"/></radialGradient>
+  </defs>
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3.2 7.5a5 5 0 1 1 1.4 3.9"/><path d="M3 4v3.6h3.6"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 16 16"><path d="M8 2.6c3 0 5 2.3 5 5.4 0 3-2.1 5.4-5 5.4S3 11 3 8c0-3.1 2-5.4 5-5.4z"/><path d="M6.2 7.4h.01M9.8 7.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+  <symbol id="i-back" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost avatars, round five: Ghosts</h1>
+    <p class="lede">Ghosts only, Chick and Penguin are dropped. The eyes are the face now: two big round lenses with a strong highlight, nearly half the width of the head, and they still read at 24 px. Everything else is motion: a float with a shadow that scales, a hem that waves, blinks and glances, and a quiet, physical animation for each thing that happens to a bot. Move your pointer and every ghost on the page looks your way; move it fast and the nearest one does a double-take. The app does not change until this round is picked.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="Six ghosts"></div>
+  </header>
+
+  <section class="section" aria-labelledby="secG">
+    <h2 id="secG">What changed, and what we stay away from</h2>
+    <div class="rules">
+      <div class="rule"><b>Eyes first</b><p>Two round ink lenses, together 42 to 46 % of the head's width, with a big top-left highlight and a small lower glint that slide against the pupil. <span class="no">No</span> mouth. Feeling comes from the lids (wide, narrow, lines, closed arcs), the gaze and the body.</p></div>
+      <div class="rule"><b>Cool, not anime</b><p><span class="no">No</span> sweat drops, <span class="no">no</span> sparkle eyes, <span class="no">no</span> blush, <span class="no">no</span> ^^ squint, <span class="no">no</span> cartoon sparks. Smooth easing with weight, light instead of symbols: a glow that breathes, a ring that expands, an orbiting dot, a scan line, a brief glitch, a z made of light.</p></div>
+      <div class="rule"><b>One family, ten silhouettes</b><p>Dome, Tall, Wide, Round, Droopy, Spire, Comet, Cape, Puff and Hooded are one path function with a few numbers each, so they morph into each other. All keep the translucent edge glow in the bot's colour and a soft inner gradient.</p></div>
+      <div class="rule"><b>Small stays still</b><p>Under 32 px only blinks remain. <code>prefers-reduced-motion</code> and the Calm robots setting leave only blinks everywhere. One shared frame loop moves the eyes, paused when the tab is hidden or a bot is off screen.</p></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secP">
+    <h2 id="secP">Playground <small>pick · then press an animation</small></h2>
+    <p>Pick a shape (press and drag across the tiles to watch the ghost morph), a colour and a status, then press any animation. The big ghost and its four neighbours each follow your pointer on their own. Hover one to make it lean in, click to poke it. Random life plays the idle variety by itself.</p>
+    <div class="pg" id="pg">
+      <div class="pg-controls" id="pgControls"></div>
+      <div class="pg-stage" id="pgStage"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secA">
+    <h2 id="secA">A · The family <small>shapes · colours · statuses</small></h2>
+    <p>Ten silhouettes in one colour at the picker's 56 px, six colours at 96, 40 and 24 px, the five statuses, the main bot's star and an uploaded picture inside the ghost.</p>
+    <article class="dir"><div class="blocks" id="family"></div></article>
+  </section>
+
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">B · In context <small>sidebar · hero · chat · picker</small></h2>
+    <p>The cozy-kit pieces the ghosts live in: the sidebar's pinned tiles (3 per row, 64 px, with names and the main bot's job), the Profile's panel hero, the chat header pill, and the avatar card with its Robot / Upload / Reset tabs.</p>
+    <article class="kit"><div class="kit-row" id="kit"></div></article>
+  </section>
+
+  <section class="section" aria-labelledby="secAcc">
+    <h2 id="secAcc">C · Performance and accessibility</h2>
+    <p>One shared <code>requestAnimationFrame</code> loop owns the pointer and every live ghost: it reads the pointer once per frame, keeps each bot's box in a cache that scroll and resize invalidate, and only touches bots an <code>IntersectionObserver</code> says are on screen; those off screen also get their CSS animations paused. It stops when the tab is hidden, when nothing is on screen, and when motion is turned down. Per frame it writes a handful of CSS variables (<code>--ex</code>, <code>--ey</code> for the eyes, <code>--lx</code>, <code>--lr</code> for the lean); every other motion is a CSS animation on a class or an attribute, including the hem, which interpolates the skin's <code>d</code> between three paths kept in CSS variables.</p>
+    <p>Every light effect (the ring, the orbit, the scan line, the "?", the z's) is <code>aria-hidden</code>; the whole bot is one <code>role="img"</code> with its name and status. <code>prefers-reduced-motion</code> turns everything off except slow blinks. The same switch is a setting:</p>
+    <div class="cz-setting cz"><div><b>Calm robots</b><small>Bots keep still: no eye following, no float, no events. They only blink, slowly.</small></div><button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i></button></div>
+  </section>
+
+  <section class="section" aria-labelledby="secC">
+    <h2 id="secC">D · How this maps to code</h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Everything stays SVG plus CSS animations, with no new dependency.</b> A ghost is one stateful SVG: <code>data-s</code> for its status, <code>data-face</code> for its lids, a class for an event in flight. The status loops, the event motions and the lid shapes are all CSS rules on those attributes, so a status change is an attribute flip, not a redraw. The only JavaScript that runs per frame is the small shared pointer loop.</p>
+      <div class="map">
+        <div><code>web/src/components/robot/shapes/ghost.ts</code><p>The ten silhouettes as a table of a few numbers each (width, dome, side, lift, taper, sag, tent, puff, hem kind, waves, depth, eye line) and one pure <code>ghostPath(shape, wave, phase)</code> that samples 64 points (7 a side, 30 over the top, 20 along the hem) and returns the smooth path. Every shape has the same 64 points, so <code>d</code> interpolates for the hem wave and the picker's morph. It returns <code>d0</code>, <code>d1</code>, <code>d2</code>, the box, the eye line and radius.</p></div>
+        <div><code>RobotFace.tsx · eyes.tsx · fx.tsx</code><p><code>RobotFace</code> keeps its props (<code>shape</code>, <code>color</code>, <code>moment</code>, <code>star</code>, <code>picture</code>, <code>pictureEyes</code>, <code>size</code>, <code>still</code>, <code>events</code>) and draws the halo, the skin with its edge glow, the rim, the hood, the eyes and the light effects inside the four groups the motion needs: <code>pose</code>, <code>float</code>, <code>evt</code>, <code>lean</code>. <code>eyes.tsx</code> draws one eye as lid → blink → gaze → pupil (ink lens, two highlights) plus the closed arc. <code>fx.tsx</code> draws the ring, the orbit, the scan line, the "?", the z's, the typing dots and the RGB split, all hidden until a class shows them.</p></div>
+        <div><code>robot.css</code><p>The classes and keyframes above, scoped by <code>html:not(.calm)</code> and <code>.robot--live</code>. The per-bot numbers travel as CSS variables on the SVG: <code>--d0/--d1/--d2</code> (the hem's three paths), <code>--oy</code> (the body's centre), <code>--sh</code> (its height), <code>--blink-dur/--blink-delay/--idle-delay</code> (so a team never blinks in step). Ink, halo and star tokens join tokens.css.</p></div>
+        <div><code>useLookAt.ts · lookAt.ts</code><p><code>useLookAt(ref, { eyeY, enabled })</code> registers the SVG with one module-level loop that owns the pointer (position, speed), the box cache, the <code>IntersectionObserver</code> and the <code>visibilitychange</code> pause. It writes <code>--ex</code>, <code>--ey</code>, <code>--lx</code>, <code>--lr</code>, toggles <code>robot--offscreen</code>, and fires the pointer micro-events (double-take on a fast pass, look-around when the pointer leaves the window, the glances and the random idle life). Disabled below 32 px, when <code>still</code> is set, and while the lids are not open.</p></div>
+        <div><code>Statuses and events</code><p>Live <code>bot_status</code> sets <code>data-s</code>: Resting → <code>rest</code>, On it → <code>onit</code>, Asking you → <code>ask</code>, Stuck → <code>stuck</code>, Off duty → <code>off</code>. Tool activities become <code>events</code> (keyed, transient): a <code>create_*</code> result → <code>created</code>; a run that ends in a reply → <code>done</code>; a new message in the chat → <code>msg</code>; the first streamed thinking of a run → <code>think</code>; a Stuck card → <code>stuck</code> once, then the status; the bot's first mount in a view → <code>hello</code>, its unmount → <code>bye</code>. A click is <code>poke</code>, handled inside the component.</p></div>
+        <div><code>look.ts</code><p>Shape ids become ghost names. Old saved shapes keep their stored value and draw through the table below (the six V1 heads and the five S1.6 birds); <code>roost/constants.py</code>, <code>api/types.ts</code> and <code>tests/test_bot_look.py</code> move in step. The picker's drag morph is a 450 ms tween of the 64 points in the component, with the hem animation paused by <code>robot--morph</code> while it runs.</p></div>
+      </div>
+      <h4>Old saved shapes still draw, through look.ts's table</h4>
+      <div class="tbl-wrap"><table><thead><tr><th>Stored shape</th><th>Where it came from</th><th>Draws as</th></tr></thead><tbody id="legacyRows"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+/* Pure builders up top (node can load and check them); the page wiring at the bottom runs only in a browser. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8];
+const FAMILY_COLOR = 1;
+const STATUSES = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"]];
+const STATUS_FACE = { rest: "open", onit: "open", ask: "wide", stuck: "lines", off: "closed" };
+/* Every animation the playground can press: id, label, group, and what it does to the SVG. */
+const EVENTS = [
+  ["dblblink", "Double blink", "Idle", { ms: 800 }],
+  ["saccade", "Saccade", "Idle", { ms: 600 }],
+  ["camera", "Look at camera", "Idle", { ms: 1900 }],
+  ["hem", "Hem wave", "Idle", { ms: 2300 }],
+  ["tilt", "Slow tilt", "Idle", { ms: 2700 }],
+  ["dbl", "Double-take", "Pointer", { ms: 800 }],
+  ["around", "Look around", "Pointer", { ms: 1800 }],
+  ["think", "Thinking", "Work", { face: "narrow", hold: true, ms: 2900 }],
+  ["created", "Created something", "Work", { face: "wide", ms: 1400 }],
+  ["done", "Done", "Work", { ms: 1500 }],
+  ["msg", "New message", "Work", { ms: 1100 }],
+  ["stuck", "Stuck glitch", "Status", { hold: true, ms: 2700 }],
+  ["ask", "Asking you", "Status", { status: "ask", ms: 3000 }],
+  ["off", "Off duty", "Status", { status: "off", ms: 3000 }],
+  ["hello", "Hello", "Life", { ms: 1400 }],
+  ["bye", "Bye, then hello", "Life", { ms: 2600 }],
+  ["poke", "Poke", "Life", { ms: 800 }],
+];
+const EVENT_GROUPS = ["Idle", "Pointer", "Work", "Status", "Life"];
+const INK = "#17152a";
+const RING = "#0e0e12";
+const STAR = "#f6c453";
+const BASE_Y = 44;
+const LIVE_MIN = 32; // px: below this a bot only blinks
+const EYE_MAX = 1.5; // units: how far a pupil may slide
+const N_SIDE = 7, N_TOP = 30, N_HEM = 20; // 64 points per ghost, every shape alike, so paths interpolate
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+let seed = 7;
+const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const toHex = (rgb) => "#" + rgb.map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("");
+const tint = (hex, a) => toHex(channels(hex).map((v) => v + (255 - v) * a));
+const shade = (hex, k) => toHex(channels(hex).map((v) => v * k));
+
+/* ---- Geometry: a closed Catmull-Rom path through sampled points ------------ */
+const f1 = (n) => +n.toFixed(1); // one decimal is plenty on a 48-unit grid and keeps the paths short
+function smooth(pts) {
+  const n = pts.length;
+  let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+  for (let i = 0; i < n; i += 1) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+  }
+  return d + "Z";
+}
+function boxOf(pts) {
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0, cx: 24 };
+}
+const lerpPts = (a, b, t) => a.map((p, i) => [p[0] + (b[i][0] - p[0]) * t, p[1] + (b[i][1] - p[1]) * t]);
+
+/* ---- The ten silhouettes: a few numbers each ------------------------------
+   w the width at the equator · dome and side the heights above and below it · lift the gap to
+   the shadow · taper narrows the hem (negative flares it) · sag bulges the sides low down ·
+   tent blends the dome toward a point · puff adds three lobes · hem: wave (n scallops of
+   depth), twin (two tails of depth), cape (low corners) · ey the eye line as a share of height. */
+const GHOSTS = [
+  { id: "dome", label: "Dome", w: 32, dome: 15, side: 14, lift: 3, taper: 1, hem: "wave", n: 3, depth: 3.2, ey: 0.42 },
+  { id: "tall", label: "Tall", w: 25, dome: 12, side: 21, lift: 3, taper: 2, hem: "wave", n: 3, depth: 3, ey: 0.33 },
+  { id: "wide", label: "Wide", w: 38, dome: 12, side: 10, lift: 3, taper: 0, hem: "wave", n: 4, depth: 2.6, ey: 0.5 },
+  { id: "round", label: "Round", w: 33, dome: 16.5, side: 8, lift: 3, taper: 5, hem: "wave", n: 3, depth: 2.4, ey: 0.46 },
+  { id: "droopy", label: "Droopy", w: 27, dome: 9, side: 19, lift: 3, taper: -4, sag: 1.6, hem: "wave", n: 2, depth: 4.4, ey: 0.5 },
+  { id: "spire", label: "Spire", w: 30, dome: 19, tent: 0.72, side: 10, lift: 3, taper: 1, hem: "wave", n: 3, depth: 3, ey: 0.52 },
+  { id: "comet", label: "Comet", w: 28, dome: 14, side: 10, lift: 4, taper: 0, hem: "twin", depth: 5.5, ey: 0.36 },
+  { id: "cape", label: "Cape", w: 26, dome: 13, side: 16, lift: 3, taper: -5, hem: "cape", depth: 3.6, ey: 0.36 },
+  { id: "puff", label: "Puff", w: 33, dome: 14, side: 10, lift: 3, taper: 2, puff: 0.09, hem: "wave", n: 5, depth: 2.2, ey: 0.44 },
+  { id: "hooded", label: "Hooded", w: 30, dome: 15, side: 14, lift: 3, taper: 1.5, hem: "wave", n: 3, depth: 3, hood: true, ey: 0.42 },
+];
+const shapeIndex = (id) => Math.max(0, GHOSTS.findIndex((o) => o.id === id));
+
+/** The hem's drop below the hem line at u (0 left … 1 right); k is the wave amount, ph its phase. */
+function hemY(o, u, k, ph) {
+  const su = Math.sin(Math.PI * u);
+  if (o.hem === "twin") {
+    const swing = k * 0.025 * Math.cos(ph), tail = (c) => Math.exp(-(((u - c) / 0.085) ** 2));
+    return o.depth * (tail(0.15 + swing) + tail(0.85 + swing)) * (1 + k * 0.08 * Math.cos(ph)) - 1.2 * su;
+  }
+  if (o.hem === "cape") return o.depth * Math.pow(1 - su, 0.85);
+  return o.depth * Math.abs(Math.sin(Math.PI * o.n * u)) * (1 + 0.4 * k * Math.sin(Math.PI * o.n * u + ph));
+}
+const hemX = (o, u, k, ph) => (o.hem === "cape" ? 1.1 : 0.45) * k * Math.sin(Math.PI * u) * Math.cos(ph);
+
+/** The 64 points of a ghost: up the left side, over the top, down the right side, back along the hem. */
+function ghostPts(o, k = 0, ph = 0) {
+  const yH = BASE_Y - o.lift, yEq = yH - o.side, hw = o.w / 2, tent = o.tent || 0, puff = o.puff || 0;
+  const sideX = (s) => hw - (o.taper || 0) * s * s * (3 - 2 * s) + (o.sag || 0) * Math.exp(-(((s - 0.72) / 0.3) ** 2));
+  const pts = [];
+  for (let i = 0; i < N_SIDE; i += 1) { const s = 1 - i / N_SIDE; pts.push([24 - sideX(s), yEq + o.side * s]); }
+  for (let i = 0; i < N_TOP; i += 1) {
+    const t = Math.PI - (i / (N_TOP - 1)) * Math.PI, c = Math.cos(t), sn = Math.sin(t);
+    const r = 1 + puff * Math.abs(Math.sin(3 * t)), yK = (1 - tent) * sn + tent * (1 - Math.abs(c));
+    pts.push([24 + hw * c * r, yEq - o.dome * yK * r]);
+  }
+  for (let i = 1; i <= N_SIDE; i += 1) { const s = i / N_SIDE; pts.push([24 + sideX(s), yEq + o.side * s]); }
+  const hwH = sideX(1);
+  for (let i = 1; i <= N_HEM; i += 1) {
+    const u = 1 - i / (N_HEM + 1);
+    pts.push([24 + hwH * (2 * u - 1) + hemX(o, u, k, ph), yH + hemY(o, u, k, ph)]);
+  }
+  return pts;
+}
+
+/** Everything a shape needs to draw: the rest path, the two hem phases, the box and the eye line. */
+function ghostGeom(o) {
+  const p0 = ghostPts(o), box = boxOf(p0);
+  const r = clamp(o.w * 0.105, 2.5, 3.7), ey = box.y0 + box.h * o.ey;
+  return { pts: p0, d0: smooth(p0), d1: smooth(ghostPts(o, 1, 0)), d2: smooth(ghostPts(o, 1, Math.PI)), box, r, ey, oy: box.y0 + box.h * 0.5 };
+}
+
+/* ---- Shared parts ---------------------------------------------------------- */
+/** A stand-in for an uploaded picture, clipped to the body shrunk a little, so a rim of the colour shows. */
+function photo(d, box, k = 0.86) {
+  const clip = uid("p"), grad = uid("q"), cx = box.cx, cy = box.y0 + box.h / 2;
+  const tf = `translate(${f(cx)} ${f(cy)}) scale(${k}) translate(${f(-cx)} ${f(-cy)})`;
+  const { x0: x, y0: y, w, h } = box;
+  return `<defs><linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5f2"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient></defs>` +
+    `<clipPath id="${clip}"><path d="${d}" transform="${tf}"/></clipPath><g clip-path="url(#${clip})">` +
+    `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="url(#${grad})"/>` +
+    `<circle cx="${f(x + w * 0.66)}" cy="${f(y + h * 0.34)}" r="${f(h * 0.14)}" fill="#fff4d6"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.74)}q${f(w * 0.3)} ${f(-h * 0.34)} ${f(w * 0.62)} 0t${f(w * 0.62)} 0V${f(y + h)}H${f(x)}z" fill="#5fae7a"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.88)}q${f(w * 0.4)} ${f(-h * 0.2)} ${f(w)} ${f(-h * 0.06)}V${f(y + h)}H${f(x)}z" fill="#3f8a63"/></g>`;
+}
+
+/** One eye: lid → blink → gaze → pupil (an ink lens with two highlights), plus the closed arc. */
+function eye(x, y, r, color, o = {}) {
+  const a = r * 0.95, ring = o.ring ? `<circle r="${f(r + 1)}" fill="${o.ring}" opacity=".9"/>` : "";
+  return `<g class="eye" transform="translate(${f(x)} ${f(y)})">${ring}` +
+    `<circle class="erim" r="${f(r + 0.6)}" fill="${tint(color, 0.55)}" opacity=".4"/>` +
+    `<g class="lid"><g class="blink"><g class="gaze"><g class="pupil"><circle r="${f(r)}" fill="url(#inkG)"/>` +
+    `<g class="hl"><circle cx="${f(-r * 0.3)}" cy="${f(-r * 0.32)}" r="${f(r * 0.36)}" fill="#fff"/><circle cx="${f(r * 0.42)}" cy="${f(r * 0.4)}" r="${f(r * 0.13)}" fill="#fff" opacity=".75"/></g></g></g></g></g>` +
+    `<g class="f-closed"><path d="M${f(-a)} ${f(-r * 0.1)}q${f(a)} ${f(r * 0.9)} ${f(a * 2)} 0" stroke="${INK}" stroke-width="${f(Math.max(1, r * 0.42))}" fill="none" stroke-linecap="round"/></g></g>`;
+}
+
+/** The face: two big eyes on the shape's eye line. */
+function face(gm, color, opts = {}) {
+  const half = gm.r * 1.18;
+  return eye(gm.box.cx - half, gm.ey, gm.r, color, opts) + eye(gm.box.cx + half, gm.ey, gm.r, color, opts);
+}
+
+/** The face or the picture (with or without eyes on it). */
+function faceOrPic(gm, color, ctx) {
+  if (!ctx.pic) return face(gm, color);
+  return photo(gm.d0, gm.box) + (ctx.picEyes ? face(gm, color, { ring: "#fff" }) : "");
+}
+
+function starMark(ring) {
+  return `<g transform="translate(40 40)"><circle r="7.4" fill="${STAR}" stroke="${ring}" stroke-width="2.6"/>` +
+    `<path d="M0 -4.3l1.3 2.6 2.9.45-2.1 2.05.5 2.9L0 2.6l-2.6 1.4.5-2.9-2.1-2.05 2.9-.45z" fill="#4a3606"/></g>`;
+}
+
+/** The light effects, pre-drawn and shown by CSS: the ring, the orbit, the scan line, the ?, the z's, the dots, the split. */
+function fx(gm, color, clip) {
+  const { box, oy } = gm, lite = tint(color, 0.7), glow = `stroke="${color}" stroke-opacity=".4" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+  const ring = `<circle class="ring" cx="24" cy="${f(oy)}" r="${f(box.w * 0.52)}" fill="none" stroke="${color}" stroke-width="1.1"/>`;
+  const orbit = `<g transform="translate(24 ${f(oy)}) scale(1 .38)"><g class="orbit"><circle r="${f(box.w * 0.66)}" fill="none"/><circle cx="${f(box.w * 0.66)}" r="1.4" fill="#fff"/></g></g>`;
+  const scan = `<rect class="scan" x="${f(box.x0)}" y="${f(box.y0)}" width="${f(box.w)}" height="1.5" fill="#fff" clip-path="url(#${clip})"/>`;
+  const q = "M-2.6 -2.7a2.8 2.8 0 1 1 3.8 2.6c-.8.3-1.2.9-1.2 1.7";
+  const qx = Math.min(42.5, box.x1 + 1.6), qy = Math.max(5, box.y0 + 1.5);
+  const ask = `<g class="q" transform="translate(${f(qx)} ${f(qy)})"><path d="${q}" ${glow} stroke-width="4.2"/><circle cy="4.7" r="2.1" fill="${color}" opacity=".4"/>` +
+    `<path d="${q}" stroke="${lite}" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cy="4.7" r="1.05" fill="${lite}"/></g>`;
+  const z = (x, y, k) => `M${f(x - 3 * k)} ${f(y - 3 * k)}h${f(6 * k)}l${f(-6 * k)} ${f(6 * k)}h${f(6 * k)}`;
+  const drawZ = (d, w, cls) => `<g class="${cls}"><path d="${d}" ${glow} stroke-width="${w + 2.4}"/><path d="${d}" stroke="${lite}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  const zx = Math.min(41, box.x1 - 1);
+  const zeds = `<g class="zeds">${drawZ(z(zx, box.y0 + 3, 1), 1.4, "z z1")}${drawZ(z(zx + 3.5, box.y0 - 1.5, 0.6), 1.1, "z z2")}</g>`;
+  const dots = `<g class="dots">${[-3, 0, 3].map((dx, i) => `<circle cx="${24 + dx}" cy="${BASE_Y + 1.4}" r=".9" fill="${tint(color, 0.5)}" style="--i:${i}"/>`).join("")}</g>`;
+  return { inside: ring, front: scan + orbit, outside: `<g aria-hidden="true">${ask}${zeds}${dots}</g>` };
+}
+
+/** The ghost's body: a halo, the skin with its edge glow, the hood or the picture, the split copies, the rim, the eyes. */
+function ghost(o, ctx) {
+  const gm = ghostGeom(o), { box, d0 } = gm, color = ctx.color, g = uid("g"), h = uid("h"), clip = uid("c");
+  const gx = box.x0 + box.w * 0.35, gy = box.y0 + box.h * 0.28, gr = Math.max(box.w, box.h) * 0.9;
+  const defs = `<defs><radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="${f(gx)}" cy="${f(gy)}" r="${f(gr)}">` +
+    `<stop offset="0" stop-color="${tint(color, 0.3)}"/><stop offset=".5" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, 0.78)}"/></radialGradient>` +
+    `<radialGradient id="${h}"><stop offset="0" stop-color="${color}" stop-opacity=".55"/><stop offset=".6" stop-color="${color}" stop-opacity=".18"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></radialGradient>` +
+    `<clipPath id="${clip}"><path class="clipd"/></clipPath></defs>`;
+  const halo = `<ellipse class="halo" cx="24" cy="${f(gm.oy)}" rx="${f(box.w * 0.72)}" ry="${f(box.h * 0.66)}" fill="url(#${h})"/>`;
+  const skin = `<path class="skin" d="${d0}" fill="url(#${g})" stroke="${color}" stroke-opacity=".4" stroke-width="3.2" stroke-linejoin="round"/>`;
+  const sheen = `<ellipse cx="${f(box.x0 + box.w * 0.3)}" cy="${f(box.y0 + box.h * 0.17)}" rx="${f(box.w * 0.13)}" ry="${f(Math.max(1.2, box.h * 0.05))}" fill="#fff" opacity=".2" transform="rotate(-30 ${f(box.x0 + box.w * 0.3)} ${f(box.y0 + box.h * 0.17)})"/>`;
+  const hood = o.hood && !ctx.pic ? `<ellipse cx="24" cy="${f(gm.ey + 0.8)}" rx="${f(o.w * 0.33)}" ry="${f(box.h * 0.2)}" fill="${tint(color, 0.45)}" opacity=".9"/>` : "";
+  /* The rim, the split copies and the scan's clip take their path from the CSS --d0 (only the skin keeps a d attribute as the fallback). */
+  const split = ctx.live ? `<path class="split r" fill="none" stroke="#ff5a7a" stroke-width="1.1"/><path class="split c" fill="none" stroke="#52e6ff" stroke-width="1.1"/>` : "";
+  const rim = `<path class="rim" fill="none" stroke="${tint(color, 0.6)}" stroke-opacity=".6" stroke-width=".7"/>`;
+  const parts = fx(gm, color, clip);
+  const shadow = `<ellipse class="shadow" cx="24" cy="${BASE_Y + 1.5}" rx="${f(box.w * 0.3)}" ry="1.4" fill="#000" opacity=".34"/>`;
+  const body = `<g class="body">${defs}${halo}${parts.inside}${skin}${sheen}${ctx.pic ? photo(d0, box) : hood}${split}${rim}</g>${ctx.pic && !ctx.picEyes ? "" : (ctx.pic ? face(gm, color, { ring: "#fff" }) : face(gm, color))}${parts.front}`;
+  return { gm, shadow, body, outside: parts.outside };
+}
+
+const statusName = (s) => (STATUSES.find(([k]) => k === s) || ["", ""])[1];
+const pathVar = (d) => `path('${d}')`;
+
+/** One bot as an SVG string: a stateful element the CSS and the pointer loop drive. */
+function avatar({ color, v = 0, s = "rest", star = false, pic = false, picEyes = false, size = 96, ring = RING, extra = "" }) {
+  const live = size >= LIVE_MIN && (!pic || picEyes);
+  const o = GHOSTS[v % GHOSTS.length], part = ghost(o, { color, pic, picEyes, live }), gm = part.gm;
+  const label = `Ghost ${o.label}, ${statusName(s)}${star ? ", main bot" : ""}${pic ? ", with a picture" : ""}`;
+  const vars = `--d0:${pathVar(gm.d0)};` + (live ? `--d1:${pathVar(gm.d1)};--d2:${pathVar(gm.d2)};` : "") +
+    `--oy:${f(gm.oy)}px;--sh:${f(gm.box.h)}px;--blink-dur:${f(5 + rnd() * 3.5)}s;--blink-delay:${f(-rnd() * 8)}s;--idle-delay:${f(-rnd() * 7)}s`;
+  return `<svg class="bot ${live ? "live" : "xs"}${extra ? " " + extra : ""}" data-v="${v % GHOSTS.length}" data-s="${s}" data-base="${s}" data-face="${STATUS_FACE[s]}" data-ey="${f(gm.ey)}" ` +
+    `viewBox="0 0 48 48" width="${size}" height="${size}" role="img" aria-label="${label}" style="${vars}"${live ? ' tabindex="0"' : ""}>` +
+    part.shadow + `<g class="pose"><g class="float"><g class="evt"><g class="lean">${part.body}</g></g></g></g>` +
+    part.outside + (star ? starMark(ring) : "") + `</svg>`;
+}
+
+const colorOf = (i) => PALETTE[i % PALETTE.length][0];
+const cell = (svgs, caption, note) => `<div class="cell"><div class="sizes">${svgs}</div>${caption ? `<b>${caption}</b>` : ""}${note ? `<small>${note}</small>` : ""}</div>`;
+
+/* ---- A: the family ------------------------------------------------------ */
+function shapesBlock() {
+  const cells = GHOSTS.map((o, v) => cell(avatar({ color: colorOf(FAMILY_COLOR), v, size: 56 }), o.label)).join("");
+  return `<section class="blk full"><h4>Ten silhouettes in one bot's colour · 56 px · picker style</h4><div class="grid12">${cells}</div></section>`;
+}
+function colourBlock() {
+  const cols = SIX.map((i, n) => {
+    const c = colorOf(i), v = (n * 3) % GHOSTS.length;
+    return `<div class="cell">${avatar({ color: c, v, size: 96 })}<div class="sizes">${avatar({ color: c, v, size: 40 })}${avatar({ color: c, v, size: 24 })}</div><b>${PALETTE[i][1]}</b></div>`;
+  }).join("");
+  return `<section class="blk full"><h4>Six colours · 96 · 40 · 24 px (24 px only blinks)</h4><div class="row">${cols}</div></section>`;
+}
+function statusBlock() {
+  const color = colorOf(FAMILY_COLOR);
+  const cells = STATUSES.map(([s, name], i) => `<div class="cell">${avatar({ color, v: i, s, size: 72 })}<div class="sizes">${avatar({ color, v: i, s, size: 40 })}${avatar({ color, v: i, s, size: 24 })}</div><b>${name}</b></div>`).join("");
+  const loop = `<div class="cell">${avatar({ color: colorOf(0), v: 5, s: "rest", size: 72, extra: "loop" })}<b id="loopName">Resting</b><small>steps through all five</small></div>`;
+  return `<section class="blk full"><h4>The five statuses, eyes and body only · 72 · 40 · 24 px · and one bot in a loop</h4><div class="row">${cells}${loop}</div>` +
+    `<p class="why">Resting floats and waves its hem. On it looks down, pulses its glow, waves faster and shimmers three dots on its shadow. Asking you comes closer, opens its eyes, breathes its glow and shows a "?" of light. Stuck is dimmed with its eyes flat as lines, glitching and trying to reboot every few seconds. Off duty dims, closes its eyes to arcs, floats slowly and lets a z of light rise.</p></section>`;
+}
+function starPicBlock() {
+  const starRow = [72, 40, 24].map((size) => avatar({ color: colorOf(0), v: 0, star: true, s: "onit", size })).join("");
+  const picRow = [72, 40, 24].map((size) => avatar({ color: colorOf(3), v: 2, pic: true, s: "ask", size })).join("");
+  const picEyesRow = [72, 40, 24].map((size) => avatar({ color: colorOf(7), v: 3, pic: true, picEyes: true, s: "rest", size })).join("");
+  return `<section class="blk full"><h4>Main bot star · a picture, without and with eyes</h4><div class="row">${cell(starRow, "Main bot, On it")}${cell(picRow, "Picture only")}${cell(picEyesRow, "Picture with eyes")}</div>` +
+    `<p class="why">A picture fills the ghost inside a rim of the bot's colour, under the same edge glow. Without eyes the status shows through the posture, the lights and the status pill. With eyes, the lenses sit on the picture in a white ring and keep following you.</p></section>`;
+}
+function familyBlocks() { return shapesBlock() + colourBlock() + statusBlock() + starPicBlock(); }
+
+/* ---- B: the cozy kit -------------------------------------------------- */
+const TEAM = [
+  { name: "Chief", job: "Leads the team", c: 0, v: 0, s: "onit", star: true, line: "I've added the three tasks for Monday." },
+  { name: "Scout", c: 1, v: 1, s: "ask", line: "Which flat should I book a viewing for?" },
+  { name: "Ledger", c: 3, v: 3, s: "rest", line: "The October total is ready." },
+  { name: "Quill", c: 7, v: 5, s: "stuck", line: "Stuck on a sign-in page." },
+  { name: "Pixel", c: 2, v: 8, s: "rest", line: "Resting" },
+  { name: "Archivist", c: 8, v: 9, s: "off", line: "Off duty" },
+];
+function sideRow(b, size, on) {
+  return `<div class="cz-row${on ? " on" : ""}">${avatar({ color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size, ring: "#16161b" })}` +
+    `<div><b>${b.name}</b><small>${b.line}</small></div>${b.s === "ask" || b.s === "stuck" ? '<i class="unread"></i>' : ""}</div>`;
+}
+function sidebarPiece() {
+  const pin = (b) => `<div class="cz-pin">${avatar({ color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size: 64, ring: "#16161b" })}<b>${b.name}</b>${b.job ? `<small>${b.job}</small>` : ""}${b.s === "ask" ? '<i class="unread"></i>' : ""}</div>`;
+  return `<div class="cz-side cz"><div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>` +
+    `<div class="cz-grid">${TEAM.map(pin).join("")}</div><div class="cz-sep"></div>${TEAM.slice(1, 4).map((b, i) => sideRow(b, 32, i === 0)).join("")}</div>`;
+}
+function heroPiece() {
+  const c = colorOf(1);
+  return `<div class="cz-hero"><div class="cz-hero-band" style="background:linear-gradient(180deg, ${c}40, ${c}00)"></div><div class="cz-hero-body">` +
+    `<div class="cz-hero-top">${avatar({ color: c, v: 1, s: "onit", size: 64, ring: "#16161b" })}<div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>` +
+    `<div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div><span class="cz-status"><i class="dot"></i>On it · comparing three listings</span>` +
+    `<div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div></div></div>`;
+}
+function chatBarPiece() {
+  return `<div class="cz-bar cz"><span class="cz-btn icon" aria-label="Back"><svg class="ico"><use href="#i-back"/></svg></span>` +
+    `<span class="cz-pill">${avatar({ color: colorOf(1), v: 1, s: "ask", size: 24, ring: "#1f1f26" })}Scout<small><i class="dot" style="display:inline-block;margin:0 4px 1px 0"></i>Asking you</small></span>` +
+    `<div class="acts"><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>`;
+}
+function pickerPiece() {
+  const c = colorOf(1);
+  const tiles = GHOSTS.map((o, v) => `<span class="cz-tile${v === 1 ? " on" : ""}" title="${o.label}">${avatar({ color: c, v, size: 30, ring: "#1d1d24" })}</span>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<i class="cz-sw${i === 1 ? " on" : ""}" style="background:${hex}" title="${name}"></i>`).join("");
+  return `<div class="cz-surface cz-pop cz"><div class="cz-pop-head">${avatar({ color: c, v: 1, size: 44, ring: "#1d1d24" })}<div><b>Scout</b><small>Ghost · Tall · Blue</small></div></div>` +
+    `<div class="cz-tabs" role="presentation"><span class="cz-tab on"><svg class="ico"><use href="#i-bot"/></svg>Robot</span><span class="cz-tab"><svg class="ico"><use href="#i-upload"/></svg>Upload</span><span class="cz-tab"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>` +
+    `<div class="cz-tiles">${tiles}</div><div class="cz-swatches">${dots}</div></div>`;
+}
+function uploadPiece() {
+  const c = colorOf(3);
+  return `<div class="cz-surface cz-pop cz"><div class="cz-pop-head">${avatar({ color: c, v: 3, size: 44, pic: true, picEyes: true, ring: "#1d1d24" })}<div><b>Ledger</b><small>Ghost · Round · a picture</small></div></div>` +
+    `<div class="cz-tabs" role="presentation"><span class="cz-tab"><svg class="ico"><use href="#i-bot"/></svg>Robot</span><span class="cz-tab on"><svg class="ico"><use href="#i-upload"/></svg>Upload</span><span class="cz-tab"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>` +
+    `<div class="row" style="gap:12px">${avatar({ color: c, v: 3, size: 72, pic: true, picEyes: true, ring: "#1d1d24" })}${avatar({ color: c, v: 3, size: 72, pic: true, ring: "#1d1d24" })}</div>` +
+    `<div class="cz-setting" style="background:var(--color-panel)"><div><b>Eyes on the picture</b><small>Keeps the lenses, and the following, on top</small></div><span class="sw" role="switch" aria-checked="true"><i></i></span></div></div>`;
+}
+function kitSlots() {
+  return `<div class="kit-slot"><h4>Sidebar · pinned 3 per row at 64 px · rows 32 px</h4>${sidebarPiece()}</div>` +
+    `<div class="kit-slot"><h4>Panel hero · 64 px · and the chat header pill · 24 px</h4>${heroPiece()}${chatBarPiece()}</div>` +
+    `<div class="kit-slot"><h4>Avatar card · Robot</h4>${pickerPiece()}</div>` +
+    `<div class="kit-slot"><h4>Avatar card · Upload</h4>${uploadPiece()}</div>`;
+}
+
+/* ---- D: old shapes keep drawing ---------------------------------------- */
+const LEGACY = [
+  ["classic", "Robot head (V1)", "dome"], ["tall", "Robot head (V1)", "tall"], ["wide", "Robot head (V1)", "wide"],
+  ["soft", "Robot head (V1)", "round"], ["cube", "Robot head (V1)", "cape"], ["monitor", "Robot head (V1)", "hooded"],
+  ["round", "Bird (S1.6)", "round"], ["egg", "Bird (S1.6)", "puff"], ["pear", "Bird (S1.6)", "droopy"],
+  ["plump", "Bird (S1.6)", "comet"], ["crest", "Bird (S1.6)", "spire"],
+];
+function legacyRows() {
+  return LEGACY.map(([stored, from, to], i) =>
+    `<tr><td><code>${stored}</code></td><td>${from}</td><td>${avatar({ color: colorOf(i), v: shapeIndex(to), size: 24, ring: "#16161b" })}<code>ghost-${to}</code></td></tr>`).join("");
+}
+
+/* ---- The playground --------------------------------------------------- */
+const PG = { v: 0, c: 0, s: "rest", life: true };
+
+function pgControls(state) {
+  const c = colorOf(state.c);
+  const chips = (items, key, on) => items.map(([id, name]) => `<button type="button" class="chip" data-${key}="${id}" aria-pressed="${on === id}">${name}</button>`).join("");
+  const tiles = GHOSTS.map((o, v) => `<button type="button" class="tile" data-pg-v="${v}" aria-pressed="${v === state.v}" title="${o.label}" aria-label="${o.label}">${avatar({ color: c, v, size: 30, ring: "#16161b" })}</button>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<button type="button" class="sw-dot" data-pg-c="${i}" aria-pressed="${i === state.c}" style="background:${hex}" aria-label="${name}" title="${name}"></button>`).join("");
+  const groups = EVENT_GROUPS.map((g) => `<div class="evgroup"><h4>${g}</h4><div class="pg-row">${EVENTS.filter((e) => e[2] === g).map(([id, name]) => `<button type="button" class="chip ev" data-pg-ev="${id}">${name}</button>`).join("")}</div></div>`).join("");
+  return `<div class="ctl"><h4>Shape · ${GHOSTS[state.v].label} · drag across to morph</h4><div class="tiles" id="pgTiles">${tiles}</div></div>` +
+    `<div class="ctl"><h4>Colour · ${PALETTE[state.c][1]}</h4><div class="dots">${dots}</div></div>` +
+    `<div class="ctl"><h4>Status</h4><div class="pg-row">${chips(STATUSES, "pg-s", state.s)}</div></div>` +
+    `<div class="ctl"><h4>Animations</h4><div class="evgroups">${groups}</div></div>` +
+    `<div class="ctl"><div class="pg-row" style="gap:16px"><button type="button" class="sw" role="switch" aria-checked="${state.life}" data-life><i></i>Random life</button>` +
+    `<button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i>Calm robots</button><span class="hint">Hover to lean in · click to poke</span></div></div>`;
+}
+
+function pgStage(state) {
+  const n = GHOSTS.length;
+  const big = avatar({ color: colorOf(state.c), v: state.v, s: state.s, size: 176, star: true, extra: "big" });
+  const others = [2, 5, 7, 8].map((k, i) => avatar({ color: colorOf((state.c + 2 * (i + 1)) % PALETTE.length), v: (state.v + k) % n, s: state.s, size: 96 })).join("");
+  return `<div class="bigwrap">${big}</div><div class="neighbours">${others}</div><small>Each one follows your pointer on its own. Animations play on all five.</small>`;
+}
+
+function buildAll() {
+  return {
+    hero: SIX.map((ci, i) => avatar({ color: colorOf(ci), v: [0, 1, 6, 3, 7, 9][i], s: ["rest", "onit", "rest", "ask", "rest", "off"][i], star: i === 0, size: 72 })).join(""),
+    family: familyBlocks(),
+    kit: kitSlots(),
+    reco: PALETTE.slice(0, 8).map(([c], i) => avatar({ color: c, v: [0, 1, 5, 3, 6, 7, 4, 9][i], s: STATUSES[i % 5][0], star: i === 0, size: 52, ring: "#16161b" })).join(""),
+    legacy: legacyRows(),
+    pgControls: pgControls(PG),
+    pgStage: pgStage(PG),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, avatar, GHOSTS, PALETTE, STATUSES, EVENTS, LEGACY, ghostPts, ghostGeom, smooth, pgControls, pgStage, tint, shade, N_SIDE, N_TOP, N_HEM };
+}
+
+/* ---- The page: one pointer loop, events, random life, the morph, the playground ---- */
+if (typeof document !== "undefined") (function page() {
+  const html = document.documentElement, reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let calmPref = false;
+  const isCalm = () => html.classList.contains("calm");
+
+  /* The shared pointer loop. One entry per live bot; only visible ones are touched. */
+  const live = new Map();
+  const pointer = { x: NaN, y: NaN, px: NaN, py: NaN, t: 0, movedAt: -1e9, speed: 0 };
+  let rectsDirty = true, running = false, idleTimer = 0, lastDbl = -1e9;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const st = live.get(e.target);
+      if (st) st.visible = e.isIntersecting;
+      e.target.classList.toggle("offscreen", !e.isIntersecting);
+    }
+    schedule();
+  }, { rootMargin: "48px" });
+
+  function register(root) {
+    for (const [svg] of live) if (!svg.isConnected) { io.unobserve(svg); live.delete(svg); }
+    root.querySelectorAll("svg.bot.live").forEach((svg) => {
+      if (live.has(svg)) return;
+      live.set(svg, { ex: 0, ey: 0, lx: 0, lr: 0, rect: null, visible: false, eyeY: Number(svg.dataset.ey) || 20,
+        glanceAt: performance.now() + 1500 + Math.random() * 4000, glancing: false, gx: 0, gy: 0, dblAt: 0, cameraUntil: 0 });
+      io.observe(svg);
+    });
+    rectsDirty = true;
+    schedule();
+  }
+  function schedule() {
+    if (running || document.hidden || isCalm()) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+  const faceTracks = (svg) => !svg.dataset.hold && (svg.dataset.face === "open" || svg.dataset.face === "wide");
+  function frame(now) {
+    running = false;
+    if (document.hidden || isCalm()) return;
+    const fresh = now - pointer.movedAt < 4000, fast = pointer.speed > 2.4 && now - lastDbl > 1500;
+    let busy = false, nearest = null, nearestDist = Infinity;
+    for (const [svg, st] of live) {
+      if (!st.visible) continue;
+      if (rectsDirty || !st.rect) st.rect = svg.getBoundingClientRect();
+      const r = st.rect, cx = r.left + r.width / 2, cy = r.top + r.height * (st.eyeY / 48);
+      const dx = pointer.x - cx, dy = pointer.y - cy, dist = Math.hypot(dx, dy) || 1;
+      let tx = 0, ty = 0;
+      if (now < st.cameraUntil) { /* a look at the camera: straight ahead */ }
+      else if (faceTracks(svg)) {
+        if (fresh) {
+          const m = EYE_MAX * (dist / (dist + r.width * 0.5));
+          tx = (dx / dist) * m; ty = (dy / dist) * m;
+          if (fast && now - st.dblAt > 2600 && dist < r.width * 4 && dist < nearestDist) { nearest = svg; nearestDist = dist; }
+        } else {
+          if (now > st.glanceAt) {
+            st.glancing = !st.glancing;
+            st.gx = st.glancing ? (Math.random() - 0.5) * 2 * EYE_MAX * 0.8 : 0;
+            st.gy = st.glancing ? (Math.random() - 0.5) * EYE_MAX * 0.6 : 0;
+            st.glanceAt = now + (st.glancing ? 500 + Math.random() * 900 : 2500 + Math.random() * 6000);
+          }
+          tx = st.gx; ty = st.gy;
+        }
+      }
+      const over = fresh && pointer.x > r.left - 4 && pointer.x < r.right + 4 && pointer.y > r.top - 4 && pointer.y < r.bottom + 4;
+      const lx = over ? clamp((dx / r.width) * 3, -1.5, 1.5) : 0;
+      const lr = over ? clamp((dx / r.width) * 12, -6, 6) : (fresh ? clamp(dx / (r.width * 4), -1, 1) * 2.5 : 0);
+      st.ex += (tx - st.ex) * 0.16; st.ey += (ty - st.ey) * 0.16;
+      const moving = Math.abs(tx - st.ex) > 0.01 || Math.abs(ty - st.ey) > 0.01;
+      if (moving || st.wrote) { svg.style.setProperty("--ex", st.ex.toFixed(2)); svg.style.setProperty("--ey", st.ey.toFixed(2)); st.wrote = moving; }
+      if (Math.abs(lx - st.lx) > 0.05 || Math.abs(lr - st.lr) > 0.1) { st.lx = lx; st.lr = lr; svg.style.setProperty("--lx", lx.toFixed(2)); svg.style.setProperty("--lr", lr.toFixed(1)); }
+      busy = busy || moving || over;
+    }
+    if (nearest) { /* a fast pass: only the nearest bot does a double-take */
+      const st = live.get(nearest), r = st.rect;
+      st.dblAt = now; lastDbl = now; nearest.style.setProperty("--dtx", pointer.x > r.left + r.width / 2 ? "1.5" : "-1.5"); flash(nearest, "dbl");
+    }
+    rectsDirty = false;
+    pointer.speed *= 0.85;
+    if (busy || fresh) schedule();
+    else { clearTimeout(idleTimer); idleTimer = setTimeout(schedule, 250); } // idle: only the glances are due
+  }
+  function stillAll() {
+    for (const [svg, st] of live) { st.ex = st.ey = st.lx = st.lr = 0; ["--ex", "--ey", "--lx", "--lr"].forEach((k) => svg.style.removeProperty(k)); }
+  }
+  window.addEventListener("pointermove", (e) => {
+    const now = performance.now(), dt = Math.max(1, now - pointer.t);
+    if (Number.isFinite(pointer.x)) pointer.speed = pointer.speed * 0.5 + (Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) / dt) * 0.5;
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = now; pointer.movedAt = now;
+    schedule();
+  }, { passive: true });
+  /* The pointer leaves the window: a short look-around, then back to idle. */
+  function pointerLeft() {
+    if (pointer.movedAt < 0) return;
+    pointer.movedAt = -1e9; pointer.speed = 0;
+    let i = 0;
+    for (const [svg, st] of live) if (st.visible && faceTracks(svg)) setTimeout(() => flash(svg, "around"), (i++ % 12) * 60);
+    schedule();
+  }
+  document.documentElement.addEventListener("mouseleave", pointerLeft);
+  window.addEventListener("pointerout", (e) => { if (!e.relatedTarget) pointerLeft(); });
+  window.addEventListener("scroll", () => { rectsDirty = true; schedule(); }, { passive: true });
+  window.addEventListener("resize", () => { rectsDirty = true; schedule(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { rectsDirty = true; schedule(); } });
+
+  /* Calm: the system preference or the setting. */
+  function applyCalm() {
+    const on = calmPref || reduce.matches;
+    html.classList.toggle("calm", on);
+    document.querySelectorAll("[data-calm]").forEach((b) => b.setAttribute("aria-checked", String(calmPref)));
+    if (on) stillAll(); else schedule();
+  }
+  reduce.addEventListener("change", applyCalm);
+
+  /* Status, events and pokes: attribute flips on one SVG. */
+  const timers = new WeakMap(), flashes = new WeakMap();
+  const EVENT = Object.fromEntries(EVENTS.map(([id, , , spec]) => [id, spec]));
+  function setStatus(svg, s, asBase = true) {
+    svg.dataset.s = s; svg.dataset.face = STATUS_FACE[s];
+    if (asBase) svg.dataset.base = s;
+  }
+  /** A micro-event: a class for a moment, beside whatever else is running. */
+  function flash(svg, name) {
+    const ev = EVENT[name], key = `ev-${name}`;
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get(key));
+    svg.classList.remove(key); void svg.getBoundingClientRect(); svg.classList.add(key);
+    box.set(key, setTimeout(() => svg.classList.remove(key), ev ? ev.ms : 800));
+    flashes.set(svg, box);
+  }
+  function endEvent(svg) {
+    clearTimeout(timers.get(svg));
+    const name = svg.dataset.ev;
+    if (!name) return;
+    delete svg.dataset.ev; delete svg.dataset.hold;
+    svg.classList.remove(`ev-${name}`);
+    setStatus(svg, svg.dataset.base, false);
+  }
+  const MICRO = { saccade: (svg) => { const st = live.get(svg); if (st) { st.glancing = false; st.glanceAt = 0; } },
+    camera: (svg) => { const st = live.get(svg); if (st) st.cameraUntil = performance.now() + 1700; },
+    poke: (svg) => poke(svg), hello: (svg) => hello(svg), bye: (svg) => bye(svg) };
+  function fire(svg, name) {
+    const ev = EVENT[name];
+    if (!ev) return;
+    if (MICRO[name]) { MICRO[name](svg); if (name === "poke" || name === "hello" || name === "bye") return; }
+    if (!ev.face && !ev.status && !ev.hold) { flash(svg, name); schedule(); return; }
+    endEvent(svg);
+    void svg.getBoundingClientRect(); // so a repeated event restarts its animation
+    if (ev.status) setStatus(svg, ev.status, false);
+    else { if (ev.face) svg.dataset.face = ev.face; if (ev.hold) svg.dataset.hold = "1"; }
+    svg.classList.add(`ev-${name}`);
+    svg.dataset.ev = name;
+    timers.set(svg, setTimeout(() => endEvent(svg), ev.ms));
+  }
+  function poke(svg) {
+    svg.classList.remove("poked"); void svg.getBoundingClientRect(); svg.classList.add("poked");
+    if (svg.dataset.s !== "off" && svg.dataset.s !== "stuck" && !svg.dataset.ev) svg.dataset.face = "wide";
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get("poked"));
+    box.set("poked", setTimeout(() => { svg.classList.remove("poked"); if (!svg.dataset.ev) svg.dataset.face = STATUS_FACE[svg.dataset.s]; }, 800));
+    flashes.set(svg, box);
+  }
+  function hello(svg) {
+    svg.classList.remove("bye", "hidden", "hello"); void svg.getBoundingClientRect(); svg.classList.add("hello");
+    setTimeout(() => svg.classList.remove("hello"), 1400);
+  }
+  function bye(svg) {
+    svg.classList.remove("hello"); svg.classList.add("bye");
+    setTimeout(() => { svg.classList.add("hidden"); }, 800);
+    setTimeout(() => hello(svg), 1500);
+  }
+  document.addEventListener("click", (e) => {
+    const svg = e.target.closest("svg.bot.live");
+    if (svg) poke(svg);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches("svg.bot.live")) { e.preventDefault(); poke(e.target); }
+  });
+
+  /* Random life: now and then one visible bot does one small idle thing. */
+  const LIFE = [["dblblink", 2], ["saccade", 4], ["camera", 1], ["tilt", 1.5], ["hem", 1.5]];
+  function lifeTick() {
+    const wait = 900 + Math.random() * 2200;
+    if (!PG.life || document.hidden || isCalm()) { setTimeout(lifeTick, wait); return; }
+    const cands = [];
+    for (const [svg, st] of live) if (st.visible && !svg.dataset.ev && faceTracks(svg)) cands.push(svg);
+    if (cands.length) {
+      const svg = cands[Math.floor(Math.random() * cands.length)], total = LIFE.reduce((a, [, w]) => a + w, 0);
+      let pick = Math.random() * total, name = LIFE[0][0];
+      for (const [id, w] of LIFE) { pick -= w; if (pick <= 0) { name = id; break; } }
+      fire(svg, name);
+    }
+    setTimeout(lifeTick, wait);
+  }
+
+  /* Build the page. */
+  const built = buildAll();
+  for (const [id, key] of [["heroStrip", "hero"], ["family", "family"], ["kit", "kit"], ["recoRow", "reco"], ["legacyRows", "legacy"], ["pgControls", "pgControls"], ["pgStage", "pgStage"]]) {
+    document.getElementById(id).innerHTML = built[key];
+  }
+  register(document);
+  applyCalm();
+  setTimeout(lifeTick, 1500);
+
+  /* The status loop bot in section A. */
+  const loopBot = document.querySelector("svg.bot.loop");
+  let loopI = 0;
+  setInterval(() => {
+    loopI = (loopI + 1) % STATUSES.length;
+    const [s, name] = STATUSES[loopI];
+    endEvent(loopBot);
+    if (s === "stuck") fire(loopBot, "stuck");
+    setStatus(loopBot, s);
+    document.getElementById("loopName").textContent = name;
+  }, 2800);
+
+  /* The playground: the morph (a tween of the 64 points) and the controls. */
+  const pg = document.getElementById("pg");
+  const stageBots = () => Array.from(document.querySelectorAll("#pgStage svg.bot"));
+  let morphRaf = 0;
+  function morphBig(fromV, toV, done) {
+    const svg = document.querySelector("#pgStage svg.bot.big");
+    if (!svg) return done();
+    const a = ghostGeom(GHOSTS[fromV]), b = ghostGeom(GHOSTS[toV]);
+    const skin = svg.querySelector(".skin"), eyes = svg.querySelectorAll(".eye"), halo = svg.querySelector(".halo"), shadow = svg.querySelector(".shadow");
+    const t0 = performance.now(), ms = 450;
+    svg.classList.add("morph");
+    cancelAnimationFrame(morphRaf);
+    const step = (now) => {
+      const u = Math.min(1, (now - t0) / ms), t = 1 - Math.pow(1 - u, 3);
+      const d = smooth(lerpPts(a.pts, b.pts, t));
+      svg.style.setProperty("--d0", pathVar(d));
+      skin.setAttribute("d", d);
+      const ey = a.ey + (b.ey - a.ey) * t, r = a.r + (b.r - a.r) * t, half = r * 1.18, k = r / a.r;
+      eyes.forEach((g, i) => g.setAttribute("transform", `translate(${f(24 + (i ? half : -half))} ${f(ey)}) scale(${f(k)})`));
+      halo.setAttribute("rx", f((a.box.w + (b.box.w - a.box.w) * t) * 0.72)); halo.setAttribute("ry", f((a.box.h + (b.box.h - a.box.h) * t) * 0.66));
+      halo.setAttribute("cy", f(a.oy + (b.oy - a.oy) * t));
+      shadow.setAttribute("rx", f((a.box.w + (b.box.w - a.box.w) * t) * 0.3));
+      if (u < 1) morphRaf = requestAnimationFrame(step); else done();
+    };
+    morphRaf = requestAnimationFrame(step);
+  }
+  function rerender(controls) {
+    if (controls) document.getElementById("pgControls").innerHTML = pgControls(PG);
+    document.getElementById("pgStage").innerHTML = pgStage(PG);
+    register(document.getElementById("pg"));
+    applyCalm();
+  }
+  function pickShape(v) {
+    if (v === PG.v) return;
+    const from = PG.v;
+    PG.v = v;
+    document.getElementById("pgControls").innerHTML = pgControls(PG);
+    if (isCalm()) { rerender(false); return; }
+    morphBig(from, v, () => { if (PG.v === v) rerender(false); });
+  }
+  let dragging = false;
+  pg.addEventListener("pointerdown", (e) => { if (e.target.closest("#pgTiles")) dragging = true; });
+  window.addEventListener("pointerup", () => { dragging = false; });
+  pg.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const tile = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("[data-pg-v]");
+    if (tile) pickShape(Number(tile.dataset.pgV));
+  });
+  pg.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.pgV !== undefined) pickShape(Number(b.dataset.pgV));
+    else if (b.dataset.pgC !== undefined) { PG.c = Number(b.dataset.pgC); rerender(true); }
+    else if (b.dataset.pgS) { PG.s = b.dataset.pgS; stageBots().forEach((svg) => { endEvent(svg); setStatus(svg, PG.s); }); pg.querySelectorAll("[data-pg-s]").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.pgS === PG.s))); }
+    else if (b.dataset.pgEv) { stageBots().forEach((svg, i) => setTimeout(() => fire(svg, b.dataset.pgEv), i * 90)); }
+    else if (b.hasAttribute("data-life")) { PG.life = !PG.life; b.setAttribute("aria-checked", String(PG.life)); }
+  });
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-calm]");
+    if (!b) return;
+    calmPref = !calmPref;
+    applyCalm();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+/* ---------------------------------------------------------------------
+   Avatar (redesign V1): the robot (robot.css draws it) with its status
+   in words under it. The status label is a coloured dot plus the word,
+   always both: colour is never the only signal.
+   --------------------------------------------------------------------- */
+
+.avatar-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.status-label {
+  --status-color: var(--color-text-secondary);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--fs-caption);
+  line-height: 1.35;
+}
+
+.avatar-wrap > .status-label {
+  align-items: center;
+  text-align: center;
+}
+
+.status-label__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-label__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-color);
+}
+
+.status-label--resting .status-label__dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-text-secondary);
+}
+
+.status-label--on_it {
+  --status-color: var(--status-on-it);
+}
+
+.status-label--asking_you {
+  --status-color: var(--status-asking);
+}
+
+.status-label--stuck {
+  --status-color: var(--status-stuck);
+}
+
+.status-label--sign_in {
+  --status-color: var(--status-sign-in);
+}
+
+.status-label--off_duty {
+  --status-color: var(--status-off);
+}
+
+.status-label--on_it .status-label__state,
+.status-label--asking_you .status-label__state,
+.status-label--stuck .status-label__state,
+.status-label--sign_in .status-label__state {
+  color: var(--status-color);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .status-label--on_it .status-label__dot {
+    animation: status-pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--color-accent-edge);
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+.status-label__activity {
+  max-width: 160px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

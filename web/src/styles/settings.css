@@ -1,0 +1,163 @@
+/* ---------------------------------------------------------------------
+   Settings (restructure slice 3): the sheet behind your initials, in
+   grouped rounded cards, with the accent swatches. Tokens only; the card
+   and row look are shared with the profile (profile-rows.css).
+   --------------------------------------------------------------------- */
+
+.settings-sheet,
+.settings-sheet__sub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.settings-sheet__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.settings-sheet__initials {
+  width: 44px;
+  height: 44px;
+  font-size: var(--fs-body);
+}
+
+.settings-sheet__username {
+  color: var(--color-text);
+  font-size: var(--fs-lead);
+  font-weight: 600;
+}
+
+.settings-sheet__group .profile-row + .profile-row,
+.settings-sheet__field + .settings-sheet__field {
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-sheet__field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.settings-sheet__version {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-sheet__label {
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.settings-sheet__note {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+.settings-sheet__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-sheet__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.settings-sheet__item + .settings-sheet__item {
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-sheet__item-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.settings-sheet__item-label {
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.settings-sheet__item-detail {
+  overflow: hidden;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-sheet__item-value {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* The six accent swatches: a round dot each, a ring on the chosen one. */
+.accent-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.accent-swatch {
+  display: inline-flex;
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.accent-swatch:has(input:checked) {
+  box-shadow: 0 0 0 2px var(--color-text);
+}
+
+.accent-swatch:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.accent-swatch__dot {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+}
+
+.accent-swatch[data-accent="violet"] .accent-swatch__dot { background: var(--accent-swatch-violet); }
+.accent-swatch[data-accent="blue"] .accent-swatch__dot { background: var(--accent-swatch-blue); }
+.accent-swatch[data-accent="teal"] .accent-swatch__dot { background: var(--accent-swatch-teal); }
+.accent-swatch[data-accent="green"] .accent-swatch__dot { background: var(--accent-swatch-green); }
+.accent-swatch[data-accent="orange"] .accent-swatch__dot { background: var(--accent-swatch-orange); }
+.accent-swatch[data-accent="pink"] .accent-swatch__dot { background: var(--accent-swatch-pink); }
+
+/* Vault: passwords (2026-11-08): a login's Always switch under its line, and the Save a password form. */
+.vault-login__always {
+  display: flex;
+  margin-top: var(--space-2);
+  font-size: var(--fs-label);
+}
+
+.vault-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.vault-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* Settings → Time zone: the list of zones fills the card. */
+.settings-sheet__zone {
+  width: 100%;
+}

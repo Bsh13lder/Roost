@@ -1,0 +1,20 @@
+{
+  "url": "https://news.example/story",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 10, "tag": "div", "attrs": {"id": "cookie-banner", "role": "dialog", "aria-label": "We use cookies"}, "children": [
+      {"id": 11, "tag": "button", "children": [{"id": 12, "text": "Accept all"}]},
+      {"id": 13, "tag": "button", "children": [{"id": 14, "text": "Reject all"}]}
+    ]},
+    {"id": 20, "tag": "a", "attrs": {"href": "/next"}, "children": [{"id": 21, "text": "Next story"}]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Story", "backend": 1},
+    {"role": "dialog", "name": "We use cookies", "backend": 10},
+    {"role": "button", "name": "Accept all", "backend": 11},
+    {"role": "button", "name": "Reject all", "backend": 13},
+    {"role": "link", "name": "Next story", "backend": 20}
+  ],
+  "boxes": {"11": [900, 600, 120, 36], "13": [1040, 600, 120, 36], "20": [100, 100, 120, 20]},
+  "hits": {}
+}

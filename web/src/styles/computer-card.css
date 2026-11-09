@@ -1,0 +1,360 @@
+/* ---------------------------------------------------------------------
+   The computer card (docs/plans/2026-10-23-roost-computer-card.md): one
+   compact line in the bot's reply while it works (never the screen: owner,
+   2026-10-26), the folded line after, and the sheet with the steps.
+   --------------------------------------------------------------------- */
+
+/* The bot's column wraps its content, so the card claims its own width and the column caps it (a phone). */
+.cc {
+  width: var(--computer-card-width);
+  max-width: 100%;
+  margin: 0 0 var(--space-2);
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard), margin var(--duration-base) var(--ease-standard);
+  animation: cc-in var(--duration-slow) var(--ease-standard);
+}
+
+.cc--folding {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: 0;
+}
+
+.cc__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The live line: the activity pill's capsule with the step mark, the site, the step and its number. */
+.cc__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 var(--space-3) 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+}
+
+.cc__pill:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-raised);
+}
+
+.cc__pill:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.cc__mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.cc__host {
+  flex: 0 1 auto;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+}
+
+.cc__dot {
+  position: relative;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--chat-accent-soft, var(--color-accent-strong));
+}
+
+.cc__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: cc-pulse 1.8s var(--ease-standard) infinite;
+}
+
+.cc__line {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  background: linear-gradient(90deg, var(--color-text-secondary) 0%, var(--color-text-secondary) 38%,
+    var(--color-text) 50%, var(--color-text-secondary) 62%, var(--color-text-secondary) 100%);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: cc-step-in var(--duration-base) var(--ease-standard), cc-shimmer 2.6s linear infinite;
+}
+
+.cc__count {
+  flex: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The folded line, once the run has ended. */
+.cc-line {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  min-height: 28px;
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  text-align: left;
+  cursor: pointer;
+  animation: cc-step-in var(--duration-base) var(--ease-standard);
+  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.cc-line:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.cc-line:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.cc-line__mark,
+.cc-line__chevron {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--color-text-faint);
+}
+
+.cc-line__chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cc-line__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The sheet: who and where, the steps. */
+.cc-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cc-sheet__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cc-sheet__who-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cc-sheet__name {
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.cc-sheet__where {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.cc-sheet__status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+.cc-sheet__status--live {
+  color: var(--color-text);
+}
+
+.cc-steps__title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cc-steps__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* The thread that joins the marks. */
+.cc-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--space-1) + 14px);
+  top: 28px;
+  bottom: -8px;
+  width: 1px;
+  background: var(--color-border);
+}
+
+.cc-step__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-raised);
+  color: var(--color-text-faint);
+}
+
+.cc-step--now {
+  color: var(--color-text);
+}
+
+.cc-step--now .cc-step__mark {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.cc-step__line {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cc-step__time {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-steps__more {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.cc-sheet__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.cc-sheet__actions > :first-child:not(button) {
+  flex-basis: 100%;
+}
+
+@keyframes cc-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes cc-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+@keyframes cc-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes cc-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc,
+  .cc-line,
+  .cc__line,
+  .cc__dot::after {
+    animation: none;
+  }
+
+  .cc,
+  .cc__pill {
+    transition: none;
+  }
+}

@@ -1,0 +1,791 @@
+/* ---------------------------------------------------------------------
+   The calendars (Board redesign G11, G12): a month of rounded day cards or a
+   week with a time grid, task pills with a project edge, the day panel and its
+   Day note. Lazy: CalendarGrid.tsx imports this file, the entry does not.
+   Colours and sizes come from tokens.css; a project's colour arrives as --pc.
+   --------------------------------------------------------------------- */
+
+.taskcal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.caltools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.calwrap {
+  position: relative;
+  min-width: 0;
+}
+
+.calhead {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.04em;
+}
+
+/* Seven days across: each week's row is `display: contents`, so its days are this grid's own items. */
+.calgrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.calrow {
+  display: contents;
+}
+
+.calcap {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+/* ---- A day's card ------------------------------------------------------------- */
+
+.ccell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 124px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+}
+
+.ccell.is-wknd {
+  background: var(--color-bg);
+}
+
+.ccell.is-wknd .ccell__n {
+  color: var(--color-text-faint);
+}
+
+.ccell.is-out {
+  opacity: 0.35;
+}
+
+.ccell.is-today {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-tint);
+}
+
+/* A calm hover: the card does not jump, it only lights its edge. */
+.ccell:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-raised);
+}
+
+.ccell.is-today:hover {
+  background: var(--color-accent-tint);
+}
+
+.ccell.is-sel {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-tint);
+}
+
+.ccell.is-over {
+  outline: 1px solid var(--color-accent-edge);
+  outline-offset: -1px;
+}
+
+.ccell__head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.ccell__sp {
+  flex: 1;
+}
+
+.ccell__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Today: a filled date and the word Today, in the month and the week. */
+.ccell.is-today .ccell__n,
+.wk__day.is-today .ccell__n {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.ccell__today {
+  color: var(--color-accent-soft);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+/* An empty day of the month says it takes a task, on hover or focus (a click anywhere on it adds one). */
+.ccell__hint {
+  margin: auto 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.ccell:hover .ccell__hint,
+.ccell:focus-within .ccell__hint {
+  opacity: 1;
+}
+
+.ccell.is-out .ccell__hint {
+  display: none;
+}
+
+.ccell__add {
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+}
+
+.ccell:hover .ccell__add,
+.wk__day:hover .ccell__add,
+.ccell__add:focus-visible {
+  opacity: 1;
+}
+
+.csum {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.csum__n {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cdot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+}
+
+.note-ic {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: var(--color-accent-soft);
+}
+
+.note-ic:hover {
+  background: var(--color-accent-tint);
+}
+
+.cmore {
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  text-align: left;
+}
+
+.cmore:hover {
+  color: var(--color-text);
+}
+
+/* ---- A task pill --------------------------------------------------------------- */
+
+.tchip {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--pc, var(--color-border-strong));
+  border-radius: var(--radius-xs);
+  background: var(--color-raised);
+  font-size: var(--fs-caption);
+  cursor: grab;
+  transition: filter var(--duration-fast) var(--ease-standard);
+}
+
+.tchip:hover {
+  filter: brightness(1.18);
+}
+
+/* A soft wash of the project's colour behind the pill, so projects read at a glance, not only by the edge. */
+.tchip.has-project::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--pc);
+  content: "";
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+/* A closed task (done, failed, cancelled) is quiet: no fill, no wash, faint text; done is ticked and struck. */
+.tchip.is-closed {
+  background: transparent;
+}
+
+.tchip.is-closed::before {
+  display: none;
+}
+
+.tchip.is-closed .tchip__title,
+.tchip.is-closed .tchip__time {
+  color: var(--color-text-faint);
+}
+
+.tchip__tick {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-ok);
+}
+
+.tchip__tick svg {
+  width: 10px;
+  height: 10px;
+}
+
+.tchip__time {
+  flex: none;
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.tchip__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tchip .prio {
+  height: 14px;
+  padding: 0 2px;
+}
+
+.tchip .prio svg {
+  width: 10px;
+  height: 10px;
+}
+
+.tchip.is-closed .tchip__title { /* every finished chip is struck, as in the list and Kanban */
+  text-decoration: line-through;
+}
+
+.tchip.is-over {
+  border-color: var(--color-danger-edge);
+  border-left-color: var(--pc, var(--color-danger));
+  background: var(--color-danger-tint);
+}
+
+.tchip__late {
+  flex: none;
+  margin-left: auto;
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
+.tchip__open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tchip__go {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+}
+
+/* ---- The week ------------------------------------------------------------------ */
+
+.wk {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+
+.wk__row {
+  display: grid;
+  grid-template-columns: 52px repeat(7, minmax(0, 1fr));
+}
+
+.wk__day {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-2);
+  border-left: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.wk__day .ccell__add {
+  margin-left: auto;
+}
+
+.wk__allday {
+  min-height: 36px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wk__lbl {
+  padding: var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.wk__col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 2px;
+  border-left: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.wk__col.is-wknd {
+  background: var(--color-bg);
+}
+
+.wk__col.is-today {
+  background: var(--color-accent-tint);
+}
+
+.wk__col.is-over {
+  outline: 1px solid var(--color-accent-edge);
+  outline-offset: -1px;
+}
+
+.wk__hours span {
+  display: block;
+  height: 40px;
+  padding-right: var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-align: right;
+  transform: translateY(-7px);
+}
+
+.wk__slots {
+  position: relative;
+  display: block;
+  height: 640px;
+  padding: 0;
+  background-image: linear-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 100% 40px;
+}
+
+.slot {
+  position: absolute;
+  box-sizing: border-box;
+  height: 38px;
+  padding: 1px 2px;
+}
+
+.slot .tchip {
+  align-items: flex-start;
+  height: 100%;
+  padding-top: 3px;
+}
+
+/* ---- The day's panel and its Day note ------------------------------------------- */
+
+.dpop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(460px, calc(100vw - 2 * var(--space-4)));
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.dpop__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dpop__head h3 {
+  margin: 0 auto 0 0;
+  font-size: var(--fs-body);
+}
+
+.dpop__totals {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.dpop__sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dpop__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.dpop__none {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+.dpop__add {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dpop__add .input {
+  flex: 1;
+}
+
+.dpop__error {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: var(--fs-label);
+}
+
+.dpop__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.dnote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  font-size: var(--fs-label);
+}
+
+.dnote__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dnote__del {
+  flex: none;
+  opacity: 0;
+}
+
+.dnote:hover .dnote__del,
+.dnote__del:focus-visible {
+  opacity: 1;
+}
+
+.dwho {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  padding-top: 1px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.dwho--you {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.dmini {
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-accent-strong);
+  border-radius: 4px;
+  background: var(--color-accent-tint);
+}
+
+/* ---- The Money calendar (G12): the grid and the clicked day's list beside it ----------------- */
+
+.mcal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* The clicked day's list goes under the month when there is no room for seven days and a list beside them. */
+@container money-main (max-width: 899px) {
+  .mcal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mcal .ccell {
+  gap: 2px;
+}
+
+.ccell__tot {
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.ccell__tot--main {
+  font-weight: 650;
+}
+
+.ccell__tot.usd {
+  color: var(--color-info);
+}
+
+.mcal__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.mcal__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.mcal__day {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ---- Phone: an agenda under a month strip (G14) --------------------------------- */
+
+.mstrip {
+  display: flex;
+  gap: var(--space-1);
+  margin-right: calc(-1 * var(--gutter));
+  padding: var(--space-1) var(--gutter) var(--space-2) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mstrip::-webkit-scrollbar {
+  display: none;
+}
+
+.mstrip__day {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  width: 40px;
+  padding: var(--space-1) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.mstrip__day.is-today {
+  border-color: var(--color-accent-strong);
+}
+
+.mstrip__day.is-today .mstrip__n {
+  color: var(--color-accent-soft);
+  font-weight: 600;
+}
+
+.mstrip__day.is-picked {
+  background: var(--color-accent-tint);
+  border-color: var(--color-accent-edge);
+  color: var(--color-text);
+}
+
+.mstrip__wd {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.mstrip__n {
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.mstrip__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.mstrip__day.has-items .mstrip__dot {
+  background: var(--color-accent-strong);
+}
+
+.mstrip__clear {
+  flex: none;
+  align-self: center;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-tint);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-label);
+  cursor: pointer;
+}
+
+.agenda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.agenda__day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.agenda__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.agenda__title {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.agenda__title.is-today {
+  color: var(--color-accent-soft);
+}
+
+.agenda__empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.agenda__sp {
+  flex: 1;
+}
+
+.agenda__total {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.agenda__none {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+/* A pill in an agenda has the whole row, one line, never a third, at the label size so it reads on a phone. */
+.agenda .tchip {
+  min-height: 36px;
+  font-size: var(--fs-label);
+}
+
+.agenda .tchip__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .ccell {
+    min-height: 84px;
+    padding: var(--space-1);
+  }
+
+  .tchip__time {
+    display: none;
+  }
+
+  .agenda .tchip__time {
+    display: inline;
+  }
+
+  .ccell__add {
+    opacity: 1;
+  }
+
+  .mcal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

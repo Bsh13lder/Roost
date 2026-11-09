@@ -1,0 +1,10 @@
+{
+  "url": "https://shop.example/products/42",
+  "title": "Just a moment...",
+  "text": "shop.example\nVerifying you are human. This may take a few seconds.\nshop.example needs to review the security of your connection before proceeding.\nRay ID: 8c2f5e1a9b3d4f60",
+  "truncated": false,
+  "status": 403,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}

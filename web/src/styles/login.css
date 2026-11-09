@@ -1,0 +1,71 @@
+/* ---------------------------------------------------------------------
+   Login — one card, with the Roost robot sitting on its top edge.
+   --------------------------------------------------------------------- */
+
+.login-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 120px 16px 48px;
+}
+
+.login-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 384px;
+  padding: 36px 28px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+/* The short bar the robot sits on, laid along the card's top edge. */
+.login-card::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 132px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--bark);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(-50%);
+}
+
+.login-card__bird {
+  position: absolute;
+  top: -78px;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+}
+
+.login-card__title {
+  margin: 4px 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-align: center;
+}
+
+.login-card__lede {
+  margin: -8px 0 6px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.login-card .btn--primary {
+  margin-top: 4px;
+  height: 44px;
+}
+
+.login-card__switch {
+  align-self: center;
+}

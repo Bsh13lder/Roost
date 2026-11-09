@@ -1,0 +1,24 @@
+{"url": "https://www.upwork.com/nx/proposals/job/~1/apply/", "viewport": [1274, 627],
+ "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+   {"id": 20, "tag": "div", "attrs": {"role": "dialog", "aria-labelledby": "t"}, "children": [
+     {"id": 21, "tag": "h2", "attrs": {"id": "t"}, "children": [{"id": 22, "text": "3 things you need to know"}]},
+     {"id": 30, "tag": "label", "attrs": {"class": "air3-checkbox-label", "data-test": "understand-and-agree"}, "children": [
+       {"id": 31, "tag": "input", "attrs": {"type": "checkbox", "class": "air3-checkbox-input sr-only"}},
+       {"id": 32, "tag": "span", "attrs": {"class": "air3-checkbox-fake-input"}, "children": [
+         {"id": 33, "tag": "div", "attrs": {"class": "air3-icon md"}, "children": [{"id": 34, "tag": "svg", "attrs": {"aria-hidden": "true"}}]}]},
+       {"id": 35, "text": " Yes, I understand."}]},
+     {"id": 36, "tag": "label", "attrs": {"for": "news"}, "children": [{"id": 37, "text": "Send me news"}]},
+     {"id": 38, "tag": "input", "attrs": {"type": "checkbox", "id": "news", "class": "sr-only"}},
+     {"id": 40, "tag": "button", "children": [{"id": 41, "text": "Cancel"}]},
+     {"id": 42, "tag": "button", "children": [{"id": 43, "text": "Continue"}]}]}]}]},
+ "ax": [{"role": "RootWebArea", "name": "Apply", "backend": 1},
+        {"role": "dialog", "name": "3 things you need to know", "backend": 20},
+        {"role": "LabelText", "name": "", "backend": 30},
+        {"role": "checkbox", "name": "Yes, I understand.", "backend": 31},
+        {"role": "LabelText", "name": "", "backend": 36},
+        {"role": "checkbox", "name": "Send me news", "backend": 38},
+        {"role": "button", "name": "Cancel", "backend": 40},
+        {"role": "button", "name": "Continue", "backend": 42}],
+ "boxes": {"20": [270, 100, 730, 500], "30": [287, 463, 685, 21], "31": [286, 462, 1, 1], "32": [287, 464, 18, 18],
+           "36": [287, 500, 200, 21], "38": [286, 499, 1, 1], "40": [700, 560, 100, 36], "42": [820, 560, 100, 36]},
+ "hits": {"286,462": 20, "630,474": 30, "297,473": 34, "286,499": 20, "387,510": 36, "750,578": 41, "870,578": 43}}

@@ -1,0 +1,56 @@
+# Roost, always on: the gateway (web API + the built web app) in Docker.
+#
+# The desk keeper is NOT in here — it owns real Brave windows and Docker
+# workspace containers on the Mac itself, so it runs as a launchd agent on
+# the host (`make desk-keeper-install`); this container reaches it at
+# host.docker.internal:18801, every request HMAC-signed with the shared
+# secret in ~/Roost/data/keeper.secret.
+#
+# Guarded by tests/test_compose.py: project name `roost`, no container_name
+# (this Mac also runs the old LazyClaw stack), one port published on the
+# host's 127.0.0.1 only, two bind mounts (~/Roost/data, and ~/Roost/mobile
+# read only for the in-app update) — nothing under
+# ~/Desktop or ~/.claude, never the Docker socket.
+#
+# Use the Makefile: `make deploy` (first time), `make up` / `down` / `logs`
+# / `rebuild`, `make claude-login` (once) and `make claude-status`.
+name: roost
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway/Dockerfile
+    image: roost-gateway:dev
+    ports:
+      - "127.0.0.1:18800:18800"
+    volumes:
+      - ${HOME}/Roost/data:/data
+      - ${HOME}/Roost/mobile:/mobile:ro   # the published phone app (scripts/publish_mobile.sh), read only
+      - roost_claude:/home/roost/.claude
+    environment:
+      ROOST_KEEPER_URL: http://host.docker.internal:18801
+      ROOST_VOICE_URL: http://host.docker.internal:18804   # the voice service on the Mac (make voice-install)
+      ROOST_MODEL: claude
+      ROOST_DESK: keeper
+      ROOST_EXTRA_ORIGINS: ${ROOST_EXTRA_ORIGINS:-}   # e.g. the Mac's Tailscale https address, set in .env (not committed)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    mem_limit: 1g
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18800/api/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  # The bundled `claude` CLI's own login (`make claude-login`), separate
+  # from any other app's credentials on this Mac.
+  roost_claude:
+    name: roost_claude

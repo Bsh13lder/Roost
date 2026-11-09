@@ -1,0 +1,10 @@
+{
+  "url": "https://tickets.example/events/spring",
+  "title": "tickets.example",
+  "text": "tickets.example\nVerify you are human by completing the action below.\ntickets.example needs to review the security of your connection before proceeding.",
+  "truncated": false,
+  "status": 200,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}

@@ -1,0 +1,137 @@
+/* ---------------------------------------------------------------------
+   The bot panel (polish R1.5): the bot's profile beside its chat. A
+   second column on a wide screen, a drawer over the chat on a tablet,
+   a full-screen sheet on a phone (see ui-overlays.css). Tokens only.
+   --------------------------------------------------------------------- */
+
+.chat-page {
+  position: relative;
+}
+
+.chat-page__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bot-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-panel);
+  outline: none;
+}
+
+.bot-panel__head {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+.bot-panel__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  padding: 0 var(--space-5) var(--space-6);
+  overflow-y: auto;
+}
+
+.panel-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.panel-hero__state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.panel-hero__main {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-tint);
+  color: var(--color-accent-soft);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+@media (min-width: 1025px) {
+  .chat-page--panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-width);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .bot-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    width: min(var(--panel-width), 100%);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  .bot-panel {
+    animation: bot-panel-in var(--duration-slow) var(--ease-standard);
+  }
+}
+
+@keyframes bot-panel-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+/* ---- The label under the job ------------------------------------------ */
+
+.group-label--quiet {
+  color: var(--color-text-secondary);
+}
+
+.group-label__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 240px;
+}
+
+.group-label__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.group-label__caption {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.group-label__used {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.group-label__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

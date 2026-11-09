@@ -1,0 +1,395 @@
+/* ---------------------------------------------------------------------
+   The chat's composer, header and dock (split from chat.css).
+   --------------------------------------------------------------------- */
+
+/* ---- Composer -------------------------------------------------------- */
+
+.chat-page__dock {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: calc(var(--talk-width) + 2 * var(--gutter));
+  padding: 8px var(--gutter) 20px;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 7px 7px 7px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-raised);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.composer:focus-within {
+  border-color: var(--chat-accent, var(--color-accent));
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--chat-accent-soft, var(--color-accent-strong));
+}
+
+/* The box grows with its text in every browser (hooks/useAutoGrow: up to COMPOSER_MAX_ROWS lines, then
+   it scrolls). It has no rounded corners of its own and a little room at each side, so no letter is
+   ever clipped (audit finding 6). */
+.composer__box {
+  flex: 1;
+  min-width: 0;
+  min-height: 24px;
+  padding: 7px var(--space-1);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: hidden;
+}
+
+.composer__box:focus,
+.composer__box:focus-visible {
+  outline: none;
+}
+
+.composer__box::placeholder {
+  color: var(--color-text-faint);
+}
+
+.composer--large {
+  border-radius: var(--radius-lg);
+  padding: 12px 10px 10px 20px;
+}
+
+.composer--large .composer__box {
+  min-height: 84px;
+}
+
+.composer__send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--chat-accent, var(--color-accent));
+  color: var(--chat-on-accent, var(--color-on-accent));
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.composer__send:hover:not(:disabled) {
+  background: var(--chat-accent-hover, var(--color-accent-strong));
+}
+
+.composer__send:active:not(:disabled) {
+  background: var(--chat-accent-press, var(--color-accent-hover));
+}
+
+.composer__send:disabled {
+  background: var(--color-border);
+  color: var(--color-text-faint);
+  cursor: not-allowed;
+}
+
+/* ---- Chat header: back · the profile pill · ⋯ ------------------------ */
+
+.chat-header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 10px 10px 8px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.chat-header > .icon-btn,
+.chat-header .menu > .icon-btn {
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.chat-header > .icon-btn:hover,
+.chat-header .menu > .icon-btn:hover,
+.chat-header .menu > .icon-btn[aria-expanded="true"] {
+  color: var(--color-text);
+  background: var(--color-raised);
+}
+
+.chat-header__pill {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-right: auto;
+  padding: 4px 16px 4px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.chat-header__pill:hover {
+  border-color: var(--color-border-strong);
+}
+
+.chat-header__pill .avatar-wrap {
+  flex: none;
+}
+
+.chat-header__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-header__name {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-header__text .status-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chat-header__text .status-label__activity {
+  overflow: hidden;
+  color: var(--color-text-faint);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ---- Dock: the round + beside the pill input -------------------------- */
+
+.chat-composer {
+  display: flex;
+}
+
+.chat-composer > .composer {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Steer: Stop, quiet and right-aligned above the composer while the bot is On it. */
+.chat-stop {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-1);
+}
+
+/* One round pill (polish R1.12): the + sits inside it, before the text. It stays a pill while the text
+   is one row and takes the large radius when the box grows. */
+.composer--leading {
+  align-items: flex-end;
+  padding: 4px 6px 4px 4px;
+  border-radius: var(--radius-pill);
+}
+
+.composer--leading[data-rows="many"] {
+  border-radius: var(--radius-lg);
+}
+
+.composer__leading {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.composer__leading .icon-btn {
+  width: var(--control-lg);
+  height: var(--control-lg);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.composer__leading .icon-btn:hover,
+.composer__leading .icon-btn[aria-expanded="true"] {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+/* The chat mode pill (2026-10-25): a small round pill beside the +, the current mode's name in it. */
+.chat-mode__pill {
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-md);
+  max-width: 7.5rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--fs-label);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chat-mode__pill:hover,
+.chat-mode__pill[aria-expanded="true"] {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+.chat-mode__pill:focus-visible {
+  outline: 2px solid var(--chat-accent, var(--color-accent));
+  outline-offset: 2px;
+}
+
+.chat-mode__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-mode__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(18rem, calc(100vw - 6rem));
+  white-space: normal;
+}
+
+.chat-mode__name {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.chat-mode__line {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+}
+
+/* ---- Reply quotes and the instructions card (replies track) ---------- */
+
+.reply-quote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-left: 2px solid var(--color-accent-edge);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.reply-quote__text,
+.reply-chip__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.reply-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.reply-chip__label {
+  flex: none;
+  color: var(--color-text-faint);
+  font-weight: 600;
+}
+
+.reply-chip__text {
+  flex: 1;
+}
+
+.instructions-card__why {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.instructions-card__diff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 24rem;
+  margin: 0;
+  overflow: auto;
+}
+
+.instructions-card__same {
+  padding: 0 var(--space-3);
+  color: var(--color-text-faint);
+  font-size: var(--fs-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.instructions-card__edit {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+/* Find in chat (restructure slice 3): a quiet bar under the header. */
+.find-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.find-bar__icon {
+  display: inline-flex;
+  color: var(--color-text-faint);
+}
+
+.find-bar .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.find-bar__count {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* The composer's + menu sits inside the pill; its file box is never drawn. */
+.composer-plus__input {
+  display: none;
+}
+
+.chat-dock__added {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: center;
+}

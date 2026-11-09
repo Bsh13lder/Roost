@@ -1,0 +1,10 @@
+{
+  "url": "https://api.example/search?q=garden+tools",
+  "title": "429 Too Many Requests",
+  "text": "Too Many Requests\nYou have sent too many requests in a given amount of time. Please try again later.",
+  "truncated": false,
+  "status": 429,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}

@@ -1,0 +1,105 @@
+/* ---------------------------------------------------------------------
+   What I remember (memory plan): the Info tab's panel, its rows and form,
+   and the chat's Remembered line. Tokens only.
+   --------------------------------------------------------------------- */
+
+.memory-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.memory-panel__head,
+.memory-group__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.memory-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.memory-group__title {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.memory-group__empty {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-body);
+}
+
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.memory-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.memory-row--faded .memory-row__text {
+  color: var(--color-text-secondary);
+}
+
+.memory-row__text {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-body);
+}
+
+.memory-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.memory-row__actions,
+.memory-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.memory-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* The Remembered line in the chat: quiet, with its Undo beside it. */
+.message--memory {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 3px 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+/* Not remembered: the from-web mark sits in the line, beside Remember it. */
+.message--memory-offer .message__taint {
+  align-self: center;
+  margin-top: 0;
+}

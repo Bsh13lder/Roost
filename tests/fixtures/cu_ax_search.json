@@ -1,0 +1,31 @@
+{
+  "url": "https://wiki.example/",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 10, "tag": "form", "attrs": {"role": "search", "action": "/search"}, "children": [
+      {"id": 11, "tag": "input", "attrs": {"type": "search", "name": "q", "value": "my secret query"}},
+      {"id": 12, "tag": "button", "children": [{"id": 13, "text": "Go"}]}
+    ]},
+    {"id": 20, "tag": "a", "attrs": {"href": "/a"}, "children": [{"id": 21, "text": "Read more"}]},
+    {"id": 22, "tag": "a", "attrs": {"href": "https://news.example/b"}, "children": [{"id": 23, "text": "Read more"}]},
+    {"id": 30, "tag": "button", "children": [{"id": 31, "text": "Submit"}]},
+    {"id": 32, "tag": "button", "children": [{"id": 33, "text": "Submit later"}]},
+    {"id": 40, "tag": "textarea", "attrs": {"name": "msg"}, "children": [{"id": 41, "text": "my secret draft"}]},
+    {"id": 50, "tag": "div", "attrs": {"contenteditable": "true"}, "children": [{"id": 51, "text": "rich secret"}]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Wiki", "backend": 1},
+    {"role": "searchbox", "name": "Search", "backend": 11, "value": "my secret query", "props": {"editable": "plaintext"}},
+    {"role": "StaticText", "name": "my secret query", "backend": 98},
+    {"role": "button", "name": "Go", "backend": 12},
+    {"role": "link", "name": "Read more", "backend": 20},
+    {"role": "link", "name": "Read  more", "backend": 22},
+    {"role": "button", "name": "Submit", "backend": 30},
+    {"role": "button", "name": "Submit later", "backend": 32},
+    {"role": "textbox", "name": "Message", "backend": 40, "value": "my secret draft", "props": {"editable": "plaintext"}},
+    {"role": "generic", "name": "", "backend": 50, "value": "rich secret", "props": {"editable": "richtext"}}
+  ],
+  "boxes": {"11": [100, 20, 400, 32], "12": [510, 20, 40, 32], "20": [100, 100, 80, 20], "22": [100, 140, 80, 20],
+            "30": [100, 200, 80, 30], "32": [200, 200, 120, 30], "40": [100, 300, 400, 100], "50": [100, 420, 400, 60]},
+  "hits": {}
+}

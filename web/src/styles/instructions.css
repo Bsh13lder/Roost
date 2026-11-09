@@ -1,0 +1,73 @@
+/* ---------------------------------------------------------------------
+   The Instructions page (split from profile.css).
+   --------------------------------------------------------------------- */
+
+/* ---- Instructions (full screen) -------------------------------------- */
+
+.instructions-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.instructions-page__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 10px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.instructions-page__head > .icon-btn {
+  color: var(--color-text-secondary);
+}
+
+.instructions-page__title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.instructions-page__text {
+  flex: 1;
+  width: 100%;
+  max-width: var(--reading-width);
+  min-height: 240px;
+  margin: 0 auto;
+  padding: 20px var(--gutter);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  resize: none;
+}
+
+.instructions-page__text:focus {
+  outline: none;
+}
+
+.instructions-count {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+}
+
+.instructions-page .instructions-count {
+  padding: 10px var(--gutter) 16px;
+  border-top: 1px solid var(--color-border);
+  text-align: right;
+}
+
+.instructions-count--over {
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+}

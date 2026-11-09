@@ -1,0 +1,334 @@
+/* ---------------------------------------------------------------------
+   Chat (S1.5): the page, messages and date separators. The dock and
+   header are in chat-dock.css, the cards in chat-cards.css, the
+   Earlier conversations sheet in chat-sheet.css.
+   --------------------------------------------------------------------- */
+
+.chat-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---- Message list ---------------------------------------------------- */
+
+.chat-page__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px var(--gutter) 12px;
+}
+
+/* The conversation shares the header's left edge (messenger layout):
+   the bot speaks from the left, you answer from the right. */
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: var(--talk-width);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.message {
+  display: flex;
+  min-width: 0;
+}
+
+.message--run-start:not(:first-child) {
+  margin-top: 14px;
+}
+
+.message--bot {
+  align-self: flex-start;
+  gap: 10px;
+  max-width: min(88%, 620px);
+}
+
+.message--user {
+  align-self: flex-end;
+  max-width: min(80%, 560px);
+}
+
+.message__avatar {
+  flex: none;
+  width: 32px;
+  margin-top: 20px; /* past the author line, level with the bubble */
+}
+
+.message__avatar .avatar {
+  animation: none;
+}
+
+.message__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.message--user .message__content {
+  align-items: flex-end;
+}
+
+.message__author {
+  margin: 0 0 4px 6px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+/* No borders (redesign P2): a bot's short reply sits on a soft fill, yours in an accent bubble, and a
+   long reply is a full-width card. */
+.message__body {
+  min-width: 0;
+  padding: 9px 15px;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+/* Plain text keeps its line breaks; markdown lays out its own blocks. */
+.message__plain {
+  white-space: pre-wrap;
+}
+
+.message--bot .message__body {
+  border-radius: var(--radius-xs) var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  background: var(--color-raised);
+}
+
+.message--bot:not(.message--run-start) .message__body {
+  border-radius: var(--radius-xs) var(--radius-lg) var(--radius-lg) var(--radius-xs);
+}
+
+.message--user .message__body {
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-xs) var(--radius-lg);
+  background: var(--chat-accent, var(--color-accent));
+  color: var(--chat-on-accent, var(--color-on-accent));
+}
+
+.message--card {
+  align-self: stretch;
+  max-width: 100%;
+}
+
+.message--card .message__content {
+  flex: 1;
+}
+
+.message--card .message__body,
+.message--card:not(.message--run-start) .message__body {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.message__link {
+  color: var(--color-accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.message--user .message__link {
+  color: var(--chat-on-accent, var(--color-on-accent));
+}
+
+/* The "from web content" mark: always shown under a reply that read a page. */
+.message__taint {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+/* Time and Copy float over the message's top edge on hover or keyboard focus, over the free side. */
+.message__actions {
+  position: absolute;
+  top: calc(-1 * var(--space-3));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px 2px 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-overlay);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.message--bot .message__actions {
+  left: var(--space-2);
+}
+
+.message--user .message__actions {
+  right: var(--space-2);
+}
+
+.message--card .message__actions {
+  right: var(--space-3);
+  left: auto;
+}
+
+.message:hover .message__actions,
+.message:focus-within .message__actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.message__actions .icon-btn {
+  color: var(--color-text-secondary);
+}
+
+.message__time {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tapbacks: the chosen one sits under the message; the picker is a few small buttons beside Copy. */
+.message__reaction {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  font-size: var(--fs-body);
+}
+
+.message__react {
+  display: inline-flex;
+  align-items: center;
+}
+
+.message__react button {
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.message__react button[aria-pressed="true"] {
+  background: var(--color-overlay);
+}
+
+/* A touch screen has no hover: the actions sit quietly under the message instead. */
+@media (hover: none) {
+  .message__actions {
+    position: static;
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .message--user .message__actions {
+    align-self: flex-end;
+  }
+}
+
+.message--activity {
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 3px 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-align: center;
+}
+
+.message__activity-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.message-list__end {
+  height: 1px;
+}
+
+/* ---- While a bot works (redesign P2): see chat-steps.css ------------ */
+
+/* ---- Empty thread ---------------------------------------------------- */
+
+.message-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 420px;
+  margin: 8vh auto 0;
+  padding: 0 8px;
+  text-align: center;
+}
+
+.message-list__empty-title {
+  margin: 14px 0 6px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-heading);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.message-list__empty-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+/* ---- Date separators -------------------------------------------------- */
+
+.message-date,
+.message-new {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--space-3);
+  margin: 18px 0 8px;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.message-date::before,
+.message-date::after,
+.message-new::before,
+.message-new::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.message-new {
+  color: var(--chat-accent-soft, var(--color-accent-soft));
+}
+
+.message-new::before,
+.message-new::after {
+  background: var(--chat-accent, var(--color-accent-edge));
+}
+
+.message-date:first-child {
+  margin-top: 0;
+}
+
+
+@media (max-width: 768px) {
+  .chat-page__scroll {
+    padding-top: 16px;
+  }
+
+  .chat-page__dock {
+    padding: 8px 12px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .message--bot,
+  .message--user {
+    max-width: 88%;
+  }
+}

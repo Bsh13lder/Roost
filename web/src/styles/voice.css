@@ -1,0 +1,194 @@
+/* ---------------------------------------------------------------------
+   Voice (docs/plans/2026-10-30-roost-voice.md V3): the composer's mic,
+   the speaker on a bot's reply, the Voice fold on the profile, and the
+   Correct my English card under a spoken message of yours.
+   --------------------------------------------------------------------- */
+
+/* ---- The mic, inside the composer pill, just before Send --------------- */
+
+.mic {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: center;
+}
+
+.mic__button {
+  width: var(--control-lg);
+  height: var(--control-lg);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+}
+
+.mic__button:hover:not(:disabled) {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+.mic[data-phase="recording"] .mic__button {
+  color: var(--color-danger-text);
+}
+
+.mic__rec {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.mic__dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 50%;
+  background: var(--color-danger);
+  animation: mic-pulse 1.2s var(--ease-standard) infinite;
+}
+
+.mic__cancel {
+  color: var(--color-text-secondary);
+}
+
+.mic__listening {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic__dot {
+    animation: none;
+  }
+}
+
+/* ---- The speaker on a reply: it stays in view while it plays ----------- */
+
+.message__actions:has(.speak-btn[data-phase="playing"]),
+.message__actions:has(.speak-btn[data-phase="loading"]) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.message__actions .speak-btn[data-phase="playing"] {
+  color: var(--chat-accent, var(--color-accent-strong));
+}
+
+/* ---- The Voice fold ---------------------------------------------------- */
+
+.voice__off {
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+.voice__try {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.voice__correct {
+  flex-wrap: wrap;
+}
+
+.voice__correct .info-row__hint {
+  flex-basis: 100%;
+}
+
+/* ---- Live words (voice tuning D4): the ear's words so far, in the box, not yours to edit yet ---- */
+
+.composer__box[data-live="true"] {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* ---- Correct what I say (voice tuning D3): the cleaned words above the box, Keep my words beside ---- */
+
+.composer--fixed {
+  flex-wrap: wrap;
+}
+
+.composer__fix {
+  flex-basis: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-1);
+  text-align: left;
+}
+
+.composer__fix .english-fix__sentence,
+.composer__fix .english-fix__said {
+  text-align: left;
+}
+
+.composer__fix-keep {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* ---- Correct my English: a quiet card right under your spoken message ---- */
+
+.message--english-fix {
+  align-self: flex-end;
+  max-width: min(80%, 560px);
+  margin-top: -2px;
+}
+
+.english-fix {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: right;
+}
+
+.english-fix__sentence,
+.english-fix__said {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.english-fix__sentence {
+  color: var(--color-text);
+}
+
+.english-fix__said {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.english-fix__wrong {
+  color: var(--color-danger);
+  text-decoration: line-through;
+}
+
+.english-fix__right {
+  color: var(--color-ok);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.english-fix__trail {
+  display: inline-block;
+  margin-left: var(--space-2);
+  white-space: nowrap;
+}

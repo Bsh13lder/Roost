@@ -1,0 +1,417 @@
+/* ---------------------------------------------------------------------
+   The UI kit (web/src/ui, redesign P1): what base.css's shared controls
+   (buttons, inputs, fields, chips) do not already cover. Tokens only.
+   --------------------------------------------------------------------- */
+
+/* ---- Field ----------------------------------------------------------- */
+
+.field__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.field__head .field__optional {
+  margin-left: 0;
+}
+
+.field__hint,
+.field__error {
+  margin: 0;
+  font-size: var(--fs-label);
+}
+
+.field__hint {
+  color: var(--color-text-secondary);
+}
+
+.field__error {
+  color: var(--color-danger);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--color-danger-edge);
+}
+
+/* ---- Input heights and the growing textarea --------------------------- */
+
+.input--sm {
+  height: var(--control-sm);
+  padding: 0 var(--space-2);
+  font-size: var(--fs-label);
+}
+
+.input--md {
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+}
+
+.input--lg {
+  height: var(--control-lg);
+}
+
+.input--grow {
+  min-height: var(--control-lg);
+  resize: none;
+  overflow-y: hidden;
+}
+
+/* ---- Chip sizes ------------------------------------------------------- */
+
+.chip--sm {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-label);
+}
+
+.chip--md {
+  height: var(--control-md);
+}
+
+/* ---- Badge ------------------------------------------------------------ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--accent {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-soft);
+}
+
+.badge--ok {
+  background: var(--color-ok-tint);
+  color: var(--color-ok);
+}
+
+.badge--warn {
+  background: var(--color-warn-tint);
+  color: var(--color-warn);
+}
+
+.badge--danger {
+  background: var(--color-danger-tint);
+  color: var(--color-danger);
+}
+
+.badge--info {
+  color: var(--color-info);
+}
+
+/* ---- Meter ------------------------------------------------------------ */
+
+.meter {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.meter__fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width var(--duration-slow) var(--ease-standard);
+}
+
+.meter__fill--accent {
+  background: var(--color-accent);
+}
+
+.meter__fill--ok {
+  background: var(--color-ok);
+}
+
+.meter__fill--warn {
+  background: var(--color-warn);
+}
+
+.meter__fill--over {
+  background: var(--color-danger);
+}
+
+/* ---- Skeleton --------------------------------------------------------- */
+
+.skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-xs);
+  background: var(--color-raised);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton:last-child:not(:first-child) {
+  width: 60%;
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ---- Empty state ------------------------------------------------------ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.empty-state__art {
+  margin-bottom: var(--space-2);
+}
+
+.empty-state__title {
+  margin: 0;
+  font-size: var(--fs-lead);
+  font-weight: 600;
+}
+
+.empty-state__hint {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.empty-state__action {
+  margin-top: var(--space-3);
+}
+
+/* ---- Toast ------------------------------------------------------------ */
+
+.toast-region {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: min(380px, calc(100vw - 2 * var(--space-4)));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-overlay);
+  box-shadow: var(--shadow-lg), var(--edge-inner);
+  color: var(--color-text);
+  font-size: var(--fs-menu);
+  pointer-events: auto;
+}
+
+.toast--ok {
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--color-ok);
+}
+
+.toast--danger {
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--color-danger-edge);
+}
+
+.toast__message {
+  flex: 1;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  /* A phone's toast takes the width between the gutters and wraps its words. */
+  .toast-region {
+    left: var(--space-4);
+    max-width: none;
+  }
+
+  .toast {
+    white-space: normal;
+  }
+}
+
+/* ---- Segmented (Board redesign G4): a short row of exclusive choices ------------------- */
+
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+}
+
+.seg button {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--color-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.seg button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ---- Switch (Board redesign G6): an on/off setting with a label --------------------------- */
+
+.sw {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  height: var(--control-sm);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sw__track {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 18px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+}
+
+.sw__track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+  transition: left var(--duration-fast) var(--ease-standard);
+}
+
+.sw[aria-checked="true"] {
+  color: var(--color-text);
+}
+
+.sw[aria-checked="true"] .sw__track {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-tint);
+}
+
+.sw[aria-checked="true"] .sw__track::after {
+  left: 14px;
+  background: var(--color-accent-strong);
+}
+
+.sw:focus-visible {
+  outline: none;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--focus-ring);
+}
+
+.sw[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* A fold (ui/Fold.tsx): the Info tab's quiet sections. The card inside drops its own frame and title. */
+.fold {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  overflow: hidden;
+}
+
+.fold__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fold__head:hover {
+  background: var(--color-hover);
+}
+
+.fold__title {
+  flex: 1;
+  font-weight: 600;
+}
+
+.fold__summary {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.fold__chevron {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+  transition: transform 150ms var(--ease-standard);
+}
+
+.fold[data-open="true"] .fold__chevron {
+  transform: rotate(90deg);
+}
+
+.fold__body {
+  border-top: 1px solid var(--color-border);
+}
+
+.fold__body > .info-card,
+.fold__body > section {
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+.fold__body > .decisions > .decisions__title,
+.fold__body > .memory-panel .info-card__title,
+.fold__body > .folders-card .info-card__title,
+.fold__body > .approval-card > .info-row:first-child > .info-row__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

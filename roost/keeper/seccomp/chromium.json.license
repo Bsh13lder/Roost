@@ -1,0 +1,4 @@
+SPDX-License-Identifier: Apache-2.0
+Based on moby/profiles seccomp/default.json (Apache-2.0, Copyright Docker, Inc. / the Moby authors),
+plus one unconditional allow for clone, clone3, unshare, setns and chroot so Chromium's own sandbox can start.
+See THIRD_PARTY_NOTICES.md.

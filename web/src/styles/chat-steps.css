@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------------
+   Chat, while a bot works (redesign P2): the typing dots, the caret at the
+   end of a streaming reply, and the reply's step lines. Split from
+   chat.css to keep each file under 800 lines; imported right after it.
+   --------------------------------------------------------------------- */
+
+.message__typing {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  min-height: 40px;
+  color: var(--color-text-secondary);
+}
+
+/* The caret at the end of a reply that is still streaming in. */
+.message__body--streaming .message__plain::after,
+.message__body--streaming .md > :last-child::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--chat-accent-soft, var(--color-accent-strong));
+  animation: roost-caret 1s steps(2, start) infinite;
+}
+
+.tool-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.tool-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+.tool-line--earlier {
+  padding-left: 20px;
+  color: var(--color-text-faint);
+}
+
+.tool-line__mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  color: var(--color-ok);
+}
+
+.tool-line__mark svg {
+  width: 12px;
+  height: 12px;
+}
+
+.tool-line__spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-accent-strong);
+  border-radius: 50%;
+  animation: roost-spin 0.9s linear infinite;
+}
+
+@keyframes roost-caret {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes roost-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message__body--streaming .message__plain::after,
+  .message__body--streaming .md > :last-child::after,
+  .tool-line__spinner {
+    animation: none;
+  }
+}
+
+/* The words beside the typing dots once a reply has been silent for a moment (FirstLine). */
+.message__first-line {
+  font-size: var(--fs-body);
+  background: linear-gradient(90deg, var(--color-text-secondary) 0%, var(--color-text-secondary) 38%,
+    var(--color-text) 50%, var(--color-text-secondary) 62%, var(--color-text-secondary) 100%);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ap-shimmer 2.6s linear infinite;
+}
+
+.message__typing .working-timer {
+  font-size: var(--fs-caption);
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message__first-line { animation: none; }
+}
+
+/* Under your message while a busy bot has yet to pick it up. */
+.message__queued {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  text-align: right;
+}

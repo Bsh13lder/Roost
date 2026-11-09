@@ -1,0 +1,512 @@
+/* Tasks done properly (redesign P3): structured rows, the task drawer, its steps, money and comments,
+   and the quick add. Every value is a token (tokens.css). */
+
+/* ---- Steps ---------------------------------------------------------------- */
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.step-progress .meter {
+  flex: 1;
+}
+
+.step-progress__text,
+.step-list__note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-md);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.step:hover,
+.step:focus-within {
+  background: var(--color-raised);
+}
+
+.step__check {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.step__title {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  overflow-wrap: anywhere;
+}
+
+.step--done .step__title {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.step__action {
+  opacity: 0;
+}
+
+/* A step's own budget form takes its own line under the step. */
+.step-budget {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0 var(--space-2);
+}
+
+.step-budget .input {
+  width: 8em;
+}
+
+.step:hover .step__action,
+.step:focus-within .step__action {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .step__action {
+    opacity: 1;
+  }
+}
+
+.step__rename,
+.step-add {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+}
+
+.step__rename .input,
+.step-add .input {
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* ---- Money ---------------------------------------------------------------- */
+
+.task-money__line {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* For (a step) above the expense line. */
+.task-money__add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.task-money__add > .select {
+  align-self: flex-start;
+}
+
+
+/* ---- Comments and activity -------------------------------------------------- */
+
+.comment-list,
+.task-activity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.comment__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+}
+
+.comment__author {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.comment__step,
+.comment__time,
+.comment__edited,
+.comment-empty,
+.task-activity {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.comment-empty {
+  margin: 0;
+}
+
+/* A comment is plain text: its own line breaks show, and a long word wraps instead of widening the drawer. */
+.comment__body {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comment__actions,
+.comment__edit,
+.comment-composer__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.comment__edit .input {
+  flex: 1 1 100%;
+}
+
+.comment-composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.comment-composer__row {
+  justify-content: flex-end;
+}
+
+.task-activity__web {
+  display: flex;
+  gap: var(--space-2);
+}
+
+
+/* ---- Quick add -------------------------------------------------------------- */
+
+.quick-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.quick-add__row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.quick-add__row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-add__reading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quick-add__reading:empty {
+  display: none;
+}
+
+.quick-add__title {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-tint);
+  color: var(--color-accent-soft);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+}
+
+.quick-chip--ask {
+  border-style: dashed;
+  border-color: var(--color-warn);
+  background: transparent;
+  color: var(--color-warn);
+}
+
+.quick-chip__remove {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.quick-chip__remove svg {
+  width: 12px;
+  height: 12px;
+  margin: auto;
+}
+
+.quick-chip__remove:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.quick-add__ask {
+  margin: 0;
+  color: var(--color-warn);
+  font-size: var(--fs-label);
+}
+
+/* ---- Quick add: suggestions, richer chips, the "?" help ----------------------- */
+
+.quick-add__field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-add__field .input {
+  width: 100%;
+}
+
+.quick-suggest {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 20;
+  min-width: 200px;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-overlay);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-suggest__option {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  cursor: pointer;
+}
+
+.quick-suggest__option[aria-selected="true"] {
+  background: var(--color-accent-tint);
+  color: var(--color-text);
+}
+
+.quick-suggest__hint {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.quick-chip--warn {
+  border-color: var(--color-warn);
+  background: transparent;
+  color: var(--color-warn);
+}
+
+.quick-chip__action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quick-chip__action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.quick-help {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(560px, calc(100vw - var(--space-8)));
+  max-height: 70vh;
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+.quick-help__lead {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.quick-help__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quick-help__row {
+  display: grid;
+  grid-template-columns: 7rem 1fr 1fr;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  font-size: var(--fs-label);
+}
+
+.quick-help__token {
+  grid-row: span 2;
+  color: var(--color-accent-soft);
+  font-family: var(--font-mono);
+}
+
+.quick-help__means {
+  grid-column: 2 / span 2;
+  color: var(--color-text);
+}
+
+.quick-help__example {
+  color: var(--color-text-secondary);
+}
+
+.quick-help__lang {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .quick-help__row {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-help__token,
+  .quick-help__means {
+    grid-row: auto;
+    grid-column: auto;
+  }
+}
+
+/* ---- Quick add: a pasted list asks "Add N tasks?" ------------------------------ */
+.quick-paste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.quick-paste__ask {
+  margin: 0;
+  font-weight: 600;
+}
+
+.quick-paste__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.quick-paste__item {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  font-size: var(--fs-label);
+}
+
+.quick-paste__steps {
+  color: var(--color-text-secondary);
+}
+
+.quick-paste__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ---- Quick add: the manual pickers (Date, Project, Priority, Tag, Repeat) ------- */
+.quick-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.quick-pickers .menu .icon-btn {
+  width: auto;
+  padding: 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.quick-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 14rem;
+}
+
+.quick-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 12rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.quick-picker__none {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}

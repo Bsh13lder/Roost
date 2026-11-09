@@ -1,0 +1,63 @@
+/* ---------------------------------------------------------------------
+   App shell (S1.4): two panes, like a chat app. On a desktop the chat
+   list (Home) sits on the left and the open chat on the right; on a
+   phone only one shows — the list on "/", the open view elsewhere.
+   --------------------------------------------------------------------- */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.app-shell__list {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-panel);
+  border-right: 1px solid var(--color-border);
+}
+
+/* Scrolls like the old content column did, so pages that grow past the
+   screen (New bot, the Board) still scroll; Chat scrolls inside itself. */
+.app-shell__detail {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell__list {
+    border-right: none;
+  }
+
+  .app-shell[data-view="detail"] .app-shell__list,
+  .app-shell[data-view="list"] .app-shell__detail {
+    display: none;
+  }
+}
+
+/* ---- Desktop's empty detail pane -------------------------------------- */
+
+.pick-a-chat {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 24px var(--gutter);
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  text-align: center;
+}
+
+.pick-a-chat p {
+  margin: 0;
+  max-width: 36ch;
+}

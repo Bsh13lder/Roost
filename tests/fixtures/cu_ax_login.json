@@ -1,0 +1,47 @@
+{
+  "url": "https://shop.example/login",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 3, "text": "Welcome back"},
+    {"id": 10, "tag": "form", "attrs": {"method": "POST", "action": "/session"}, "children": [
+      {"id": 11, "tag": "input", "attrs": {"type": "email", "name": "email", "value": "me@private.example"}},
+      {"id": 12, "tag": "input", "attrs": {"type": "password", "name": "pw", "value": "hunter2"}},
+      {"id": 13, "tag": "button", "attrs": {"type": "submit"}, "children": [{"id": 14, "text": "Sign in"}]}
+    ]},
+    {"id": 20, "tag": "a", "attrs": {"href": "/forgot"}, "children": [{"id": 21, "text": "Forgot password?"}]},
+    {"id": 30, "tag": "form", "attrs": {"method": "post", "id": "verify"}, "children": [
+      {"id": 31, "text": "Enter the code we sent you"},
+      {"id": 32, "tag": "input", "attrs": {"inputmode": "numeric", "maxlength": "6", "name": "digits"}},
+      {"id": 33, "tag": "input", "attrs": {"autocomplete": "one-time-code", "name": "otp"}},
+      {"id": 34, "tag": "button", "children": [{"id": 35, "text": "Verify"}]}
+    ]},
+    {"id": 40, "tag": "form", "attrs": {"method": "post"}, "children": [
+      {"id": 41, "text": "Where do you live?"},
+      {"id": 42, "tag": "input", "attrs": {"inputmode": "numeric", "maxlength": "5", "name": "zip"}},
+      {"id": 43, "tag": "input", "attrs": {"autocomplete": "new-password", "type": "text", "name": "newpw"}}
+    ]},
+    {"id": 50, "tag": "a", "attrs": {"href": "https://help.example/about"}, "children": [{"id": 51, "text": "Footer link"}]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Sign in", "backend": 1},
+    {"role": "StaticText", "name": "Welcome back", "backend": 3},
+    {"role": "textbox", "name": "Email", "backend": 11, "value": "me@private.example", "props": {"focusable": true, "editable": "plaintext"}},
+    {"role": "textbox", "name": "Password", "backend": 12, "value": "hunter2", "props": {"focusable": true, "focused": true, "editable": "plaintext"}},
+    {"role": "StaticText", "name": "hunter2", "backend": 99},
+    {"role": "button", "name": "Sign in", "backend": 13, "props": {"focusable": true}},
+    {"role": "link", "name": "Forgot password?", "backend": 20, "props": {"focusable": true}},
+    {"role": "textbox", "name": "Digits", "backend": 32, "props": {"editable": "plaintext"}},
+    {"role": "textbox", "name": "One-time code", "backend": 33, "props": {"editable": "plaintext"}},
+    {"role": "button", "name": "Verify", "backend": 34},
+    {"role": "textbox", "name": "Zip", "backend": 42, "props": {"editable": "plaintext"}},
+    {"role": "textbox", "name": "New password", "backend": 43, "props": {"editable": "plaintext"}},
+    {"role": "link", "name": "Footer link", "backend": 50},
+    {"role": "button", "name": "Hidden", "backend": 60, "ignored": true}
+  ],
+  "boxes": {
+    "11": [400, 200, 300, 32], "12": [400, 250, 300, 32], "13": [400, 300, 100, 36], "20": [520, 306, 120, 20],
+    "32": [400, 400, 120, 32], "33": [540, 400, 120, 32], "34": [680, 400, 80, 32],
+    "42": [400, 500, 120, 32], "43": [540, 500, 120, 32], "50": [400, 2000, 100, 20]
+  },
+  "hits": {}
+}

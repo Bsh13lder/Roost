@@ -1,0 +1,652 @@
+/* The Tasks list (Board redesign G3/G4): one task is one 44px line. Every value is a token (tokens.css). */
+
+/* ---- Rows --------------------------------------------------------------- */
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 72px 112px 150px 96px 64px;
+  align-items: center;
+  gap: var(--space-3);
+  position: relative;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.task-row:hover,
+.task-row.is-cursor {
+  background: var(--color-panel);
+}
+
+.task-row:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.task-row.is-cursor {
+  box-shadow: inset 2px 0 0 var(--color-accent-strong);
+}
+
+/* Urgent, while open: a red edge on the left. */
+.task-row--urgent {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+.task-row--urgent.is-cursor {
+  box-shadow: inset 3px 0 0 var(--color-danger), inset 0 0 0 1px var(--color-panel);
+}
+
+.task-row__cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.check {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.check:hover:not(:disabled) {
+  border-color: var(--color-ok);
+}
+
+.check:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.check.is-done {
+  border-color: var(--color-ok);
+  background: var(--color-ok);
+}
+
+.task-row__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.task-row__open {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.task-row__open:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+.task-row__open .t {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-row.is-done .t {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+}
+
+.task-row__quiet,
+.task-row__star {
+  flex: none;
+  font-size: var(--fs-label);
+  color: var(--color-text-faint);
+}
+
+.task-row__star {
+  color: var(--color-warn);
+}
+
+/* Priority (Amendment G): an Urgent pill, a warm flag for High, nothing else. */
+.prio {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  height: 20px;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.prio svg {
+  width: 12px;
+  height: 12px;
+}
+
+.prio--urgent {
+  padding: 0 7px 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-danger-tint);
+  box-shadow: inset 0 0 0 1px var(--color-danger-edge);
+  color: var(--color-danger);
+}
+
+.prio--high {
+  padding: 0 2px;
+  color: var(--color-warn);
+}
+
+/* Steps, money, project, due. */
+.task-row__steps {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.task-row__steps--button {
+  padding: 2px var(--space-1) 2px 2px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  cursor: pointer;
+}
+
+.task-row__steps--button:hover {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+.task-row__steps--button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.task-row__meter {
+  width: 22px;
+  height: 4px;
+}
+
+.chev {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.chev.is-open {
+  transform: rotate(90deg);
+}
+
+.task-row__money {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.task-row__money--over {
+  color: var(--color-danger);
+}
+
+.task-row__project {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.task-row__project .n {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.task-row__due {
+  justify-content: flex-end;
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.task-row__due--over {
+  color: var(--color-danger);
+}
+
+.task-row__due--today {
+  color: var(--color-ok);
+}
+
+.task-row__due--soon {
+  color: var(--color-warn);
+}
+
+.task-row__due--later {
+  color: var(--color-text-secondary);
+}
+
+/* Actions show on hover, with focus inside, on the keyboard cursor, or while a menu or popover is open. */
+.task-row__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.task-row:hover .task-row__actions,
+.task-row.is-cursor .task-row__actions,
+.task-row:focus-within .task-row__actions,
+.task-row__actions:has([aria-expanded="true"]) {
+  opacity: 1;
+}
+
+.task-row__actions .icon-btn {
+  width: var(--control-sm);
+  height: var(--control-sm);
+  font-size: var(--fs-label);
+}
+
+/* Phone only (G14 lays it out): the project, steps and money under the title. */
+.row__meta {
+  display: none;
+}
+
+/* ---- One task's steps, under its row ----------------------------------------- */
+
+.substeps {
+  margin: 0 0 var(--space-2) 36px;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--color-border);
+}
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 28px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.sub .check {
+  width: 14px;
+  height: 14px;
+}
+
+.sub.is-done .t {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+}
+
+@media (hover: none) {
+  .task-row__actions {
+    opacity: 1;
+  }
+}
+
+/* ---- The stat line, the views and the tools (G4) ----------------------------- */
+
+.stat-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.stat {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  text-align: left;
+}
+
+button.stat {
+  cursor: pointer;
+}
+
+button.stat:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+.stat__n {
+  display: block;
+  font-size: var(--fs-display);
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__n--faint {
+  color: var(--color-text-faint);
+}
+
+.stat__l {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.stat--danger .stat__n {
+  color: var(--color-danger);
+}
+
+.tasks-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* Show finished (lead task 14): the switch rides at the end of the toolbar row; its count is quiet */
+.show-finished {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.show-finished__count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.tasks-top--project {
+  justify-content: flex-end;
+}
+
+.views {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.tasks-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.tasks-tools__search {
+  width: 200px;
+}
+
+/* ---- The quick box (G4) --------------------------------------------------------- */
+
+.quick-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+
+.quick-box:focus-within {
+  border-color: var(--color-accent-edge);
+}
+
+.quick-box__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quick-box__glyph {
+  width: 20px;
+  color: var(--color-accent-strong);
+  font-size: var(--fs-heading);
+  text-align: center;
+}
+
+.quick-box__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-box__field .input {
+  border-color: transparent;
+  background: none;
+}
+
+.quick-box__chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: 28px;
+}
+
+.quick-box__chips:empty {
+  display: none;
+}
+
+/* ---- Groups and the shortcuts line (G4) ----------------------------------------- */
+
+.group {
+  margin-bottom: var(--space-5);
+}
+
+.group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.group__title {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.group__title.danger {
+  color: var(--color-danger);
+}
+
+.group__head .btn {
+  margin-left: auto;
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.shortcuts kbd {
+  padding: 2px 5px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  color: var(--color-text-secondary);
+  font: 500 var(--fs-caption) / 1 var(--font-mono);
+}
+
+/* ---- A narrow Board on a laptop (the sidebar beside it) ---------------------------- */
+
+/* Under ~820px of Board the seven columns leave the title a few letters, so steps and money move to a
+   second line under it (.row__meta, without the project, which keeps its column). Phones have their own. */
+@media (min-width: 769px) {
+  @container board (max-width: 819px) {
+    .task-row {
+      grid-template-columns: 24px minmax(0, 1fr) 128px 88px 64px;
+      grid-template-areas:
+        "c t p d a"
+        ". m m m m";
+      row-gap: 0;
+    }
+
+    .task-row__cell--check { grid-area: c; }
+    .task-row__title { grid-area: t; }
+    .task-row__cell--project { grid-area: p; }
+    .task-row__due { grid-area: d; }
+    .task-row__actions { grid-area: a; }
+
+    .task-row__cell--steps,
+    .task-row__cell--money,
+    .row__meta .task-row__project {
+      display: none;
+    }
+
+    .row__meta {
+      display: flex;
+      grid-area: m;
+      gap: var(--space-3);
+      align-items: center;
+      min-width: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--fs-caption);
+      white-space: nowrap;
+    }
+
+    .row__meta:not(:has(> :not(:empty))) {
+      display: none;
+    }
+  }
+}
+
+/* ---- Phone ------------------------------------------------------------------------ */
+
+@media (max-width: 768px) {
+  .stat__n {
+    font-size: var(--fs-title);
+  }
+
+  .stat-line {
+    gap: var(--space-4);
+  }
+
+  .tasks-tools {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .tasks-tools__search {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+
+  .shortcuts {
+    display: none;
+  }
+}
+
+/* ---- Phone: a task is two lines (G14) ---------------------------------------------- */
+
+@media (max-width: 768px) {
+  /* Line 1: tick, title, due. Line 2 (.row__meta): project, steps and money. */
+  .task-row {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "c t d"
+      ". m m";
+    row-gap: 2px;
+    min-height: 56px;
+    padding: var(--space-2);
+    user-select: none;
+  }
+
+  .task-row__cell--check {
+    grid-area: c;
+  }
+
+  .task-row__title {
+    grid-area: t;
+  }
+
+  .task-row__due {
+    grid-area: d;
+    white-space: nowrap;
+  }
+
+  .task-row__cell--steps,
+  .task-row__cell--money,
+  .task-row__cell--project {
+    display: none;
+  }
+
+  /* The menu stays in place for a long press on the row to open; it is not drawn. */
+  .task-row__actions {
+    position: absolute;
+    top: 0;
+    right: var(--space-2);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .row__meta {
+    display: flex;
+    grid-area: m;
+    gap: var(--space-3);
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    font-size: var(--fs-caption);
+    white-space: nowrap;
+  }
+
+  .row__meta .task-row__project,
+  .row__meta .task-row__money {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .substeps {
+    margin-left: 32px;
+  }
+}

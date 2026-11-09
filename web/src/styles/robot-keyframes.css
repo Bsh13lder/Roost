@@ -1,0 +1,247 @@
+/* ---------------------------------------------------------------------
+   The Lensbots' keyframes (robot.css names them): the blink, the
+   postures' breath, the glyphs' motion and the events. Ported from
+   docs/design/robots-v7-sketch.html. Nothing here plays on its own:
+   robot.css decides when.
+   --------------------------------------------------------------------- */
+
+@keyframes robot-blink-top {
+  0%, 93%, 100% { transform: translateY(0); }
+  95.5% { transform: translateY(10.9px); }
+}
+
+@keyframes robot-blink-bottom {
+  0%, 93%, 100% { transform: translateY(0); }
+  95.5% { transform: translateY(-10.9px); }
+}
+
+@keyframes robot-breathe {
+  0%, 100% { transform: none; }
+  50% { transform: scale(1.012, 0.985); }
+}
+
+@keyframes robot-work-bob {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-0.55px); }
+}
+
+@keyframes robot-ahem {
+  0%, 68%, 100% { transform: none; }
+  76% { transform: translateY(-1.8px) scale(0.98, 1.03); }
+  85% { transform: scale(1.03, 0.97); }
+  92% { transform: none; }
+}
+
+@keyframes robot-sigh {
+  0%, 100% { transform: none; }
+  38% { transform: translateY(-0.7px) scale(0.99, 1.025); }
+  58% { transform: translateY(0.3px) scale(1.02, 0.97); }
+}
+
+@keyframes robot-scan-x {
+  from { transform: translateX(-5.4px); }
+  to { transform: translateX(5.4px); }
+}
+
+@keyframes robot-dot-wave {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  25% { transform: translateY(-2.2px); opacity: 1; }
+}
+
+@keyframes robot-q-tilt {
+  0%, 100% { transform: rotate(0); }
+  40% { transform: rotate(-9deg); }
+  70% { transform: rotate(4deg); }
+}
+
+@keyframes robot-bang-in {
+  0% { transform: scale(0.2); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes robot-env-in {
+  0% { transform: translateY(6px) scale(0.4); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+
+@keyframes robot-draw-in {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes robot-hand-tap {
+  0%, 55%, 100% { transform: none; }
+  65% { transform: translate(0.6px, 0.9px) scale(0.88); }
+  78% { transform: none; }
+}
+
+@keyframes robot-z-float {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translate(0.6px, -1.4px); opacity: 0.55; }
+}
+
+@keyframes robot-whirr {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes robot-focus-tick {
+  to { transform: rotate(150deg); }
+}
+
+@keyframes robot-zoom-in {
+  0%, 100% { transform: scale(var(--lz, 1)); }
+  28% { transform: scale(1.16); }
+  55% { transform: scale(1.05); }
+  74% { transform: scale(1.09); }
+}
+
+@keyframes robot-zoom-hold {
+  0%, 100% { transform: scale(1); }
+  20%, 75% { transform: scale(1.1); }
+}
+
+@keyframes robot-dilate {
+  0%, 100% { transform: scale(var(--is, 1)); }
+  30% { transform: scale(1.34); }
+  60% { transform: scale(1.1); }
+}
+
+@keyframes robot-refocus {
+  0%, 100% { transform: scale(var(--is, 1)); }
+  30% { transform: scale(0.66); }
+  65% { transform: scale(1.14); }
+}
+
+@keyframes robot-dbl-look {
+  0% { transform: none; }
+  16%, 40% { transform: translateX(calc(var(--dtx, 1) * -3.4px)); }
+  50% { transform: translateX(calc(var(--dtx, 1) * 1.4px)); }
+  66%, 100% { transform: none; }
+}
+
+@keyframes robot-dbl-body {
+  0%, 42% { transform: none; }
+  52% { transform: translateY(-1.3px) rotate(calc(var(--dtx, 1) * -3deg)) scale(0.98, 1.03); }
+  72% { transform: scale(1.01, 0.99); }
+  100% { transform: none; }
+}
+
+@keyframes robot-look-around {
+  0%, 100% { transform: none; }
+  18%, 40% { transform: translateX(-3.2px); }
+  58%, 80% { transform: translateX(3.2px) translateY(-0.6px); }
+}
+
+@keyframes robot-dart {
+  0%, 100% { transform: none; }
+  18% { transform: translateY(-2.4px); }
+}
+
+@keyframes robot-dbl-blink-top {
+  0%, 100% { transform: none; }
+  15%, 22% { transform: translateY(10.9px); }
+  38% { transform: none; }
+  55%, 62% { transform: translateY(10.9px); }
+  78% { transform: none; }
+}
+
+@keyframes robot-dbl-blink-bottom {
+  0%, 100% { transform: none; }
+  15%, 22% { transform: translateY(-10.9px); }
+  38% { transform: none; }
+  55%, 62% { transform: translateY(-10.9px); }
+  78% { transform: none; }
+}
+
+@keyframes robot-slow-blink-top {
+  0%, 100% { transform: none; }
+  30%, 52% { transform: translateY(10.9px); }
+  80% { transform: none; }
+}
+
+@keyframes robot-slow-blink-bottom {
+  0%, 100% { transform: none; }
+  30%, 52% { transform: translateY(-10.9px); }
+  80% { transform: none; }
+}
+
+@keyframes robot-squint {
+  0%, 100% { transform: none; }
+  20%, 72% { transform: translateY(4.2px); }
+}
+
+@keyframes robot-hmm-lid {
+  0%, 100% { transform: translateY(calc(var(--lt, -10.8) * 1px)); }
+  20%, 78% { transform: translateY(-5.4px) rotate(calc(var(--side, 1) * -13deg)); }
+}
+
+@keyframes robot-brow-up {
+  0%, 100% { transform: translateY(calc(var(--lt, -10.8) * 1px)); }
+  20%, 78% { transform: translateY(-12.4px); }
+}
+
+@keyframes robot-hmm-tilt {
+  0%, 100% { transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); }
+  25%, 75% { transform: rotate(-5deg) translateX(-0.4px); }
+}
+
+@keyframes robot-curious {
+  0%, 100% { transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); }
+  22%, 70% { transform: translateY(-0.4px) rotate(11deg); }
+  84% { transform: rotate(-2.5deg); }
+}
+
+@keyframes robot-buzz {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(0.22px); }
+  75% { transform: translateX(-0.22px); }
+}
+
+@keyframes robot-hop {
+  0% { transform: none; }
+  12% { transform: scale(1.12, 0.86); }
+  30% { transform: translateY(-6.4px) scale(0.93, 1.08); }
+  48% { transform: translateY(0) scale(1.1, 0.9); }
+  60% { transform: translateY(-1.8px) scale(0.98, 1.02); }
+  72% { transform: scale(1.03, 0.97); }
+  100% { transform: none; }
+}
+
+@keyframes robot-hop-shadow {
+  0%, 48%, 100% { transform: scale(1); }
+  30% { transform: scale(0.66); opacity: 0.2; }
+}
+
+@keyframes robot-pulse-out {
+  0% { opacity: 0.75; transform: scale(0.92); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes robot-nod {
+  0%, 100% { transform: none; }
+  28% { transform: translateY(0.6px) rotate(-2deg); }
+  52% { transform: translateY(1px) scale(1.01, 0.985); }
+  74% { transform: translateY(-0.4px); }
+}
+
+@keyframes robot-perk {
+  0%, 100% { transform: none; }
+  30% { transform: translateY(-1.6px) scale(0.98, 1.03); }
+  60% { transform: scale(1.02, 0.98); }
+}
+
+@keyframes robot-slump {
+  0% { transform: none; }
+  32% { transform: translateY(1.7px) rotate(-4deg) scale(1.03, 0.95); }
+  55% { transform: translateY(0.7px) rotate(-3deg) scale(1, 1.01); }
+  72%, 92% { transform: translateY(1.8px) rotate(-4deg) scale(1.03, 0.95); }
+  100% { transform: translateY(0.6px) rotate(-1deg); }
+}
+
+@keyframes robot-squash {
+  0%, 100% { transform: none; }
+  14% { transform: scale(1.15, 0.84); }
+  38% { transform: translateY(-1.2px) scale(0.94, 1.08); }
+  62% { transform: scale(1.03, 0.98); }
+}

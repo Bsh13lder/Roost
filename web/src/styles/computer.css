@@ -1,0 +1,564 @@
+/* ---------------------------------------------------------------------
+   The profile's Computer tab (S1.8): the screen box, Take control, the
+   Window card, the Sealed box terminal and About this computer.
+   --------------------------------------------------------------------- */
+
+.computer-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.computer-tab__screen {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.screen-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-sunken);
+}
+
+/* Pinned to the box, so a screen of any shape is letterboxed, never cropped. */
+.screen-box__image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.screen-box__state {
+  margin: 0;
+  padding: 0 20px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: center;
+}
+
+.computer-tab__caption {
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  text-align: center;
+}
+
+/* A button that reads as a link inside a sentence ("Open it", "Retry"). */
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-edge);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: var(--color-accent-soft);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.control__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.control__note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-tint);
+  color: var(--color-text);
+  font-size: var(--fs-label);
+}
+
+.computer-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.about-computer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+.about-computer__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.about-computer p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.computer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+.computer-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.computer-card__title {
+  margin: 0;
+  font-size: var(--fs-lead);
+  font-weight: 600;
+}
+
+.computer-card__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+.computer-card__lede {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.computer-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---- Browser state pill ---------------------------------------------- */
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+}
+
+.state-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-text-secondary);
+}
+
+.state-pill--running {
+  border-color: var(--color-accent-edge);
+  color: var(--color-accent-soft);
+}
+
+.state-pill--running .state-pill__dot {
+  background: var(--color-accent);
+  box-shadow: none;
+}
+
+.state-pill--stopped .state-pill__dot {
+  background: var(--color-off);
+  box-shadow: none;
+}
+
+/* ---- Sealed box terminal --------------------------------------------- */
+
+.terminal {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.terminal:focus-within {
+  border-color: var(--color-accent-edge);
+}
+
+.terminal__prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.terminal__sigil {
+  color: var(--color-accent-strong);
+  font-weight: 500;
+}
+
+.terminal__input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.terminal__input:focus,
+.terminal__input:focus-visible {
+  outline: none;
+}
+
+.terminal__input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.terminal__placeholder,
+.terminal__result,
+.terminal__error {
+  margin: 0;
+  padding: 14px 16px 16px;
+}
+
+.terminal__placeholder {
+  color: var(--color-text-faint);
+}
+
+.terminal__result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.terminal__result pre {
+  max-height: 320px;
+  margin: 0;
+  overflow: auto;
+  font: inherit;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.terminal__stdout {
+  color: var(--color-text);
+}
+
+.terminal__stderr {
+  color: var(--color-danger);
+}
+
+.terminal__stream {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.terminal__exit {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.terminal__exit--failed {
+  color: var(--color-danger);
+}
+
+.terminal__error {
+  padding-bottom: 0;
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+}
+
+/* ---- A sleeping computer (polish R1.13) -------------------------------- */
+
+.computer-asleep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-5);
+  text-align: center;
+}
+
+.computer-asleep__robot {
+  position: relative;
+}
+
+.computer-asleep__title {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.computer-asleep__line {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.computer-asleep__z {
+  position: absolute;
+  top: 0;
+  right: calc(-1 * var(--space-2));
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  opacity: 0;
+  animation: computer-asleep-drift 3s var(--ease-standard) infinite;
+}
+
+.computer-asleep__z:nth-of-type(2) {
+  animation-delay: 1s;
+}
+
+.computer-asleep__z:nth-of-type(3) {
+  animation-delay: 2s;
+}
+
+@keyframes computer-asleep-drift {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--space-3), calc(-1 * var(--space-5)));
+    opacity: 0;
+  }
+}
+
+.computer-asleep--still .computer-asleep__z {
+  animation: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .computer-asleep__z {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ---- The live screen (Computers 2.0, C1) -------------------------------- */
+
+/* noVNC draws its canvas into this box; the box fills the screen box and letterboxes the picture. */
+.live-screen {
+  position: absolute;
+  inset: 0;
+  background: var(--color-sunken);
+}
+
+.live-screen[hidden] {
+  display: none;
+}
+
+.live-screen__state {
+  position: relative;
+}
+
+.computer-kind .seg {
+  margin-top: var(--space-1);
+}
+
+/* ---- Take control, full screen (Computers 2.0, C2) ------------------------ */
+
+.control-screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--color-sunken);
+}
+
+.control-screen__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* A finger on the screen belongs to the computer (noVNC: a tap clicks), never to the page's pan or zoom. */
+.control-screen__stage .live-screen {
+  touch-action: none;
+}
+
+/* Take control on a touch screen: the keyboard row under the screen. */
+.touch-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.touch-keys__field {
+  flex: 1 1 12rem;
+  min-width: 0;
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-size: var(--fs-lead); /* 16px: a phone does not zoom in on focus */
+}
+
+.touch-keys__field:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.touch-keys__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.control-screen__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-danger-edge);
+  background: var(--color-danger-tint);
+}
+
+.control-screen__state {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.give-back {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.give-back__field {
+  min-width: 16rem;
+}
+
+.give-back__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The Sign-in card's "Keep me signed in on this computer?" */
+.give-back__question {
+  color: var(--color-text-secondary);
+}
+
+/* ---- Vault: site logins ---------------------------------------------------- */
+
+.site-logins {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.site-logins__title {
+  margin: 0;
+  font-size: var(--fs-body);
+}
+
+.site-logins__empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.site-logins__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-logins__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* ---- The ring where the bot clicks (C3) ------------------------------------ */
+
+/* Centred on the point, over the live canvas; it never takes a click. */
+.pointer-ring {
+  position: absolute;
+  z-index: 1;
+  border: 2px solid var(--color-accent-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 0 2px var(--color-bg);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation-name: pointer-ring-fade;
+  animation-timing-function: var(--ease-standard);
+  animation-fill-mode: forwards;
+}
+
+/* Reduced motion: a still ring for the same time. */
+.pointer-ring--still {
+  animation: none;
+}
+
+@keyframes pointer-ring-fade {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+}

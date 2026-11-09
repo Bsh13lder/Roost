@@ -1,0 +1,3 @@
+- [ ] Water plants #home #garden 🔁 every week ⏫ ⏰ 08:30 ⏳ 2026-10-21 📅 2026-10-22 🆔 aaa111
+- [x] File taxes #money ✅ 2026-10-19 📅 2026-10-18 🆔 bbb222
+- [-] Skip the gym ❌ 2026-10-17 🆔 ccc333

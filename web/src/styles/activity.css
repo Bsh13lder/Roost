@@ -1,0 +1,461 @@
+/* ---------------------------------------------------------------------
+   The activity pill (docs/plans/2026-10-23-roost-activity-pill.md): what
+   a bot is doing in plain words while it works, the quiet line after,
+   and the sheet with every step. The marks move calmly; reduced motion
+   keeps them still.
+   --------------------------------------------------------------------- */
+
+.ap {
+  width: var(--computer-card-width);
+  max-width: 100%;
+  margin: 0 0 var(--space-2);
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard), margin var(--duration-base) var(--ease-standard);
+  animation: ap-in var(--duration-slow) var(--ease-standard);
+}
+
+.ap--folding {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: 0;
+}
+
+.ap__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ap__inner > .cc {
+  margin-bottom: 0;
+}
+
+/* The pill itself: a round chip with the moving mark, the words and the step count. */
+.ap__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 var(--space-3) 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+}
+
+.ap__pill:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-raised);
+}
+
+.ap__pill:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.ap__mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.ap__mark--bot {
+  width: auto;
+  height: auto;
+  margin: -6px 0;
+  background: none;
+}
+
+.ap__time {
+  flex: none;
+  font-size: var(--fs-caption);
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap__line {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: linear-gradient(90deg, var(--color-text-secondary) 0%, var(--color-text-secondary) 38%,
+    var(--color-text) 50%, var(--color-text-secondary) 62%, var(--color-text-secondary) 100%);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ap-step-in var(--duration-base) var(--ease-standard), ap-shimmer 2.6s linear infinite;
+}
+
+.ap__count {
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* The quiet line a finished run folds into. */
+.ap-line {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  min-height: 28px;
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  text-align: left;
+  cursor: pointer;
+  animation: ap-step-in var(--duration-base) var(--ease-standard);
+  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.ap-line:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.ap-line:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.ap-line__mark,
+.ap-line__chevron {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--color-text-faint);
+}
+
+.ap-line__chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ap-line__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The sheet: the steps as a timeline and Technical details. */
+.as {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.as__empty {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.as__list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.as-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  animation: ap-step-in var(--duration-base) var(--ease-standard);
+}
+
+/* The thread between the marks. */
+.as-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 36px;
+  bottom: -4px;
+  left: 15px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--color-border);
+}
+
+.as-step__mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+}
+
+.as-step--now .as-step__mark {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.as-step__line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 6px;
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  overflow-wrap: anywhere;
+}
+
+.as-step__note {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.as-step__time {
+  padding-top: 7px;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.as-step--now .as-step__time {
+  color: var(--color-accent-strong);
+  font-weight: 600;
+}
+
+/* A note (owner, 2026-11-04): the bot's own words between steps, a quiet sentence on the thread, not a tool row. */
+.as-step--note .as-step__mark {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text-faint);
+}
+
+.as-step--note .as-step__line {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.as-step__web {
+  align-self: flex-start;
+  font-style: normal;
+}
+
+.as-tech {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+
+.as-tech__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.as-tech__toggle:hover {
+  color: var(--color-text-secondary);
+}
+
+.as-tech__toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.as-tech__chevron {
+  display: inline-grid;
+  place-items: center;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.as-tech__chevron svg {
+  width: 12px;
+  height: 12px;
+}
+
+.as-tech__chevron--open {
+  transform: rotate(90deg);
+}
+
+.as-tech__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+/* The marks: each moves only while its step runs. */
+.am {
+  display: inline-grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.am svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.am--moving .am-turn {
+  animation: am-turn 2.4s ease-in-out infinite;
+}
+
+.am--moving .am-turn-small {
+  transform-origin: 7px 7px;
+  transform-box: view-box;
+  animation: am-spin 1.6s linear infinite;
+}
+
+.am--moving .am-spin {
+  animation: am-spin 3.2s linear infinite;
+}
+
+.am--moving .am-tap {
+  animation: am-tap 1.4s var(--ease-standard) infinite;
+}
+
+.am--moving .am-write {
+  animation: am-write 1.6s ease-in-out infinite;
+}
+
+.am--moving .am-dot {
+  animation: am-dot 1.2s ease-in-out infinite;
+}
+
+.am--moving .am-dot--2 {
+  animation-delay: 0.15s;
+}
+
+.am--moving .am-dot--3 {
+  animation-delay: 0.3s;
+}
+
+@keyframes am-turn {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.15);
+  }
+}
+
+@keyframes am-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes am-tap {
+  0%,
+  60%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  30% {
+    transform: translate(-0.6px, -0.6px) scale(0.86);
+  }
+}
+
+@keyframes am-write {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes am-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes ap-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes ap-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+@keyframes ap-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap,
+  .ap-line,
+  .ap__line,
+  .as-step,
+  .am--moving * {
+    animation: none !important;
+  }
+
+  .ap,
+  .ap__pill,
+  .as-tech__chevron {
+    transition: none;
+  }
+}

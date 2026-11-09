@@ -1,0 +1,10 @@
+{
+  "url": "https://news.example/today?__cf_chl_rt_tk=Qx7Lm2Pz9",
+  "title": "news.example",
+  "text": "news.example\nOne more step\nPlease wait while your request is being checked.",
+  "truncated": false,
+  "status": 200,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}

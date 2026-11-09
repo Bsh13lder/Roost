@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The alerts' small icon is named in Dart only (lib/notify/local_alerts.dart), so the release
+     build's resource shrinker must keep it. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_roost" />

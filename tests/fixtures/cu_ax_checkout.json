@@ -1,0 +1,24 @@
+{
+  "url": "https://shop.example/checkout",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 10, "tag": "form", "attrs": {"method": "post", "action": "https://pay.shop.example/charge"}, "children": [
+      {"id": 11, "tag": "input", "attrs": {"name": "holder", "autocomplete": "cc-name"}},
+      {"id": 12, "tag": "button", "attrs": {"type": "button"}, "children": [{"id": 13, "text": "Apply coupon"}]},
+      {"id": 14, "tag": "button", "children": [{"id": 15, "text": "Place order"}]},
+      {"id": 16, "tag": "input", "attrs": {"type": "submit", "value": "Pay later"}}
+    ]},
+    {"id": 20, "tag": "button", "attrs": {"aria-expanded": "false"}, "children": [{"id": 21, "text": "Order details"}]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Checkout", "backend": 1},
+    {"role": "textbox", "name": "Card holder", "backend": 11, "props": {"editable": "plaintext"}},
+    {"role": "button", "name": "Apply coupon", "backend": 12},
+    {"role": "button", "name": "Place order", "backend": 14},
+    {"role": "button", "name": "Pay later", "backend": 16},
+    {"role": "button", "name": "Order details", "backend": 20, "props": {"expanded": false}}
+  ],
+  "boxes": {"11": [100, 100, 300, 32], "12": [100, 150, 140, 32], "14": [100, 200, 140, 40], "16": [260, 200, 140, 40],
+            "20": [100, 300, 200, 30]},
+  "hits": {}
+}

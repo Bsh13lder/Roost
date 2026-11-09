@@ -1,0 +1,23 @@
+{
+  "url": "https://shop.example/account",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 10, "tag": "button", "children": [{"id": 11, "tag": "span", "children": [{"id": 12, "text": "Delete"}]}]},
+    {"id": 13, "tag": "button", "children": [{"id": 14, "tag": "span", "children": [{"id": 15, "text": "Save"}]}]},
+    {"id": 16, "tag": "p", "children": [{"id": 17, "text": "Plain words"}]},
+    {"id": 20, "tag": "div", "attrs": {"role": "dialog", "aria-modal": "true", "aria-labelledby": "t"}, "children": [
+      {"id": 21, "tag": "h2", "attrs": {"id": "t"}, "children": [{"id": 22, "text": "Join our newsletter"}]},
+      {"id": 23, "tag": "div", "attrs": {"class": "backdrop"}},
+      {"id": 24, "tag": "button", "children": [{"id": 25, "tag": "span", "children": [{"id": 26, "text": "No thanks"}]}]}
+    ]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Account", "backend": 1},
+    {"role": "button", "name": "Delete", "backend": 10},
+    {"role": "button", "name": "Save", "backend": 13},
+    {"role": "dialog", "name": "Join our newsletter", "backend": 20},
+    {"role": "button", "name": "No thanks", "backend": 24}
+  ],
+  "boxes": {"10": [100, 100, 80, 30], "13": [300, 100, 80, 30], "24": [600, 400, 100, 30]},
+  "hits": {"140,115": 23, "340,115": 14, "650,415": 25, "10,600": 17}
+}

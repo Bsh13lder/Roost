@@ -1,0 +1,489 @@
+/* Approval mode, Folders, Ask and Proposal cards, diffs and Mac activity lines (approval modes). Tokens only. */
+
+.approval-card__group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.approval-card__topics,
+.folders-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.folders-card__list {
+  gap: 0;
+}
+
+.approval-card__note {
+  color: var(--color-text-secondary);
+}
+
+.folders-card__title-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folders-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.folders-card__head .info-row__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.folders-card__all {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.folders-card__path {
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+.folders-card__confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  max-width: 260px;
+  font-size: var(--fs-body);
+}
+
+.folders-card__confirm p {
+  margin: 0;
+}
+
+.add-folder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.add-folder > .field {
+  align-self: stretch;
+}
+
+.add-folder__choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.folders-card__rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+/* ---- Ask and Proposal cards ------------------------------------------- */
+
+.approval {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 520px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+.approval__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.approval__name {
+  color: var(--color-accent-soft);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.approval__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.approval__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.approval__edit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.approval__edit .input {
+  width: 100%;
+}
+
+.approval-line {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  overflow-wrap: anywhere;
+}
+
+.step-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.step-row__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.step-row__n {
+  color: var(--color-text-secondary);
+}
+
+.step-row__title {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.arg-rows {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: var(--fs-label);
+}
+
+.arg-rows__pair {
+  display: contents;
+}
+
+.arg-rows__label {
+  color: var(--color-text-secondary);
+}
+
+.arg-rows__value {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The Send card's text (owner, 2026-11-03): whole and readable, scrolling inside its box when it is long. */
+.arg-rows__value--draft {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--color-raised);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.step-row__detail {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  overflow-wrap: anywhere;
+}
+
+.step-row__outside {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--diff-remove-bg);
+  color: var(--diff-remove-text);
+  font-size: var(--fs-label);
+}
+
+/* ---- Diff -------------------------------------------------------------- */
+
+.diff {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.diff__count {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.diff__text {
+  width: 100%;
+  max-height: 320px;
+  margin: 0;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-sunken);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+}
+
+.diff__line {
+  display: block;
+  padding: 0 var(--space-2);
+  color: var(--color-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diff__line--add {
+  background: var(--diff-add-bg);
+  color: var(--diff-add-text);
+}
+
+.diff__line--remove {
+  background: var(--diff-remove-bg);
+  color: var(--diff-remove-text);
+}
+
+.diff__line--note {
+  color: var(--diff-note);
+}
+
+/* ---- Mac activity line ------------------------------------------------- */
+
+.message--mac {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mac-activity__undo {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+  font: inherit;
+  font-size: var(--fs-label);
+  cursor: pointer;
+}
+
+.mac-activity__undo:disabled {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+.mac-activity__error {
+  color: var(--warning-text);
+  font-size: var(--fs-label);
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.choice__question {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.choice__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.choice__safe {
+  margin-left: var(--space-2);
+  font-size: var(--fs-label);
+  opacity: 0.85;
+}
+
+.choice__own {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.choice__own .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.choice__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.choice__why {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  overflow-wrap: anywhere;
+}
+
+/* C3: the picture of the button an Ask card asks about, above its rows. */
+.crop-view {
+  display: block;
+  max-width: 100%;
+  max-height: var(--crop-max-height);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background: var(--color-sunken);
+}
+
+.crop-view__failed {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+/* An answered options card, shrunk to one line (lead task 07); its options open under Show options. */
+.choice-done {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.choice-done__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1);
+  cursor: pointer;
+  list-style: none;
+}
+
+.choice-done__line::-webkit-details-marker {
+  display: none;
+}
+
+.choice-done__tick {
+  color: var(--color-ok);
+}
+
+.choice-done__answer {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.choice-done__more {
+  margin-left: var(--space-2);
+  color: var(--color-text-faint);
+  text-decoration: underline;
+}
+
+.choice-done[open] .choice-done__more {
+  display: none;
+}
+
+.choice-done__question {
+  margin: var(--space-2) 0 var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+.choice-done__options {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+/* ---- Program activity line (Programs) ----------------------------------- */
+
+.message--program {
+  flex-direction: column;
+}
+
+.program-activity--failed {
+  color: var(--warning-text);
+}
+
+.program-activity__output {
+  max-width: 100%;
+  text-align: left;
+}
+
+.program-activity__output summary {
+  cursor: pointer;
+  font-size: var(--fs-label);
+}
+
+.program-activity__output pre {
+  max-height: 240px;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2);
+  overflow: auto;
+  border-radius: var(--radius-sm);
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The Pay card (owner, 2026-11-05): only the card parts the page asks for, then Pay · Don't pay. */
+.approval__note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.pay-card__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.pay-card__fields .field:first-child {
+  grid-column: 1 / -1;
+}
+
+.pay-card__save,
+.pay-card__pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+}
+
+.pay-card__save {
+  grid-column: 1 / -1;
+}
+
+.pay-card__saved {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

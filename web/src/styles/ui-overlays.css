@@ -1,0 +1,424 @@
+/* ---------------------------------------------------------------------
+   The Radix-based kit (redesign P1): Select, Menu, Tabs, Sheet, Popover
+   and Tooltip. Their panels live in portals at the end of <body>, so
+   nothing here depends on where the trigger sits. Tokens only.
+   --------------------------------------------------------------------- */
+
+/* ---- Select ----------------------------------------------------------- */
+
+.select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--edge-inner);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.select--sm {
+  height: var(--control-sm);
+  font-size: var(--fs-label);
+}
+
+.select--md {
+  height: var(--control-md);
+}
+
+.select--lg {
+  height: var(--control-lg);
+}
+
+.select:hover {
+  background: var(--color-raised);
+}
+
+.select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.select:disabled {
+  color: var(--color-text-faint);
+  cursor: not-allowed;
+}
+
+.select[data-placeholder] {
+  color: var(--color-text-faint);
+}
+
+.select__icon {
+  display: inline-grid;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  color: var(--color-text-secondary);
+}
+
+.select__content,
+.menu__list,
+.popover {
+  z-index: 50;
+  border-radius: var(--radius-md);
+  background: var(--color-overlay);
+  box-shadow: var(--shadow-lg), var(--edge-inner);
+  color: var(--color-text);
+}
+
+.select__content {
+  min-width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
+  overflow: hidden;
+}
+
+.select__viewport {
+  padding: var(--space-1);
+}
+
+.select__item,
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-item);
+  padding: 0 var(--pad-item);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--fs-menu);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+/* The item a keyboard or pointer is on: a soft hover fill, no outline. */
+.select__item[data-highlighted],
+.menu__item[data-highlighted] {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.menu__item--danger {
+  color: var(--color-danger);
+}
+
+.select__hint {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.select__item[data-highlighted] .select__check {
+  color: inherit;
+}
+
+.select__item[data-disabled],
+.menu__item[data-disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.select__check {
+  display: inline-grid;
+  margin-left: auto;
+  color: var(--color-accent-strong);
+}
+
+/* ---- Menu ------------------------------------------------------------- */
+
+.menu {
+  position: relative;
+  flex: none;
+}
+
+.menu__list {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: var(--space-1);
+}
+
+/* A setting in the menu (MenuSwitch): a small box that shows the tick when it is on. */
+.menu__item--switch {
+  gap: var(--space-2);
+}
+
+.menu__switch-box {
+  display: inline-grid;
+  place-items: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  font-size: var(--fs-caption);
+  line-height: 1;
+}
+
+.menu__item--switch[data-state="checked"] .menu__switch-box {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* One choice of several (MenuRadioItem): a round box with a dot on the chosen one. */
+.menu__item--radio {
+  align-items: flex-start;
+  padding-block: var(--space-2);
+}
+
+.menu__radio-dot {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+}
+
+.menu__item--radio[data-state="checked"] .menu__radio-dot {
+  border-color: var(--color-accent);
+}
+
+.menu__radio-fill {
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.menu__note {
+  margin: 0;
+  padding: var(--space-2) var(--pad-item);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-menu);
+}
+
+.menu__sep {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background: var(--color-border);
+}
+
+/* ---- Tabs: one style everywhere --------------------------------------- */
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tabs__list {
+  display: flex;
+  gap: var(--gap-tight);
+  padding: var(--gap-tight);
+  overflow-x: auto;
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  box-shadow: var(--edge-inner);
+  scrollbar-width: none;
+}
+
+.tabs__tab {
+  flex: 1 0 auto;
+  min-height: var(--control-md);
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--fs-menu);
+  font-weight: 600;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.tabs__tab:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.tabs__tab[data-state="active"] {
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+/* The line variant (the Board): an underline marks the selected tab, a count follows the label. */
+
+.tabs--line {
+  gap: 0;
+}
+
+.tabs--line .tabs__list {
+  gap: var(--space-1);
+  padding: 0;
+  overflow-x: auto;
+  border: none;
+  border-radius: 0;
+  background: none;
+  scrollbar-width: none;
+}
+
+.tabs--line .tabs__tab {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--control-lg);
+  padding: 0 var(--space-3);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tabs--line .tabs__tab[data-state="active"] {
+  border-bottom-color: var(--color-accent-strong);
+  background: none;
+  color: var(--color-text);
+}
+
+.tabs__count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+}
+
+.tabs__count--danger {
+  color: var(--color-danger);
+}
+
+.tabs__panel:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Sheet: a drawer from the right ----------------------------------- */
+
+.ui-sheet__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--color-scrim);
+}
+
+.ui-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 100vw);
+  border-left: 0;
+  background: var(--color-panel);
+  box-shadow: var(--shadow-lg), var(--edge-inner);
+}
+
+.ui-sheet--full {
+  inset: 0;
+  width: 100vw;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.ui-sheet--bottom {
+  top: auto;
+  left: 0;
+  width: 100vw;
+  max-height: 85vh;
+  border-left: 0;
+  border-top: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.ui-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2) var(--space-6);
+}
+
+.ui-sheet__title {
+  margin: 0;
+  font-size: var(--fs-heading);
+  font-weight: 600;
+}
+
+.ui-sheet__description {
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.ui-sheet__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-4) var(--space-6);
+  overflow-y: auto;
+}
+
+.ui-sheet__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ui-sheet[data-state="open"] {
+    animation: sheet-in var(--duration-slow) var(--ease-standard);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+/* ---- Popover and Tooltip ---------------------------------------------- */
+
+.popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: calc(100vw - 2 * var(--space-4));
+  max-height: var(--radix-popover-content-available-height, 90vh);
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+
+.tooltip {
+  z-index: 70;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+/* A bare sheet gives its whole panel to the caller (Take control's full screen). */
+.ui-sheet__body--bare {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}

@@ -1,0 +1,10 @@
+{
+  "url": "https://bank.example/auth/verify",
+  "title": "Bank Example",
+  "text": "Two-step verification\nWe sent a 6-digit code to the phone number ending in 42.\nEnter the code\nVerify\nDidn't get it? Send a new code",
+  "truncated": false,
+  "status": 200,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}

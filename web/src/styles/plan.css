@@ -1,0 +1,103 @@
+/* ---------------------------------------------------------------------
+   The Plan tab (routines plan, Task 17). Imported by PlanView only, so it stays in the lazy chunk. The calendar
+   and the Kanban reuse the Board's classes (board-calendar.css, kanban.css). Tokens only.
+   --------------------------------------------------------------------- */
+
+.plan-view,
+.plan-kanban,
+.plan-cal,
+.plan-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.plan-loading,
+.plan-view__unreadable,
+.plan-day__empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* Items are put in a day by the bot or by the text; the grid's "+" would add nothing, so it only selects. */
+.plan-cal .ccell__add {
+  display: none;
+}
+
+.plan-kboard {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.plan-day__title {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.plan-day__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-day__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--fs-body);
+}
+
+.plan-day__item.is-done .plan-day__text {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.plan-day__text {
+  overflow-wrap: anywhere;
+}
+
+.plan-item__time,
+.plan-item__tag {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.plan-text__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plan-text__conflict {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-tint);
+}
+
+.plan-text__conflict p {
+  margin: 0;
+  font-size: var(--fs-body);
+}
+
+.plan-text__error {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: var(--fs-label);
+}
+
+.plan-text__saved {
+  color: var(--color-ok);
+  font-size: var(--fs-label);
+}

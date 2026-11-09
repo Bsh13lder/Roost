@@ -1,0 +1,119 @@
+{
+  "Helper": [
+    [{ "tool": "add_task", "args": { "title": "Call the dentist", "due_date": "tomorrow at 9" } }],
+    [{ "tool": "log_expense", "args": { "amount": 12.5, "category": "food", "note": "lunch" } }],
+    [{ "text": "Done: the dentist tomorrow at 09:00, and 12.50 EUR for lunch." }],
+    [{ "tool": "list_tasks", "args": { "status": "all" } }],
+    [{ "tool": "create_doc", "args": { "title": "My tasks", "markdown": "- Call the dentist" } }],
+    [{ "text": "Saved your tasks in My tasks." }]
+  ],
+  "Chief": [
+    [
+      { "tool": "create_bot", "args": { "name": "HiMap SEO", "job": "Improves HiMap's search ranking", "instructions": "Audit HiMap pages for SEO and suggest fixes.", "shape": "egg", "color": "#14b8a6", "role": "seo" } },
+      { "tool": "create_bot", "args": { "name": "HiMap Social", "job": "Plans HiMap's social posts", "instructions": "Draft social media posts for HiMap.", "shape": "crest", "color": "#ec4899" } }
+    ],
+    [{ "tool": "ask_bot", "args": { "bot": "HiMap SEO", "task": "List three quick SEO fixes for himap.app" } }],
+    [{ "text": "Created HiMap SEO and HiMap Social. HiMap SEO suggests: titles, meta descriptions, alt text." }],
+    [{ "tool": "suggest_model", "args": { "bot": "Scout", "model": "claude-fable-5-1", "effort": "high", "reason": "Long price hunts need deeper reasoning." } }],
+    [{ "text": "I suggested Fable 5.1 for Scout." }],
+    [
+      { "tool": "ask_bot", "args": { "bot": "Scout", "task": "Price a grocery basket under 60 EUR" } },
+      { "tool": "ask_bot", "args": { "bot": "Quill", "task": "Write the shopping list" } }
+    ],
+    [{ "text": "Saturday plan: a 52 EUR basket at Mercadona, and the list is ready." }]
+  ],
+  "HiMap SEO": [[{ "text": "Three fixes: titles, meta descriptions, alt text." }]],
+  "Scout": [
+    [{ "text": "Hello. I am Scout." }],
+    [{ "tool": "send_helpers", "args": { "helpers": [{ "task": "Find the opening hours of the bakery on Calle Mayor" }, { "task": "Find the price of a loaf of bread there" }] } }],
+    [{ "text": "Both helpers are back: the bakery opens at 08:00 and a loaf is 1.20 EUR." }],
+    [{ "text": "Basket at Mercadona: 52 EUR." }]
+  ],
+  "Scout/helper-1": [[{ "text": "HELPER-ONE-REPORT: opens at 08:00." }]],
+  "Scout/helper-2": [[{ "text": "HELPER-TWO-REPORT: a loaf is 1.20 EUR." }]],
+  "Quill": [[{ "text": "List: rice, eggs, tomatoes, chicken, fruit." }]],
+  "Office": [
+    [{ "tool": "add_task", "args": { "title": "Buy orchids for Ana" } }],
+    [{ "text": "Added: Buy orchids for Ana." }],
+    [{ "tool": "list_tasks", "args": { "status": "all" } }],
+    [{ "tool": "create_doc", "args": { "title": "Task list", "markdown": "# Task list\n\n- Buy orchids for Ana\n- Call the dentist" } }],
+    [{ "text": "Saved your tasks in “Task list”." }],
+    [{ "tool": "log_expense", "args": { "amount": 12.5, "category": "food", "note": "lunch", "spent_at": "2026-10-03" } }],
+    [{ "text": "Logged 12.50 EUR to food on 3 October." }],
+    [{ "tool": "list_expenses", "args": { "month": "2026-10" } }],
+    [{ "tool": "create_sheet", "args": { "title": "October expenses", "rows": [["Date", "Category", "Amount", "Note"], ["2026-10-03", "food", "12.50", "lunch"]] } }],
+    [{ "text": "Made the sheet “October expenses”." }],
+    [{ "tool": "add_note", "args": { "title": "Ana", "content": "Ana's birthday is 3 May. She likes orchids.", "tags": ["people"] } }],
+    [{ "text": "Saved to [[Ana]]." }]
+  ],
+  "Life admin": [
+    [{ "tool": "add_task", "args": { "title": "Call the dentist", "due_date": "tomorrow at 9", "pre_reminders": ["-30m"] } }],
+    [{ "text": "Done. Call the dentist, tomorrow at 09:00." }],
+    [{ "tool": "log_expense", "args": { "amount": 12.5, "category": "food", "note": "lunch" } }],
+    [{ "text": "Logged 12.50 EUR to food." }]
+  ],
+  "Clerk": [
+    [{ "tool": "mac_write_new", "args": { "folder": "MySpace", "path": "hello.md", "text": "Hello from Clerk\n" } }],
+    [{ "text": "Saved hello.md." }]
+  ],
+  "Porter": [
+    [{ "tool": "open_page", "args": { "url": "https://login.example/" } }],
+    [{ "tool": "request_sign_in", "args": { "site": "login.example", "why": "to see your orders" } }],
+    [{ "tool": "read_page", "args": {} }],
+    [{ "text": "Signed in and done." }]
+  ],
+  "Courier": [
+    [{ "tool": "open_page", "args": { "url": "https://login.example/" } }],
+    [{ "tool": "request_sign_in", "args": { "site": "login.example", "why": "to see your orders" } }],
+    [{ "tool": "read_page", "args": {} }],
+    [{ "text": "Signed in and done." }]
+  ],
+  "Writer": [
+    [{ "tool": "add_task", "args": { "title": "Water the ferns" } }],
+    [{ "text": "## Your week\n\n- **Monday**: water the ferns\n- **Tuesday**: see [[Garden plan]]\n- **Wednesday**: call the plumber\n\n| Day | Morning | Afternoon | File |\n| --- | --- | --- | --- |\n| Mon | Ferns | Market | `balcony_ferns_watering_schedule_for_october_and_november_for_every_pot_on_every_shelf_v2_final_checked_twice.xlsx` |\n| Tue | Garden plan | Shop | `garden_plan_with_every_bed_and_every_pot_drawn_to_scale_v3.pdf` |\n| Wed | Plumber | Laundry | `plumber_quote_for_the_kitchen_tap_and_the_bathroom_pipes_2026.pdf` |\n\n```js\nconst plan = [\"water the ferns\", \"see the garden plan\", \"call the plumber\", \"laundry\", \"cinema\", \"market\", \"read a thick book\", \"rest\"].map((step, day) => `${day + 1}. ${step}`).join(\" | \");\n```\n\nSaved as balcony_ferns_watering_schedule_for_the_whole_of_october_and_november_v2_final_really_final_now.xlsx. More at https://docs.example/guide." }]
+  ],
+  "Slowpoke": [[{"wait": 3}, {"text": "Slow answer one."}], [{"wait": 3}, {"text": "Slow answer two."}], [{"text": "Slow answer three."}]],
+  "Picker": [[{"tool": "ask_choice", "args": {"question": "Which day should I book the dentist?", "options": ["Monday", "Tuesday", "Wednesday"], "safe": 1, "why": "Tuesday is the quietest day."}}], [{"text": "Booked for your pick."}], [{"tool": "ask_choice", "args": {"question": "Which day should I book the dentist?", "options": ["Monday", "Tuesday", "Wednesday"], "safe": 1}}], [{"tool": "ask_choice", "args": {"question": "Which day should I book the dentist?", "options": ["Monday", "Tuesday", "Wednesday"], "safe": 1}}], [{"text": "Understood, I will not ask again."}]],
+  "Stucky": [[{"tool": "open_page", "args": {"url": "https://login.example/"}}], [{"tool": "request_sign_in", "args": {"site": "login.example", "why": "to see your orders"}}], [{"tool": "read_page", "args": {}}], [{"text": "Signed in and done."}]],
+  "Clock": [[{"text": "Routine checked: nothing new today."}]],
+  "Proposer": [[{"tool": "propose_routine", "args": {"name": "Morning check", "instructions": "Look at my tasks and tell me the three that matter.", "schedule": {"kind": "times", "days": [1, 2, 3, 4, 5], "times": ["09:00"]}}}], [{"text": "I proposed a routine for you to approve."}]],
+  "Asker": [[{"tool": "note_question", "args": {"question": "Which invoice format do you prefer?", "default_choice": "PDF", "why": "I draft them every month."}}], [{"text": "I noted a question and carried on with PDF."}]],
+  "Diarist": [[{"tool": "plan_add", "args": {"text": "Water the ferns"}}], [{"text": "It is on my Plan."}]],
+  "Shopper": [
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Search", "kind": "field"}, "expect": "the search box has the cursor"}}],
+    [{"tool": "type", "args": {"text": "blue mug", "source": {"from": "message"}, "expect": "blue mug is in the search box"}}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "press_key", "args": {"key": "Enter", "expect": "the results for blue mug"}}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Blue mug", "kind": "link"}, "expect": "the blue mug's page"}}],
+    [{"wait": 2}, {"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Buy now", "kind": "button"}, "expect": "the order is placed"}}],
+    [{"tool": "look", "args": {}}],
+    [{"echo": "tool"}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Address", "kind": "field"}, "expect": "the address box has the cursor"}}],
+    [{"tool": "type", "args": {"text": "12 Fake Street, Springfield, tel. 600 123 456", "source": {"from": "message"}, "expect": "the address is in the box"}}],
+    [{"text": "I won't type an address you didn't give me."}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Other shop", "kind": "link"}, "expect": "the other shop opens"}}],
+    [{"text": "The other shop is open."}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Gold mug"}, "expect": "the gold mug's page"}}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Gold mug"}, "expect": "the gold mug's page"}}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Gold mug"}, "expect": "the gold mug's page"}}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Gold mug"}, "expect": "the gold mug's page"}}],
+    [{"tool": "click", "args": {"target": {"text": "Next", "kind": "link"}, "expect": "the next page"}}],
+    [{"echo": "tool"}],
+    [{"tool": "look", "args": {}}],
+    [{"tool": "click", "args": {"target": {"text": "Next", "kind": "link"}, "expect": "the next page"}}],
+    [{"text": "I'm on page 2 of the other shop."}],
+    [{"tool": "open_app", "args": {"app": "files", "why": "to show the desktop"}}],
+    [{"tool": "look", "args": {}}],
+    [{"echo": "tool"}]
+  ],
+  "Skiller": [[{"tool": "propose_skill", "args": {"name": "Weekly SEO check", "use_when": "the user asks how the site ranks this week", "steps": "1. Open the rankings page\n2. Note the three biggest moves\n3. Report them in one short list"}}], [{"text": "I offered a skill for you to save."}]]
+}

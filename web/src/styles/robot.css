@@ -1,0 +1,410 @@
+/* ---------------------------------------------------------------------
+   The Lensbots (components/robot, avatars v7): one stateful SVG per bot.
+   data-moment is its posture (rest · onit · ask · stuck · off), data-face
+   its lids (open · wide · focus · narrow · sad · happy · closed), data-g
+   the glyph in its eye field (onit · think · ask · stuck · ctrl · msg ·
+   done · off), data-role its emblem, a robot--ev-* class an event in
+   flight, robot--poked a click. robot--live: drawn larger than 32 px
+   with its eyes showing; robot--xs only blinks. Groups, outside in: pose
+   (the status's posture) · float (the idle breath) · evt (events) · lean
+   (the pointer tilt and hover) · body (the shape's own tilt). An eye is
+   drawn in eye units and scaled into the visor; its lids sit in a group
+   scaled to the eye's height, so every lid number is in lid units:
+   -10.8 is open, 0 is shut, for every eye style.
+   --ex/--ey/--lx/--lr/--dtx come from the shared pointer loop (lookAt.ts).
+   Every motion but the blink sits behind the reduced-motion query and
+   html:not(.calm) (the Calm robots switch). The keyframes are in
+   robot-keyframes.css.
+   --------------------------------------------------------------------- */
+
+.robot {
+  --ex: 0;
+  --ey: 0;
+  --lx: 0;
+  --lr: 0;
+  --hs: 1;
+  --dtx: 1;
+  --oy: 43px;
+  --cy: 28px;
+  --side: 1;
+  --pkx: 2.4;
+  --pky: 2.4;
+  --gx: 0;
+  --gy: 0;
+  --ly: 0;
+  --lt: -10.8;
+  --lbt: 10.8;
+  --la: 0;
+  --lba: 0;
+  --lz: 1;
+  --is: 1;
+  --ft: 0deg;
+  --fy: 0px;
+  --blink-dur: 6s;
+  --blink-delay: 0s;
+  --idle-delay: 0s;
+  --bot: var(--color-accent);
+  --bot-light: var(--color-accent-soft);
+  --bot-deep: var(--color-accent);
+  --bot-frame: var(--color-accent);
+  --bot-inner: var(--color-accent);
+  --bot-feet: var(--color-accent);
+  --bot-nub: var(--color-accent-soft);
+  --bot-ring: var(--color-accent-soft);
+  --bot-pulse: var(--color-accent-soft);
+  --bot-emblem: var(--color-accent-soft);
+  --bot-emblem-ink: var(--color-accent);
+  --robot-ring: var(--color-panel);
+  display: block;
+  overflow: visible;
+  flex: none;
+}
+
+/* ---- Colours: the bot's through --bot, the rest from tokens ----------- */
+
+.robot__skin-0 { stop-color: var(--bot-light); }
+.robot__skin-1 { stop-color: var(--bot); }
+.robot__skin-2 { stop-color: var(--bot-deep); }
+.robot__sclera-0 { stop-color: var(--lens-sclera-top); }
+.robot__sclera-1 { stop-color: var(--lens-sclera-mid); }
+.robot__sclera-2 { stop-color: var(--lens-sclera); }
+
+.robot__sheen {
+  fill: var(--lens-highlight);
+  opacity: 0.2;
+}
+
+.robot__shadow {
+  fill: var(--lens-shadow);
+  opacity: 0.38;
+}
+
+.robot__rim {
+  fill: none;
+  stroke: var(--bot);
+  stroke-width: 1.8;
+}
+
+.robot__ear-inner { fill: var(--bot-inner); }
+.robot__foot { fill: var(--bot-feet); }
+.robot__nub { fill: var(--bot-nub); }
+
+.robot__pulse {
+  fill: none;
+  stroke: var(--bot-pulse);
+  stroke-width: 1.2;
+  opacity: 0;
+}
+
+.robot__visor-frame {
+  fill: none;
+  stroke: var(--bot-frame);
+  stroke-width: 1.8;
+}
+
+.robot__visor { fill: var(--lens-visor); }
+
+.robot__visor-sheen {
+  fill: none;
+  stroke: var(--lens-highlight);
+  stroke-opacity: 0.14;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+.robot__eye-ring {
+  fill: none;
+  stroke: var(--bot-ring);
+  stroke-width: 1.2;
+}
+
+.robot__eye-ring--dial {
+  stroke: var(--lens-ink);
+  stroke-opacity: 0.5;
+  stroke-width: 1.25;
+  stroke-dasharray: 0.7 2.4;
+}
+
+.robot__pupil-dot { fill: var(--lens-pupil); }
+.robot__hl { fill: var(--lens-highlight); }
+.robot__hl--small { opacity: 0.7; }
+
+.robot__lid {
+  fill: var(--lens-visor);
+  stroke: var(--lens-lid-edge);
+  stroke-width: 1.2;
+}
+
+.robot__lid--top { stroke-opacity: 0.6; }
+.robot__lid--bottom { stroke-opacity: 0.45; }
+
+.robot__ink-fill { fill: var(--lens-ink); }
+
+.robot__ink-line {
+  fill: none;
+  stroke: var(--lens-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.robot__hand {
+  stroke: var(--lens-ink);
+  stroke-linejoin: round;
+}
+
+.robot__z {
+  fill: none;
+  stroke: var(--lens-z);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.robot__z--small { opacity: 0.8; }
+
+.robot__star-mark {
+  fill: var(--robot-star-mark);
+  stroke: var(--robot-ring);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/* The role emblem: the bot's colour, lighter, with a deeper mark; no glow. */
+.robot__emblem-plate {
+  fill: var(--bot-emblem);
+  stroke: var(--bot-emblem-ink);
+  stroke-opacity: 0.35;
+  stroke-width: 0.6;
+}
+.robot__emblem-dot { fill: var(--bot-emblem-ink); }
+.robot__emblem-glass { fill: var(--bot-emblem-ink); opacity: 0.55; }
+
+.robot__emblem-mark {
+  fill: none;
+  stroke: var(--bot-emblem-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.robot__emblem-mark--light { stroke: var(--bot-emblem); }
+
+/* ---- Statics: postures, lids, the glyph each state shows -------------- */
+
+.robot__pose,
+.robot__float,
+.robot__evt,
+.robot__lean {
+  transform-box: view-box;
+  transform-origin: 24px var(--oy);
+}
+
+.robot__pose { transition: transform var(--duration-slow) var(--ease-standard), opacity var(--duration-slow); }
+
+.robot__lean {
+  transform: translate(calc(var(--lx) * 1px), 0) rotate(calc(var(--lr) * 1deg)) scale(var(--hs));
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.robot--live { cursor: pointer; }
+.robot--live:hover .robot__lean { --hs: 1.035; }
+
+.robot__face {
+  transform-box: fill-box;
+  transform-origin: 50% 70%;
+  transform: translateY(var(--fy)) rotate(var(--ft));
+  transition: transform var(--duration-slow) var(--ease-standard);
+}
+
+.robot__shadow,
+.robot__pulse,
+.robot__lens,
+.robot__pupil,
+.robot__eye-ring--dial,
+.robot__g,
+.robot__zf {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.robot__body { transition: filter var(--duration-slow); }
+.robot[data-moment="off"] .robot__body { filter: saturate(0.4) brightness(0.8); }
+.robot[data-moment="off"] .robot__pupil { opacity: 0.35; }
+
+.robot__lens {
+  transform: scale(var(--lz));
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.robot__pupil {
+  transform: scale(var(--is));
+  transition: transform var(--duration-slow) var(--ease-standard), opacity var(--duration-slow);
+}
+
+.robot__look {
+  transform: translate(calc((var(--ex) * var(--pkx) + var(--gx)) * 1px), calc((var(--ey) * var(--pky) + var(--ly) + var(--gy)) * 1px));
+  transition: transform var(--duration-fast) linear;
+}
+
+.robot__lt,
+.robot__bt { transform-box: fill-box; transform-origin: 50% 100%; }
+
+.robot__lb,
+.robot__bb { transform-box: fill-box; transform-origin: 50% 0%; }
+
+.robot__lt {
+  transform: translateY(calc(var(--lt) * 1px)) rotate(calc(var(--side) * var(--la) * 1deg));
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.robot__lb {
+  transform: translateY(calc(var(--lbt) * 1px)) rotate(calc(var(--side) * var(--lba) * -1deg));
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+/* The lids, as lid and pupil numbers. */
+.robot[data-face="wide"] { --lt: -12.6; --lbt: 12.6; --lz: 1.06; --is: 1.12; }
+.robot[data-face="focus"] { --lt: -7.6; --lbt: 9.4; --is: 0.82; }
+.robot[data-face="narrow"] { --lt: -4.6; --lbt: 6.6; --is: 0.7; }
+.robot[data-face="sad"] { --lt: -5.6; --la: 16; --lbt: 9.6; --is: 0.8; --ly: 2.2; }
+.robot[data-face="happy"] { --lt: -8.6; --la: -5; --lbt: 4.6; --lba: 12; --is: 0.94; }
+.robot[data-face="closed"] { --lt: 0.4; --lbt: -0.4; --is: 0.3; }
+
+.robot[data-face="sad"] .robot__lt,
+.robot[data-face="closed"] :is(.robot__lt, .robot__lb) { transition-duration: 1.2s; }
+
+/* The postures. */
+.robot[data-moment="ask"] { --ft: -7deg; }
+.robot[data-moment="stuck"] { --ft: 4deg; --fy: 0.9px; }
+.robot[data-moment="onit"] { --fy: 0.4px; }
+.robot[data-moment="off"] { --fy: 1.2px; }
+.robot[data-moment="stuck"] .robot__pose { transform: translateY(1.2px) rotate(-2.5deg) scale(1.02, 0.97); }
+.robot[data-moment="off"] .robot__pose { transform: translateY(1.6px) scale(1.02, 0.97); }
+.robot[data-moment="ask"] .robot__pose { transform: translateY(-0.8px); }
+
+/* Info in the eye field: a glyph replaces the pupil in one eye (ask, stuck, msg, done, ctrl) or in both
+   (onit, think), and the lids around a glyph eye open fully, so it reads. */
+.robot__g {
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+.robot__pw { transition: opacity var(--duration-fast); }
+
+.robot__zz {
+  opacity: 0;
+  transition: opacity var(--duration-slow);
+}
+
+.robot[data-g="ask"] .robot__eye--r .robot__g--q,
+.robot[data-g="stuck"] .robot__eye--r .robot__g--bang,
+.robot[data-g="msg"] .robot__eye--r .robot__g--env,
+.robot[data-g="done"] .robot__eye--r .robot__g--chk,
+.robot[data-g="ctrl"] .robot__eye--r .robot__g--hand,
+.robot[data-g="onit"] .robot__g--scan,
+.robot[data-g="think"] .robot__g--dots,
+.robot[data-g="off"] .robot__zz { opacity: 1; }
+
+.robot:is([data-g="ask"], [data-g="stuck"], [data-g="msg"], [data-g="done"], [data-g="ctrl"]) .robot__eye--r .robot__pw,
+.robot:is([data-g="onit"], [data-g="think"]) .robot__pw { opacity: 0; }
+
+.robot:is([data-g="ask"], [data-g="msg"], [data-g="done"], [data-g="ctrl"], [data-g="stuck"]) .robot__eye--r {
+  --lt: -11.4;
+  --lbt: 11.4;
+  --la: 0;
+  --lba: 0;
+  --lz: 1.04;
+}
+
+.robot[data-g="stuck"] .robot__eye--r { --lt: -10.2; --la: 7; }
+.robot:is([data-g="onit"], [data-g="think"]) { --lt: -10.4; --lbt: 10.8; }
+.robot[data-g="think"] { --lt: -8.6; }
+.robot:is([data-g="msg"], [data-g="ctrl"]) .robot__eye--l { --gx: 2.6; --gy: 0.6; }
+.robot[data-g="done"] .robot__eye--l { --gx: 1.6; }
+.robot[data-g="ask"] .robot__eye--l { --gx: 1.2; --gy: -1; }
+.robot__check { stroke-dashoffset: 0; }
+
+/* ---- The blink: everywhere, at every size; reduced motion and Calm robots keep it ---- */
+
+.robot__bt { animation: robot-blink-top var(--blink-dur) ease-in-out var(--blink-delay) infinite; }
+.robot__bb { animation: robot-blink-bottom var(--blink-dur) ease-in-out var(--blink-delay) infinite; }
+
+.robot[data-face="closed"] :is(.robot__bt, .robot__bb),
+.robot[data-face="narrow"] :is(.robot__bt, .robot__bb),
+.robot:is([data-g="ask"], [data-g="msg"], [data-g="done"], [data-g="ctrl"], [data-g="stuck"]) .robot__eye--r :is(.robot__bt, .robot__bb) {
+  animation: none;
+}
+
+html.calm .robot__bt,
+html.calm .robot__bb { animation-duration: 9s; }
+
+html.calm .robot * { transition: none !important; }
+
+html.calm .robot__lean { transform: none; }
+
+.robot--offscreen * { animation-play-state: paused !important; }
+
+/* ---- Motion: live robots, no reduced-motion preference, not calm ------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.calm) .robot--live[data-moment="rest"] .robot__float { animation: robot-breathe 4.8s ease-in-out var(--idle-delay) infinite; }
+  html:not(.calm) .robot--live[data-moment="off"] .robot__float { animation: robot-breathe 9s ease-in-out var(--idle-delay) infinite; }
+  html:not(.calm) .robot--live[data-moment="onit"] .robot__float { animation: robot-work-bob 1.2s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-moment="ask"] .robot__float { animation: robot-ahem 2.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-moment="stuck"] .robot__float { animation: robot-sigh 5.6s ease-in-out infinite; }
+
+  /* the glyphs */
+  html:not(.calm) .robot--live[data-g="onit"] .robot__scan-bar { animation: robot-scan-x 1.3s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+  html:not(.calm) .robot--live[data-g="onit"] .robot__eye-ring--dial { animation: robot-whirr 2.4s steps(8, end) infinite; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__dot { animation: robot-dot-wave 1.5s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__eye--l .robot__dot--1 { animation-delay: 0.13s; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__eye--l .robot__dot--2 { animation-delay: 0.26s; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__eye--r .robot__dot--0 { animation-delay: 0.39s; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__eye--r .robot__dot--1 { animation-delay: 0.52s; }
+  html:not(.calm) .robot--live[data-g="think"] .robot__eye--r .robot__dot--2 { animation-delay: 0.65s; }
+  html:not(.calm) .robot--live[data-g="ask"] .robot__g--q { animation: robot-q-tilt 2.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-g="stuck"] .robot__g--bang { animation: robot-bang-in 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+  html:not(.calm) .robot--live[data-g="msg"] .robot__g--env { animation: robot-env-in 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+  html:not(.calm) .robot--live[data-g="done"] .robot__check { animation: robot-draw-in 0.45s ease-out 0.3s both; }
+  html:not(.calm) .robot--live[data-g="ctrl"] .robot__g--hand { animation: robot-hand-tap 1.8s ease-in-out infinite; }
+  html:not(.calm) .robot--live[data-g="off"] .robot__zf { animation: robot-z-float 3.2s ease-in-out infinite; }
+
+  /* events: from the pointer and the idle life */
+  html:not(.calm) .robot--live.robot--ev-dbl .robot__dtg { animation: robot-dbl-look 1.05s cubic-bezier(0.3, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--ev-dbl .robot__evt { animation: robot-dbl-body 1.05s cubic-bezier(0.3, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--ev-dbl .robot__lens { animation: robot-zoom-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.42s; }
+  html:not(.calm) .robot--live.robot--ev-around .robot__dtg { animation: robot-look-around 1.75s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-dblblink .robot__bt { animation: robot-dbl-blink-top 0.75s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-dblblink .robot__bb { animation: robot-dbl-blink-bottom 0.75s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-camera .robot__lens { animation: robot-zoom-in 1.8s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-camera .robot__pupil { animation: robot-refocus 1.8s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-tilt .robot__face { animation: robot-curious 2.55s cubic-bezier(0.3, 1.2, 0.4, 1); }
+  html:not(.calm) .robot--live.robot--ev-tilt .robot__eye--r .robot__bt { animation: robot-squint 2.55s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-tilt .robot__eye--l .robot__lens { animation: robot-zoom-hold 2.55s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-whirr .robot__eye-ring--dial { animation: robot-focus-tick 1.3s steps(10, end); }
+  html:not(.calm) .robot--live.robot--ev-whirr .robot__pupil { animation: robot-refocus 1.3s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-whirr .robot__evt { animation: robot-buzz 0.32s linear 2; }
+  html:not(.calm) .robot--live.robot--ev-hmm .robot__eye--l .robot__lt { animation: robot-hmm-lid 2.2s cubic-bezier(0.3, 0.9, 0.3, 1); }
+  html:not(.calm) .robot--live.robot--ev-hmm .robot__eye--r .robot__lt { animation: robot-brow-up 2.2s cubic-bezier(0.3, 0.9, 0.3, 1); }
+  html:not(.calm) .robot--live.robot--ev-hmm .robot__face { animation: robot-hmm-tilt 2.2s ease-in-out; }
+
+  /* events: from live data */
+  html:not(.calm) .robot--live.robot--ev-created .robot__evt { animation: robot-hop 1.45s cubic-bezier(0.3, 0.7, 0.3, 1); }
+  html:not(.calm) .robot--live.robot--ev-created .robot__shadow { animation: robot-hop-shadow 1.45s cubic-bezier(0.3, 0.7, 0.3, 1); }
+  html:not(.calm) .robot--live.robot--ev-created .robot__pulse { animation: robot-pulse-out 1s ease-out 0.55s; }
+  html:not(.calm) .robot--live.robot--ev-created .robot__pupil { animation: robot-dilate 1s cubic-bezier(0.3, 1.3, 0.4, 1) 0.1s; }
+  html:not(.calm) .robot--live.robot--ev-done .robot__eye--l .robot__bt { animation: robot-slow-blink-top 1.6s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-done .robot__eye--l .robot__bb { animation: robot-slow-blink-bottom 1.6s ease-in-out; }
+  html:not(.calm) .robot--live.robot--ev-done .robot__evt { animation: robot-nod 1.6s cubic-bezier(0.3, 0.7, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--ev-msg .robot__evt { animation: robot-perk 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--ev-msg .robot__eye--r .robot__lens { animation: robot-zoom-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--ev-stuck .robot__evt { animation: robot-slump 2.6s cubic-bezier(0.4, 0, 0.3, 1); }
+  html:not(.calm) .robot--live.robot--poked .robot__evt { animation: robot-squash 0.75s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--poked .robot__lens { animation: robot-zoom-in 0.75s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  html:not(.calm) .robot--live.robot--poked .robot__dtg { animation: robot-dart 0.75s ease-out; }
+  html:not(.calm) .robot--live.robot--poked .robot__eye-ring--dial { animation: robot-focus-tick 0.75s steps(5, end); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .robot * { transition: none !important; }
+  .robot__lean { transform: none !important; }
+}

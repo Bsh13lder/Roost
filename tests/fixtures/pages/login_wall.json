@@ -1,0 +1,10 @@
+{
+  "url": "https://accounts.example/v3/password",
+  "title": "Example Accounts",
+  "text": "Hi Ana\nEnter your password\nShow password\nForgot password?\nNext",
+  "truncated": false,
+  "status": 200,
+  "password_field": true,
+  "captcha_frame": false,
+  "notice": null
+}

@@ -1,0 +1,250 @@
+/* ---------------------------------------------------------------------
+   The bot's profile as rows (restructure slice 3): the hero, one rounded
+   card of rows, the Notifications card, and each row's own page with a
+   back arrow (Settings in grouped cards, the Library by day). Tokens only.
+   --------------------------------------------------------------------- */
+
+.profile-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.panel-hero__name {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text);
+  font-size: var(--fs-title);
+  font-weight: 700;
+}
+
+.panel-hero__job {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.panel-hero__edit {
+  margin-top: var(--space-2);
+  border-radius: var(--radius-pill);
+}
+
+.panel-hero--editing {
+  gap: var(--space-3);
+}
+
+/* One rounded card that holds rows or a switch. */
+.profile-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-raised);
+}
+
+.profile-rows {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-raised);
+  list-style: none;
+}
+
+.profile-rows li + li .profile-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--fs-lead);
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-row:hover {
+  background: var(--color-hover);
+}
+
+.profile-row:focus-visible {
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+.profile-row__icon,
+.profile-row__chevron {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+.profile-row__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-row__value {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+/* Notifications: the switch alone in its card, the caption under it. */
+.notify-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.notify-card .profile-card {
+  padding: var(--space-3) var(--space-4);
+}
+
+.notify-card__switch {
+  width: 100%;
+  font-size: var(--fs-lead);
+}
+
+.notify-card__caption {
+  margin: 0;
+  padding: 0 var(--space-4);
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+/* A row's own page: back arrow and heading, then the content. */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile-page__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.profile-page__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-heading);
+  font-weight: 700;
+}
+
+.plan-routines,
+.settings-page,
+.library {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.settings-group__title {
+  margin: 0;
+  padding: 0 var(--space-4);
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.settings-group__card > .fold {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.settings-group__card > .fold:first-child {
+  border-top: 0;
+}
+
+.settings-group__card > .info-row + .info-row,
+.settings-group__card > .info-row + .full-limit {
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-group__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.settings-group--danger {
+  padding-top: var(--space-2);
+}
+
+/* The Library: rows by day. */
+.library__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.library__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-right: var(--space-3);
+}
+
+.library__row + .library__row {
+  border-top: 1px solid var(--color-border);
+}
+
+.library__link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.library__link:hover {
+  background: var(--color-hover);
+}
+
+.library__icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+.library__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.library__label,
+.library__detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library__detail,
+.library__when {
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.library__when {
+  flex: none;
+}

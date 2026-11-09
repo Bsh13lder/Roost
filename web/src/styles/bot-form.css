@@ -1,0 +1,222 @@
+/* ---------------------------------------------------------------------
+   New bot — a live preview of its robot (left), the form (right).
+   --------------------------------------------------------------------- */
+
+.bot-form {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+  max-width: 920px;
+}
+
+.bot-form__preview {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 24px 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  text-align: center;
+}
+
+.bot-form__stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 168px;
+}
+
+.bot-form__stage .avatar-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.bot-form__preview-name {
+  max-width: 100%;
+  margin: 20px 0 2px;
+  overflow-wrap: anywhere;
+  font-family: var(--font-sans);
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.bot-form__preview-job {
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.bot-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.bot-form__actions {
+  display: flex;
+  padding-top: 6px;
+}
+
+/* ---- Segmented pill group (real radios underneath) ------------------- */
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.segmented__option {
+  position: relative;
+  display: inline-flex;
+}
+
+.segmented__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segmented__label {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  pointer-events: none;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.segmented__option:hover .segmented__label {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.segmented__input:checked + .segmented__label {
+  background: var(--color-accent-tint);
+  border-color: var(--color-accent-edge);
+  color: var(--color-accent-soft);
+}
+
+.segmented__input:focus-visible + .segmented__label {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+/* ---- Color swatches -------------------------------------------------- */
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* `color` is set inline to the swatch's own color so the ring matches. */
+.swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--avatar-outline);
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.swatch:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--avatar-outline),
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--color-border-strong);
+}
+
+.swatch[aria-pressed="true"] {
+  box-shadow:
+    inset 0 0 0 1px var(--avatar-outline),
+    0 0 0 3px var(--color-bg),
+    0 0 0 5px currentColor;
+}
+
+.swatch:focus-visible {
+  outline-offset: 7px;
+}
+
+/* New bot's "Start from" row: the templates and From a file. */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.presets__file {
+  cursor: pointer;
+}
+
+/* The file input is visually hidden, so its label shows the keyboard focus. */
+.presets__file:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+.presets__label {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+/* Phones: the preview becomes a compact bar that stays in view while
+   you scroll down to the shape, color and badge pickers. */
+@media (max-width: 900px) {
+  .bot-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .bot-form__preview {
+    top: 8px;
+    z-index: 2;
+    flex-direction: row;
+    gap: 16px;
+    padding: 14px 18px 14px 10px;
+    text-align: left;
+    box-shadow: var(--shadow-md);
+  }
+
+  .bot-form__stage {
+    flex: none;
+    width: 120px;
+    height: 104px;
+  }
+
+  .bot-form__stage svg.avatar {
+    width: 104px;
+    height: 104px;
+  }
+
+  .bot-form__preview-text {
+    min-width: 0;
+  }
+
+  .bot-form__preview-name {
+    margin-top: 0;
+    font-size: var(--fs-heading);
+  }
+}

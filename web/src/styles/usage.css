@@ -1,0 +1,61 @@
+/* Token usage (docs/plans/2026-11-04-roost-token-usage.md): the Usage fold and Home's quiet line. */
+.usage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.usage__stats {
+  display: flex;
+  gap: var(--space-6);
+  margin: 0;
+}
+
+.usage__stats dt {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.usage__stats dd {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.usage__note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.usage__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  height: var(--control-md);
+}
+
+.usage__bar-slot {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  height: 100%;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.usage__bar {
+  width: 100%;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+  background: var(--color-accent-tint);
+}
+
+.usage__bar[data-today="true"] {
+  background: var(--color-accent);
+}
+
+.tokens-line {
+  margin: var(--space-2) var(--space-4);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}

@@ -1,0 +1,294 @@
+/* ---------------------------------------------------------------------
+   The avatar editor (redesign P1, ghosts since avatars v5): a big live
+   preview beside the shape and colour pickers, Surprise me and the
+   picture buttons.
+   --------------------------------------------------------------------- */
+
+.avatar-studio {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.avatar-studio__preview {
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+}
+
+.avatar-studio__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.avatar-studio__actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.avatar-studio__upload {
+  cursor: pointer;
+}
+
+/* The file input is visually hidden, so its label shows the keyboard focus. */
+.avatar-studio__upload:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+.avatar-studio__upload[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .avatar-studio {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- The look: shapes and twelve swatches ---------------------------- */
+
+.avatar-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.avatar-picker fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.avatar-picker legend {
+  margin-bottom: 10px;
+}
+
+.avatar-picker__shapes {
+  display: grid;
+  /* Fixed tiles that wrap: the profile panel is narrower than ten in a row. A press that moves across
+     the tiles is a drag that morphs the ghost (AvatarPicker), so a touch must not scroll instead. */
+  grid-template-columns: repeat(auto-fill, 56px);
+  gap: 8px;
+  touch-action: none;
+  user-select: none;
+}
+
+.avatar-picker__shape {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-raised);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.avatar-picker__shape:hover {
+  border-color: var(--color-border-strong);
+}
+
+.avatar-picker__shape:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+
+.avatar-picker__shape:has(input:focus-visible),
+.avatar-picker__swatch:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+.avatar-picker__colors {
+  display: grid;
+  /* As many 32px swatches as fit (twelve, or a thirteenth for a colour from before the palette); the
+     profile panel is narrower than twelve of them in a row, so they wrap instead of shrinking to nothing. */
+  grid-template-columns: repeat(auto-fill, 32px);
+  gap: 10px;
+}
+
+.avatar-picker__swatch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--avatar-outline);
+  cursor: pointer;
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+/* `.sr-only`'s `margin: -1px` (base.css) assumes a control flowing next to
+   visible siblings; here the input is the swatch's only child, so that
+   negative margin instead pushes its 1x1 hit box outside the swatch (into the
+   grid gap) rather than onto the swatch's corner — and the corner of a round
+   swatch sits outside its own painted circle anyway, so a click there would
+   still miss. Center the control on the circle instead. */
+.avatar-picker__shape input.sr-only,
+.avatar-picker__swatch input.sr-only {
+  inset: 0;
+  margin: auto;
+}
+
+.avatar-picker__swatch:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--avatar-outline),
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--color-border-strong);
+}
+
+.avatar-picker__swatch:has(input:checked) {
+  box-shadow:
+    inset 0 0 0 1px var(--avatar-outline),
+    0 0 0 3px var(--color-panel),
+    0 0 0 5px var(--color-text);
+}
+
+
+
+/* ---- The look card (under the hero robot) ----------------------------- */
+
+.look-edit__anchor {
+  display: inline-flex;
+}
+
+.look-trigger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.look-trigger svg.avatar {
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.look-trigger__pencil {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.look-trigger:hover svg.avatar,
+.look-trigger:focus-visible svg.avatar {
+  opacity: 0.55;
+}
+
+.look-trigger:hover .look-trigger__pencil,
+.look-trigger:focus-visible .look-trigger__pencil {
+  opacity: 1;
+}
+
+.look-trigger:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+.look-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(300px, 100%);
+  min-width: 0;
+}
+
+.look-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.look-card__tabs {
+  flex: 1;
+  min-width: 0;
+}
+
+.look-card__upload {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.look-card__hint {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.avatar-picker--compact {
+  gap: var(--space-3);
+}
+
+.avatar-picker--compact .avatar-picker__shapes {
+  grid-template-columns: repeat(auto-fill, 48px);
+  gap: 6px;
+}
+
+.avatar-picker--compact .avatar-picker__shape {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-picker--compact .avatar-picker__shape:has(input:checked) {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.avatar-picker--compact .avatar-picker__colors {
+  grid-template-columns: repeat(auto-fill, 24px);
+  gap: 8px;
+}
+
+/* The look card's Role row (avatars v7 role looks): eight small chips that wrap, and the suggestion
+   from the bot's job, marked on its chip with a dashed edge until the user confirms it. */
+.role-row {
+  /* Its chips wrap to the card's width and never widen the card (or the popover around it). */
+  contain: inline-size;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.role-row legend {
+  margin-bottom: var(--space-2);
+}
+
+.role-row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.role-row .chip--suggested:not([aria-pressed="true"]) {
+  border-style: dashed;
+  border-color: var(--color-accent-edge);
+  color: var(--color-text);
+}
+
+.role-row__hint {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}

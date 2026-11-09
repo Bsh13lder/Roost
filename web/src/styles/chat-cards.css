@@ -1,0 +1,201 @@
+/* ---------------------------------------------------------------------
+   The chat's fold cards and the Stuck card (split from chat.css).
+   --------------------------------------------------------------------- */
+
+/* ---- Fold cards (Created, Suggested) ---------------------------------- */
+
+.fold-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 12px 16px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  text-align: start;
+}
+
+.fold-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fold-card__icon {
+  display: flex;
+  flex: none;
+}
+
+.fold-card__icon .avatar {
+  animation: none;
+}
+
+.fold-card__title {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-accent-soft);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fold-card__why {
+  margin-top: 6px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.fold-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.fold-card__details summary {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fold-card__instructions {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.fold-card__taint {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-tint);
+  color: var(--color-text);
+  font-size: var(--fs-caption);
+}
+
+.fold-card__body .error-notice {
+  margin: 0;
+}
+
+.fold-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fold-card__note {
+  margin-right: auto;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.fold-card--folded {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.fold-card__tick {
+  flex: none;
+  color: var(--color-accent-strong);
+}
+
+.fold-card__line {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fold-card--folded .btn {
+  flex: none;
+}
+
+/* ---- The Stuck card (stuck flow): the full address, and where it stands */
+
+.stuck-card__url {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+.stuck-card__state {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  line-height: 1.45;
+}
+
+/* ---- The Sign-in card's live screen, in the chat (owner, 2026-10-22) ------- */
+
+/* It holds a live screen: the card takes the whole chat column. */
+.fold-card--wide {
+  max-width: none;
+}
+
+/* The computer's own shape (.screen-box keeps 16 / 10, the 1280 x 800 screen); noVNC scales into it. */
+.sign-in-screen {
+  width: 100%;
+}
+
+.sign-in-screen--preview {
+  max-width: 20rem;
+}
+
+.sign-in-screen--control {
+  border-color: var(--color-danger-edge);
+}
+
+.sign-in-screen__state {
+  margin-inline-end: auto;
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+/* B3: the Sign-in card's masked field (SecretField.tsx). */
+.secret-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.secret-field__input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Save in Vault (Vault: passwords, 2026-11-08): its own line under the masked field. */
+.secret-field__save {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}

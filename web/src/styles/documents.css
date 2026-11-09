@@ -1,0 +1,35 @@
+/* The Board's Documents tab (M2 D4): list with kind icons, Univer editors, PDF viewer. */
+.documents-board { display: flex; flex-direction: column; gap: 16px; }
+.documents-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.doc-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-panel);
+}
+.doc-row__open {
+  flex: 1 1 160px; min-width: 0; padding: 0; border: 0; background: none; color: var(--color-text);
+  font: inherit; font-weight: 600; text-align: left; cursor: pointer; overflow-wrap: anywhere;
+}
+.doc-row__when { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.doc-row__actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.kind-icon { flex: none; color: var(--color-accent-strong); }
+.kind-icon--sheet { color: var(--color-off); }
+.kind-icon--pdf { color: var(--color-danger); }
+.doc-open { display: flex; flex-direction: column; gap: 12px; }
+.doc-open__bar { display: flex; align-items: center; gap: 12px; }
+.doc-open__title { margin: 0; font: 600 var(--fs-title) var(--font-sans); overflow-wrap: anywhere; }
+.univer-shell { display: flex; flex-direction: column; gap: 8px; }
+.univer-shell__state { margin: 0; color: var(--color-text-secondary); font-size: var(--fs-label); }
+.univer-editor {
+  height: min(70vh, 720px); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  overflow: hidden; background: var(--color-panel);
+}
+.univer-host { height: 100%; }
+.pdf-viewer { display: flex; flex-direction: column; align-items: safe center; gap: 8px; overflow-x: auto; }
+.pdf-viewer__nav { display: flex; align-items: center; gap: 12px; }
+
+/* A phone: the title and its age on one line, the row's actions on the next, under the title. */
+@media (max-width: 768px) {
+  .doc-row__open { flex-basis: 0; }
+  .doc-row__actions { flex-basis: 100%; padding-left: 32px; }
+}

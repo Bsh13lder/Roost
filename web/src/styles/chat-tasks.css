@@ -1,0 +1,282 @@
+/* The chat's tasks and marks (2026-10-26): the quiet "Web" mark, "#Project" chips in your bubbles, the task cards
+   a bot's list or add leaves under its reply, and a reminder's small Done · Failed · Reschedule · Skip chips under its bubble.
+   Tokens only. */
+
+/* ---- the web mark ---------------------------------------------------- */
+
+.web-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 22px;
+  padding: 0 var(--space-2) 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.web-mark svg {
+  width: 12px;
+  height: 12px;
+}
+
+.web-mark:hover,
+.web-mark[data-state="open"] {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-secondary);
+}
+
+.message__taint.web-mark {
+  align-self: flex-start;
+}
+
+.web-mark__explained {
+  max-width: 280px;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  line-height: 1.45;
+}
+
+/* ---- #Project in your own bubble ------------------------------------- */
+
+.project-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+  border-radius: var(--radius-xs);
+  background: var(--color-hover);
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+
+.project-chip svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.85;
+}
+
+.project-chip:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- task cards ------------------------------------------------------ */
+
+.message--task-cards {
+  display: block;
+  padding-left: calc(32px + var(--space-2));
+}
+
+.task-cards {
+  max-width: 560px;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+
+.task-cards__head {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.task-cards__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-cards__quiet,
+.reminder-chips__quiet {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+.task-cards__more {
+  display: inline-block;
+  margin-top: var(--space-2);
+  color: var(--color-accent-strong);
+  font-size: var(--fs-label);
+}
+
+.task-cards__toggle {
+  display: block;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-strong);
+  font-size: var(--fs-label);
+  cursor: pointer;
+}
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.task-card:first-child {
+  border-top: 0;
+}
+
+.task-card__tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  padding: 0;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.task-card__tick:hover:not(:disabled) {
+  border-color: var(--color-ok);
+  color: var(--color-ok);
+}
+
+.task-card__tick--done {
+  border-color: var(--color-ok);
+  background: var(--color-ok-tint);
+  color: var(--color-ok);
+}
+
+.task-card__tick:disabled {
+  cursor: default;
+}
+
+.task-card__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.task-card__title {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+button.task-card__title {
+  cursor: pointer;
+}
+
+button.task-card__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.task-card--finished .task-card__title {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+}
+
+.task-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+.task-card__due--over {
+  color: var(--color-danger);
+}
+
+.task-card__due--today {
+  color: var(--color-ok);
+}
+
+.task-card__due--soon {
+  color: var(--color-warn);
+}
+
+.task-card__project {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.task-card__project svg {
+  width: 12px;
+  height: 12px;
+}
+
+.task-card__problem {
+  color: var(--color-danger);
+  font-size: var(--fs-caption);
+}
+
+/* ---- a reminder's chips (owner, 2026-10-26: "like Grok") ------------ */
+
+.reminder-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.reminder-chip {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.reminder-chip:hover:not(:disabled),
+.reminder-chip:focus-visible {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.reminder-chip:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.reminder-chips__said {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+

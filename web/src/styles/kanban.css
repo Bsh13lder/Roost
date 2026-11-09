@@ -1,0 +1,250 @@
+/* ---------------------------------------------------------------------
+   The Kanban (Board redesign G6): columns of cards, a split-by-project
+   row per project, collapsed columns, and the card's meta line.
+   --------------------------------------------------------------------- */
+
+.kanban {
+  display: flex;
+  flex-direction: column;
+}
+
+.kboard {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.kcol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 160px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+
+.kcol.is-over {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-tint);
+}
+
+.kcol.is-fixed {
+  cursor: not-allowed;
+}
+
+.kcol__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 0 var(--space-1) var(--space-1);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.kcol__head .icon-btn {
+  width: 24px;
+  height: 24px;
+}
+
+.kcol__name {
+  margin-right: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kcol__anchor {
+  display: inline-flex;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.kcol__empty {
+  padding: var(--space-5) 0;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  text-align: center;
+}
+
+.kcol.is-collapsed {
+  align-items: center;
+  min-height: 120px;
+  padding: var(--space-2);
+}
+
+.kcol.is-collapsed .kcol__head {
+  flex-direction: column;
+  padding: 0;
+}
+
+.kcol.is-collapsed .kcol__name {
+  margin: var(--space-2) 0;
+  writing-mode: vertical-rl;
+}
+
+.kcol.is-collapsed .kcol__add {
+  display: none;
+}
+
+.klane {
+  margin-bottom: var(--space-5);
+}
+
+.klane__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+/* ---- A card --------------------------------------------------------------------- */
+
+.kcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-raised);
+  cursor: grab;
+}
+
+.kcard:hover {
+  border-color: var(--color-border-strong);
+}
+
+.kcard.is-dragging {
+  opacity: 0.5;
+}
+
+.kcard--urgent {
+  border-left: 3px solid var(--color-danger);
+}
+
+.kcard.is-done .t {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+}
+
+.kcard__t {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.kcard__t .t {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.kcard__anchor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+}
+
+.kcard__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  font-size: var(--fs-caption);
+}
+
+.kcard__due--over {
+  color: var(--color-danger);
+}
+
+.kcard__due--today {
+  color: var(--color-ok);
+}
+
+.kcard__due--soon {
+  color: var(--color-warn);
+}
+
+.kcard__due--later {
+  color: var(--color-text-secondary);
+}
+
+.kcard__project,
+.kcard__who {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
+.kcard__who--you {
+  color: var(--color-text-faint);
+}
+
+.kcard .substeps {
+  margin-left: 0;
+}
+
+.kanban__hint,
+.qpop__hint {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+}
+
+/* ---- The "+" popover (QuickAddPopover) ----------------------------------------- */
+
+.qpop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(420px, calc(100vw - 16px));
+}
+
+.qpop__title {
+  margin: 0;
+  font-size: var(--fs-body);
+}
+
+.qpop .quick-box {
+  margin-bottom: 0;
+}
+
+/* ---- Phone: the columns are swipeable pages (G14) ------------------------------- */
+
+@media (max-width: 768px) {
+  .kboard {
+    display: flex;
+    gap: var(--space-3);
+    margin-right: calc(-1 * var(--gutter)); /* runs to the screen's right edge */
+    padding-right: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .kboard::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kboard > .kcol {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
+
+  .kboard > .kcol.is-collapsed {
+    flex: 0 0 52px;
+  }
+}

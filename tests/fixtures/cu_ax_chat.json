@@ -1,0 +1,30 @@
+{
+  "url": "https://chat.example/room",
+  "viewport": [1280, 690],
+  "dom": {"id": 1, "tag": "html", "children": [{"id": 2, "tag": "body", "children": [
+    {"id": 10, "tag": "form", "attrs": {"class": "composer"}, "children": [
+      {"id": 11, "tag": "input", "attrs": {"type": "text", "name": "msg"}},
+      {"id": 12, "tag": "button", "children": [{"id": 13, "text": "Send"}]}
+    ]},
+    {"id": 20, "tag": "form", "attrs": {"method": "GET", "action": "/find"}, "children": [
+      {"id": 21, "tag": "input", "attrs": {"type": "text", "name": "q"}},
+      {"id": 22, "tag": "button", "children": [{"id": 23, "text": "Find"}]}
+    ]},
+    {"id": 30, "tag": "button", "attrs": {"role": "textbox"}, "children": [{"id": 31, "text": "Buy now"}]},
+    {"id": 40, "tag": "a", "attrs": {"href": "/pay", "aria-label": "Next page"}, "children": [{"id": 41, "text": "Pay now"}]},
+    {"id": 50, "tag": "a", "attrs": {"href": "/jobs"}, "children": [{"id": 51, "text": "Jobs"}]}
+  ]}]},
+  "ax": [
+    {"role": "RootWebArea", "name": "Chat", "backend": 1},
+    {"role": "textbox", "name": "Message", "backend": 11, "props": {"editable": "plaintext"}},
+    {"role": "button", "name": "Send", "backend": 12},
+    {"role": "textbox", "name": "Find", "backend": 21, "props": {"editable": "plaintext"}},
+    {"role": "button", "name": "Find", "backend": 22},
+    {"role": "textbox", "name": "Buy now", "backend": 30},
+    {"role": "link", "name": "Next page", "backend": 40},
+    {"role": "link", "name": "Jobs", "backend": 50}
+  ],
+  "boxes": {"11": [100, 20, 400, 32], "12": [510, 20, 60, 32], "21": [100, 80, 400, 32], "22": [510, 80, 60, 32],
+            "30": [100, 150, 100, 30], "40": [100, 200, 80, 20], "50": [100, 240, 80, 20]},
+  "hits": {}
+}

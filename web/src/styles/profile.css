@@ -1,0 +1,481 @@
+/* ---------------------------------------------------------------------
+   The bot profile (S1.6): header, the big avatar with the name and job
+   editable in place, pill tabs, the Info tab's cards and rows, the look
+   picker, the Share as Template sheet and the full-screen Instructions
+   page. Tokens only, no new colors.
+   --------------------------------------------------------------------- */
+
+/* ---- The name and job, editable in place ------------------------------ */
+
+.name-job-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.editable {
+  max-width: 100%;
+  text-align: center;
+}
+
+.editable__text {
+  display: inline;
+  margin: 0;
+  overflow-wrap: anywhere;
+  cursor: text;
+  text-decoration: underline dotted transparent;
+  text-underline-offset: 5px;
+  transition: text-decoration-color var(--duration-fast) var(--ease-standard);
+}
+
+.editable__text:hover {
+  text-decoration-color: var(--color-text-faint);
+}
+
+.editable__name {
+  font-family: var(--font-sans);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.editable__job {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.editable__edit {
+  display: inline-grid;
+  place-items: center;
+  margin-left: 4px;
+  vertical-align: middle;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-faint);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.editable__edit svg {
+  width: 15px;
+  height: 15px;
+}
+
+.editable__edit:hover {
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.editable--open {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(100%, 420px);
+  padding: 4px 0;
+  text-align: left;
+}
+
+.editable__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editable__input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- Documents and Links tabs (S1.9) --------------------------------- */
+
+.tab-empty {
+  margin: 0;
+  padding: 28px 12px;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: center;
+}
+
+.documents-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.documents-tab__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.documents-tab__note {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+.made-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.made-section__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* A finished task, shown: quiet and struck, like a done row on the board */
+.made-section__row.is-finished .made-section__link,
+.made-section__row.is-finished .made-section__link:hover {
+  color: var(--color-text-faint);
+  text-decoration: line-through;
+}
+
+.made-section__title {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.made-section__list,
+.links-tab {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  list-style: none;
+}
+
+.made-section__row,
+.links-tab__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 18px;
+}
+
+.made-section__row + .made-section__row,
+.links-tab__row + .links-tab__row {
+  border-top: 1px solid var(--color-border);
+}
+
+.made-section__link {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.made-section__link:hover,
+.links-tab__link:hover .links-tab__host {
+  color: var(--color-accent-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.links-tab__link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.links-tab__host {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.links-tab__path {
+  overflow: hidden;
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.links-tab__path:empty {
+  display: none;
+}
+
+.links-tab__when {
+  flex: none;
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+}
+
+/* ---- Info tab: cards and rows ---------------------------------------- */
+
+.info-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* A card keeps its own height: in the bounded panel a squeezed card clipped its header. */
+.info-tab > * {
+  flex: none;
+}
+
+.info-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+.info-card__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.info-card--rows {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 14px 18px;
+}
+
+.info-row + .info-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.info-row--link {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.info-row--link:hover {
+  background: var(--color-raised);
+}
+
+.info-row--link svg {
+  flex: none;
+  color: var(--color-text-faint);
+}
+
+.info-row__label {
+  flex: none;
+  font-weight: 600;
+}
+
+.info-row__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-row__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.info-row__action {
+  align-self: flex-start;
+}
+
+.info-tab__later {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  text-align: center;
+}
+
+/* The Notifications switch as a full row: the words left, the track right. */
+.switch--row {
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  text-align: left;
+}
+
+.switch--row .switch__track {
+  flex: none;
+  width: 40px;
+  height: 24px;
+}
+
+.switch--row .switch__thumb {
+  width: 20px;
+  height: 20px;
+}
+
+.switch--row[aria-checked="true"] {
+  border-color: transparent;
+}
+
+.switch--row[aria-checked="true"] .switch__track {
+  background: var(--color-accent);
+}
+
+.switch--row[aria-checked="true"] .switch__thumb {
+  transform: translateX(16px);
+}
+
+/* ---- Share as Template ---------------------------------------------- */
+
+.share-sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 4px 20px 8px;
+  overflow-y: auto;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.share-sheet__body p {
+  margin: 0;
+}
+
+.share-sheet__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-raised);
+  color: var(--color-text);
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.share-sheet__saved {
+  color: var(--color-accent-soft);
+}
+
+.sheet__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px 16px;
+}
+
+@media (max-width: 768px) {
+  .editable__name {
+    font-size: var(--fs-title);
+  }
+}
+
+.info-row--select,
+.info-row__line {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* A select's line inside a row that also holds a hint below it (the Model row). */
+.info-row__line {
+  display: flex;
+}
+
+.decisions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.decisions__title {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.decisions__empty,
+.decisions__question,
+.decisions__answer,
+.decisions__when {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.decisions__empty,
+.decisions__when {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.decisions__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.decisions__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.decisions__text {
+  min-width: 0;
+}
+
+.decisions__answer {
+  font-weight: 600;
+}

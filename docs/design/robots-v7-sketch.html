@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Lensbot and Peeper v7</title>
+<meta name="description" content="Round seven of Roost's bot avatars: a deeper pass on Lensbot and Peeper, with clean white eyes in seven shapes, many more silhouettes, and the bot's needs shown as small glyphs inside the eye field.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost avatars, round seven: Lensbot and Peeper, white eyes, info in the
+   eye field. Self-contained: no fonts, images or scripts from anywhere
+   else. Dark only (V4). :root values come from web/src/styles/tokens.css.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-accent-soft: #c4b5fd;
+  --color-danger: #f87171;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px #b2a6f6;
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-fs-menu: 0.8125rem;
+  --new-gap: 4px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5; overflow-x: hidden;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: 0.8em; color: var(--color-accent-soft); word-break: break-word; }
+.lede { color: var(--color-text-secondary); max-width: 74ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 74ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-top: 22px; align-items: flex-end; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--color-panel); border-radius: 14px; padding: 14px; box-shadow: var(--new-edge-inner); display: grid; gap: 6px; align-content: start; }
+.rule b { font-family: var(--font-round); }
+.rule p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.rule .no { color: var(--color-danger); font-weight: 600; }
+
+/* ---- Playground ---- */
+.pg { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; }
+@media (max-width: 900px) { .pg { grid-template-columns: minmax(0, 1fr); padding: 14px; } }
+.pg-controls { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.pg-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { font: inherit; font-size: var(--fs-label); font-weight: 600; min-height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip:hover { background: #26262f; }
+.chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.chip[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.chip.ev { background: var(--color-bg); }
+.chip.ev:hover { background: var(--color-raised); }
+.chip .cue-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, 40px); gap: var(--new-gap); }
+.tile { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.tile:hover { background: var(--new-hover); }
+.tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tile[aria-pressed="true"] { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.tile.auto { font-size: 0.625rem; font-weight: 700; color: var(--color-text-secondary); font-family: var(--font-mono); letter-spacing: .04em; }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-dot { width: 22px; height: 22px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.sw-dot:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.sw-dot[aria-pressed="true"] { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--color-panel), 0 0 0 3.5px var(--color-text); }
+.pg-stage { background: var(--color-bg); border-radius: 14px; padding: 28px 12px 20px; display: grid; justify-items: center; align-content: center; gap: 22px; min-height: 420px; min-width: 0; }
+.pg-stage .neighbours { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.pg-stage small { color: var(--color-text-faint); font-size: var(--fs-caption); text-align: center; }
+.sw { display: inline-flex; align-items: center; gap: 10px; font: inherit; font-size: var(--fs-label); color: var(--color-text); background: none; border: 0; padding: 0; cursor: pointer; }
+.sw:focus-visible { outline: none; border-radius: 999px; box-shadow: var(--focus-ring); }
+.sw i { width: 34px; height: 20px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); position: relative; transition: background .2s; flex: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--color-text); transition: transform .2s; }
+.sw[aria-checked="true"] i { background: var(--new-accent); }
+.sw[aria-checked="true"] i::after { transform: translateX(14px); }
+.hint { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.evgroups { display: grid; gap: 8px; }
+.evgroup { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px; align-items: start; }
+.evgroup h4 { padding-top: 8px; }
+
+/* ---- Family cards ---- */
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 18px; }
+@media (max-width: 640px) { .dir { padding: 14px; } }
+.dir-head { display: grid; gap: 6px; }
+.dir-head p { color: var(--color-text-secondary); max-width: 78ch; }
+.dir-head .tag { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--new-accent-strong); letter-spacing: .06em; text-transform: uppercase; }
+.blocks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.blk { background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.grid10 { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 12px 8px; }
+.cell { display: grid; justify-items: center; gap: 4px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.cell > small { font-size: 0.6875rem; color: var(--color-text-faint); text-align: center; line-height: 1.3; }
+.sizes { display: flex; gap: 8px; align-items: flex-end; }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+
+/* ---- Glyph legend ---- */
+.glegend { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.gcard { background: var(--color-panel); border-radius: 14px; padding: 12px; box-shadow: var(--new-edge-inner); display: grid; gap: 8px; align-content: start; min-width: 0; }
+.gcard header { display: flex; align-items: center; gap: 8px; }
+.gcard header b { font-family: var(--font-round); }
+.gcard header .cue-dot { width: 8px; height: 8px; border-radius: 50%; }
+.gcard .pair { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.gcard p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+
+/* ---- In context (cozy kit) ---- */
+.kit-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .kit-row { grid-template-columns: minmax(0, 1fr); } }
+.kit-slot { background: var(--color-panel); border-radius: 14px; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; box-shadow: var(--new-edge-inner); }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { flex: 1; height: 26px; padding: 0 8px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-secondary); font: inherit; font-weight: 600; white-space: nowrap; border: 0; background: none; cursor: pointer; }
+.cz-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.cz-tab[aria-selected="true"] { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-pop { width: 300px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: grid; grid-template-columns: repeat(auto-fill, 40px); gap: var(--new-gap); }
+.cz-tile { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; border: 0; padding: 0; background: none; cursor: pointer; color: var(--color-text-secondary); }
+.cz-tile:hover { background: var(--new-hover); }
+.cz-tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.cz-tile[aria-pressed="true"] { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-tile.auto { font-size: 0.625rem; font-weight: 700; font-family: var(--font-mono); }
+.cz-upload { display: grid; gap: 8px; font-size: var(--fs-caption); color: var(--color-text-secondary); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-side { width: 268px; max-width: 100%; background: var(--color-bg); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { display: grid; justify-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; text-align: center; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin b { font-weight: 600; color: var(--color-text); display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cz-pin small { color: var(--color-text-faint); font-size: 0.6875rem; display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cz-pin .unread { position: absolute; top: 8px; right: 12px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 320px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-bg); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); width: max-content; max-width: 100%; }
+.cz-status .dot, .cz-pill .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+.cz-bar { width: 420px; max-width: 100%; height: 48px; padding: 0 10px 0 8px; border-radius: var(--new-radius-surface); background: var(--color-bg); box-shadow: var(--new-edge-inner); display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cz-pill { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-weight: 600; min-width: 0; }
+.cz-pill small { color: var(--color-text-faint); font-weight: 500; font-size: var(--fs-caption); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.cz-bar .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+@media (max-width: 480px) { .cz-bar .acts .cz-btn:not(.icon) { display: none; } }
+.cz-setting { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--new-radius-item); background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 440px; }
+.cz-setting div { flex: 1; min-width: 0; }
+.cz-setting b { display: block; }
+.cz-setting small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+
+/* ---- Notes ---- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 520px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td .bot { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 78ch; }
+.verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.verdict { background: var(--color-bg); border-radius: 12px; padding: 12px; display: grid; gap: 4px; align-content: start; font-size: var(--fs-label); color: var(--color-text-secondary); }
+.verdict b { color: var(--color-text); font-family: var(--font-round); font-size: var(--fs-body); }
+.verdict.pick { box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------------------------------------------------------------------
+   The avatar: one stateful SVG on a 48-unit grid.
+   data-dir   lens · peep
+   data-st    the state key (rest onit think ask stuck ctrl msg done off)
+   data-s     posture   rest · onit · ask · stuck · off
+   data-g     the glyph in the eye field: onit think ask stuck ctrl msg done off (or none)
+   data-face  lids: open · wide · focus · narrow · sad · happy · closed
+   data-onit  spin · scan: what the pupils become while On it
+   .live      32 px and up: follows the pointer, plays every motion, shows glyphs.
+              Smaller: blinks only, and a tiny coloured dot (.cue) carries the glyph.
+   An eye is drawn in eye units (about 10 across its half-width) and scaled into
+   place. Its lids live in a group scaled to the eye's height, so every lid number
+   is in lid units: -10.8 is open, 0 is shut, for every eye shape.
+   --ex/--ey/--lx/--lr/--dtx come from the shared pointer loop (see the script).
+   --------------------------------------------------------------------- */
+.bot { display: block; overflow: visible; flex: none; }
+.bot.live { cursor: pointer; }
+.bot.live:focus-visible { outline: none; border-radius: 50%; box-shadow: var(--focus-ring); }
+.pose, .float, .evt, .lean { transform-box: view-box; transform-origin: 24px 43px; }
+.pose { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .5s; }
+.lean { transform: translate(calc(var(--lx, 0) * 1px), 0) rotate(calc(var(--lr, 0) * 1deg)) scale(var(--hs, 1)); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.bot.live:hover .lean { --hs: 1.035; }
+.tilter { transform-box: fill-box; transform-origin: 50% 70%; transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); transition: transform .55s cubic-bezier(.3, 1.35, .45, 1); }
+.shadow, .pulse { transform-box: fill-box; transform-origin: center; }
+.pulse { opacity: 0; }
+.body { transition: filter .9s; }
+.bot[data-s="off"] .body { filter: saturate(.4) brightness(.8); }
+
+/* Eye parts */
+.lens, .pupil, .ring, .g, .zf { transform-box: fill-box; transform-origin: 50% 50%; }
+.lens { transform: scale(var(--lz, 1)); transition: transform .4s cubic-bezier(.3, 1.3, .4, 1); }
+.pupil { transform: scale(var(--is, 1)); transition: transform .5s cubic-bezier(.3, 1.45, .4, 1), opacity .9s; }
+.look { transform: translate(calc((var(--ex, 0) * var(--pkx, 2.4) + var(--gx, 0)) * 1px), calc((var(--ey, 0) * var(--pky, 2.4) + var(--ly, 0) + var(--gy, 0)) * 1px)); transition: transform .14s linear; }
+.lt, .bt { transform-box: fill-box; transform-origin: 50% 100%; }
+.lb, .bb { transform-box: fill-box; transform-origin: 50% 0%; }
+.lt { transform: translateY(calc(var(--lt, -10.8) * 1px)) rotate(calc(var(--side, 1) * var(--la, 0) * 1deg)); transition: transform .34s cubic-bezier(.3, .9, .3, 1.1); }
+.lb { transform: translateY(calc(var(--lbt, 10.8) * 1px)) rotate(calc(var(--side, 1) * var(--lba, 0) * -1deg)); transition: transform .34s cubic-bezier(.3, .9, .3, 1.1); }
+.bot[data-s="off"] .pupil { opacity: .35; }
+
+/* Faces: lid and pupil numbers. */
+.bot[data-face="wide"] { --lt: -12.6; --lbt: 12.6; --lz: 1.06; --is: 1.12; }
+.bot[data-face="focus"] { --lt: -7.6; --lbt: 9.4; --is: .82; }
+.bot[data-face="narrow"] { --lt: -4.6; --lbt: 6.6; --is: .7; }
+.bot[data-face="sad"] { --lt: -5.6; --la: 16; --lbt: 9.6; --is: .8; --ly: 2.2; }
+.bot[data-face="happy"] { --lt: -8.6; --la: -5; --lbt: 4.6; --lba: 12; --is: .94; }
+.bot[data-face="closed"] { --lt: .4; --lbt: -.4; --is: .3; }
+.bot[data-face="sad"] .lt, .bot[data-face="closed"] .lt, .bot[data-face="closed"] .lb { transition-duration: 1.2s; }
+.bot[data-s="ask"] { --ft: -7deg; }
+.bot[data-s="stuck"] { --ft: 4deg; --fy: .9px; }
+.bot[data-s="onit"] { --fy: .4px; }
+.bot[data-s="off"] { --fy: 1.2px; }
+.bot[data-s="stuck"] .pose { transform: translateY(1.2px) rotate(-2.5deg) scale(1.02, .97); }
+.bot[data-s="off"] .pose { transform: translateY(1.6px) scale(1.02, .97); }
+.bot[data-s="ask"] .pose { transform: translateY(-.8px); }
+
+/* ---- Info in the eye field ----------------------------------------------
+   A glyph replaces the pupil in one eye (ask, stuck, msg, done, ctrl) or in
+   both (onit, think). The lids around a glyph eye open fully, so it reads. */
+.g { opacity: 0; transition: opacity .22s; }
+.pw { transition: opacity .22s; }
+.zz { opacity: 0; transition: opacity .5s; }
+.bot[data-g="ask"] .e-r .g-q, .bot[data-g="stuck"] .e-r .g-bang, .bot[data-g="msg"] .e-r .g-env,
+.bot[data-g="done"] .e-r .g-chk, .bot[data-g="ctrl"] .e-r .g-cur,
+.bot[data-g="onit"][data-onit="spin"] .g-spin, .bot[data-g="onit"][data-onit="scan"] .g-scan,
+.bot[data-g="think"] .g-dots, .bot[data-g="off"] .zz { opacity: 1; }
+.bot:is([data-g="ask"], [data-g="stuck"], [data-g="msg"], [data-g="done"], [data-g="ctrl"]) .e-r .pw,
+.bot:is([data-g="onit"], [data-g="think"]) .pw { opacity: 0; }
+.bot:is([data-g="ask"], [data-g="msg"], [data-g="done"], [data-g="ctrl"], [data-g="stuck"]) .e-r { --lt: -11.4; --lbt: 11.4; --la: 0; --lba: 0; --lz: 1.04; }
+.bot[data-g="stuck"] .e-r { --lt: -10.2; --la: 7; }
+.bot:is([data-g="onit"], [data-g="think"]) { --lt: -10.4; --lbt: 10.8; }
+.bot[data-g="think"] { --lt: -8.6; }
+.bot:is([data-g="msg"], [data-g="ctrl"]) .e-l { --gx: 2.6; --gy: .6; }
+.bot[data-g="done"] .e-l { --gx: 1.6; }
+.bot[data-g="ask"] .e-l { --gx: 1.2; --gy: -1; }
+.bot.gone-static .g { transition: none; }
+/* At 24 px: a tiny coloured dot instead. */
+.cue { fill: var(--cue, transparent); opacity: var(--cueo, 0); transition: fill .3s, opacity .3s; }
+.bot:is([data-g="onit"], [data-g="think"]) { --cue: #6ea8fe; --cueo: 1; }
+.bot[data-g="ask"] { --cue: #ffffff; --cueo: 1; }
+.bot[data-g="stuck"] { --cue: #f5b04a; --cueo: 1; }
+.bot[data-g="ctrl"] { --cue: #f2827a; --cueo: 1; }
+.bot[data-g="msg"] { --cue: #b2a6f6; --cueo: 1; }
+.bot[data-g="done"] { --cue: #86d27a; --cueo: 1; }
+.bot[data-g="off"] { --cue: #6b6b78; --cueo: 1; }
+
+/* Blinks: everywhere, at every size, calm or not. */
+.bt { animation: blinkT var(--blink-dur, 5.8s) ease-in-out var(--blink-delay, 0s) infinite; }
+.bb { animation: blinkB var(--blink-dur, 5.8s) ease-in-out var(--blink-delay, 0s) infinite; }
+.bot[data-face="closed"] :is(.bt, .bb), .bot[data-face="narrow"] :is(.bt, .bb) { animation: none; }
+.bot:is([data-g="ask"], [data-g="msg"], [data-g="done"], [data-g="ctrl"], [data-g="stuck"]) .e-r :is(.bt, .bb) { animation: none; }
+html.calm .bt, html.calm .bb { animation-duration: 9s; }
+html.calm .bot * { transition: none !important; }
+.bot.offscreen * { animation-play-state: paused !important; }
+.bot.gone { visibility: hidden; }
+@keyframes blinkT { 0%, 93%, 100% { transform: translateY(0); } 95.5% { transform: translateY(10.9px); } }
+@keyframes blinkB { 0%, 93%, 100% { transform: translateY(0); } 95.5% { transform: translateY(-10.9px); } }
+
+/* Status loops and glyph motion: live bots only, never when calm (calm keeps the glyph, still). */
+html:not(.calm) .bot.live[data-s="rest"] .float { animation: breathe 4.8s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="off"] .float { animation: breathe 9s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .float { animation: workBob 1.2s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="ask"] .float { animation: ahem 2.8s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .float { animation: sigh 5.6s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-g="onit"] .spn { animation: spin .95s linear infinite; }
+html:not(.calm) .bot.live[data-g="onit"] .sb { animation: scanX 1.3s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+html:not(.calm) .bot.live[data-g="onit"] .ring { animation: whirr 2.4s steps(8, end) infinite; }
+html:not(.calm) .bot.live[data-g="think"] .d { animation: dotWave 1.5s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-g="think"] .e-l .d1 { animation-delay: .13s; }
+html:not(.calm) .bot.live[data-g="think"] .e-l .d2 { animation-delay: .26s; }
+html:not(.calm) .bot.live[data-g="think"] .e-r .d0 { animation-delay: .39s; }
+html:not(.calm) .bot.live[data-g="think"] .e-r .d1 { animation-delay: .52s; }
+html:not(.calm) .bot.live[data-g="think"] .e-r .d2 { animation-delay: .65s; }
+html:not(.calm) .bot.live[data-g="ask"] .g-q { animation: qTilt 2.8s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-g="stuck"] .g-bang { animation: bangIn .5s cubic-bezier(.3, 1.5, .5, 1) both; }
+html:not(.calm) .bot.live[data-g="msg"] .g-env { animation: envIn .55s cubic-bezier(.3, 1.4, .5, 1) both; }
+html:not(.calm) .bot.live[data-g="done"] .ck { animation: drawIn .45s ease-out .3s both; }
+html:not(.calm) .bot.live[data-g="ctrl"] .g-cur { animation: curTap 1.8s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-g="off"] .zf { animation: zFloat 3.2s ease-in-out infinite; }
+
+/* Events */
+html:not(.calm) .bot.live.ev-notice .lens { animation: zoomIn .95s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-notice .pupil { animation: dilate .95s cubic-bezier(.3, 1.3, .4, 1); }
+html:not(.calm) .bot.live.ev-notice .ring { animation: focusTick .95s steps(6, end); }
+html:not(.calm) .bot.live.ev-dbl .dtg { animation: dblLook 1.05s cubic-bezier(.3, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-dbl .evt { animation: dblBody 1.05s cubic-bezier(.3, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-dbl .lens { animation: zoomIn .6s cubic-bezier(.2, .8, .2, 1) .42s; }
+html:not(.calm) .bot.live.ev-around .dtg { animation: lookAround 1.75s ease-in-out; }
+html:not(.calm) .bot.live.ev-dblblink .bt { animation: dblBlinkT .75s ease-in-out; }
+html:not(.calm) .bot.live.ev-dblblink .bb { animation: dblBlinkB .75s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .lens { animation: zoomIn 1.8s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .pupil { animation: refocus 1.8s ease-in-out; }
+html:not(.calm) .bot.live.ev-tilt .tilter { animation: curious 2.55s cubic-bezier(.3, 1.2, .4, 1); }
+html:not(.calm) .bot.live.ev-tilt .e-r .bt { animation: squint 2.55s ease-in-out; }
+html:not(.calm) .bot.live.ev-tilt .e-l .lens { animation: zoomHold 2.55s ease-in-out; }
+html:not(.calm) .bot.live.ev-whirr .ring { animation: focusTick 1.3s steps(10, end); }
+html:not(.calm) .bot.live.ev-whirr .pupil { animation: refocus 1.3s ease-in-out; }
+html:not(.calm) .bot.live.ev-whirr .evt { animation: buzz .32s linear 2; }
+html:not(.calm) .bot.live.ev-hmm .e-l .lt { animation: hmmLid 2.2s cubic-bezier(.3, .9, .3, 1); }
+html:not(.calm) .bot.live.ev-hmm .e-r .lt { animation: browUp 2.2s cubic-bezier(.3, .9, .3, 1); }
+html:not(.calm) .bot.live.ev-hmm .tilter { animation: hmmTilt 2.2s ease-in-out; }
+html:not(.calm) .bot.live.ev-sad .evt { animation: slump 2.6s cubic-bezier(.4, 0, .3, 1); }
+html:not(.calm) .bot.live.ev-startle .evt { animation: jolt .9s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-startle .pupil { animation: pinch .9s ease-out; }
+html:not(.calm) .bot.live.ev-satisfied .bt { animation: slowBlinkT 1.7s ease-in-out; }
+html:not(.calm) .bot.live.ev-satisfied .bb { animation: slowBlinkB 1.7s ease-in-out; }
+html:not(.calm) .bot.live.ev-satisfied .evt { animation: nod 1.7s cubic-bezier(.3, .7, .2, 1); }
+html:not(.calm) .bot.live.ev-done .e-l .bt { animation: slowBlinkT 1.6s ease-in-out; }
+html:not(.calm) .bot.live.ev-done .e-l .bb { animation: slowBlinkB 1.6s ease-in-out; }
+html:not(.calm) .bot.live.ev-done .evt { animation: nod 1.6s cubic-bezier(.3, .7, .2, 1); }
+html:not(.calm) .bot.live.ev-msg .evt { animation: perk .8s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-msg .e-r .lens { animation: zoomIn .8s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-created .evt { animation: hop 1.45s cubic-bezier(.3, .7, .3, 1); }
+html:not(.calm) .bot.live.ev-created .shadow { animation: hopShadow 1.45s cubic-bezier(.3, .7, .3, 1); }
+html:not(.calm) .bot.live.ev-created .pulse { animation: pulseOut 1s ease-out .55s; }
+html:not(.calm) .bot.live.ev-created .pupil { animation: dilate 1s cubic-bezier(.3, 1.3, .4, 1) .1s; }
+html:not(.calm) .bot.live.ev-power :is(.lt, .lb) { transition-duration: 2s; transition-delay: .6s; }
+html:not(.calm) .bot.live.ev-power .pose { transition-duration: 2.4s; }
+html:not(.calm) .bot.live.ev-power .tilter { transition-duration: 2.2s; transition-timing-function: cubic-bezier(.4, 0, .3, 1); }
+html:not(.calm) .bot.live.ev-power .pupil { animation: powerDown 2.2s ease-in both; }
+html:not(.calm) .bot.live.ev-power .zz { transition-delay: 2.5s; }
+html:not(.calm) .bot.live.ev-power .body { transition-duration: 2.4s; }
+html:not(.calm) .bot.live.ev-boot .pupil { animation: bootUp 1.2s ease-out; }
+html:not(.calm) .bot.live.ev-boot .lens { animation: zoomIn 1.2s ease-out .2s; }
+html:not(.calm) .bot.live.ev-hello .evt { animation: helloPop 1.35s cubic-bezier(.3, .8, .3, 1); }
+html:not(.calm) .bot.live.ev-hello .bt { animation: helloOpenT 1.35s ease-out; }
+html:not(.calm) .bot.live.ev-hello .bb { animation: helloOpenB 1.35s ease-out; }
+html:not(.calm) .bot.live.ev-hello .tilter { animation: waggle 1.35s ease-in-out; }
+html:not(.calm) .bot.live.ev-bye .evt { animation: byeSink .8s cubic-bezier(.5, 0, .7, .4) both; }
+html:not(.calm) .bot.live.ev-bye .bt { animation: byeCloseT .8s ease-in both; }
+html:not(.calm) .bot.live.ev-bye .bb { animation: byeCloseB .8s ease-in both; }
+html:not(.calm) .bot.live.ev-bye .tilter { animation: byeTilt .8s ease-in-out both; }
+html:not(.calm) .bot.live.poked .evt { animation: squash .75s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.poked .lens { animation: zoomIn .75s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.poked .dtg { animation: dart .75s ease-out; }
+html:not(.calm) .bot.live.poked .ring { animation: focusTick .75s steps(5, end); }
+
+@keyframes breathe { 0%, 100% { transform: none; } 50% { transform: scale(1.012, .985); } }
+@keyframes workBob { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-.55px); } }
+@keyframes ahem { 0%, 68%, 100% { transform: none; } 76% { transform: translateY(-1.8px) scale(.98, 1.03); } 85% { transform: scale(1.03, .97); } 92% { transform: none; } }
+@keyframes sigh { 0%, 100% { transform: none; } 38% { transform: translateY(-.7px) scale(.99, 1.025); } 58% { transform: translateY(.3px) scale(1.02, .97); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes scanX { from { transform: translateX(-5.4px); } to { transform: translateX(5.4px); } }
+@keyframes dotWave { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 25% { transform: translateY(-2.2px); opacity: 1; } }
+@keyframes qTilt { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-9deg); } 70% { transform: rotate(4deg); } }
+@keyframes bangIn { 0% { transform: scale(.2); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes envIn { 0% { transform: translateY(6px) scale(.4); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes drawIn { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes curTap { 0%, 55%, 100% { transform: none; } 65% { transform: translate(.6px, .9px) scale(.88); } 78% { transform: none; } }
+@keyframes zFloat { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translate(.6px, -1.4px); opacity: .55; } }
+@keyframes whirr { to { transform: rotate(360deg); } }
+@keyframes focusTick { to { transform: rotate(150deg); } }
+@keyframes zoomIn { 0%, 100% { transform: scale(var(--lz, 1)); } 28% { transform: scale(1.16); } 55% { transform: scale(1.05); } 74% { transform: scale(1.09); } }
+@keyframes zoomHold { 0%, 100% { transform: scale(1); } 20%, 75% { transform: scale(1.1); } }
+@keyframes dilate { 0%, 100% { transform: scale(var(--is, 1)); } 30% { transform: scale(1.34); } 60% { transform: scale(1.1); } }
+@keyframes refocus { 0%, 100% { transform: scale(var(--is, 1)); } 30% { transform: scale(.66); } 65% { transform: scale(1.14); } }
+@keyframes pinch { 0%, 100% { transform: scale(var(--is, 1)); } 18%, 55% { transform: scale(.55); } }
+@keyframes dblLook { 0% { transform: none; } 16%, 40% { transform: translateX(calc(var(--dtx, 1) * -3.4px)); } 50% { transform: translateX(calc(var(--dtx, 1) * 1.4px)); } 66%, 100% { transform: none; } }
+@keyframes dblBody { 0%, 42% { transform: none; } 52% { transform: translateY(-1.3px) rotate(calc(var(--dtx, 1) * -3deg)) scale(.98, 1.03); } 72% { transform: scale(1.01, .99); } 100% { transform: none; } }
+@keyframes lookAround { 0%, 100% { transform: none; } 18%, 40% { transform: translateX(-3.2px); } 58%, 80% { transform: translateX(3.2px) translateY(-.6px); } }
+@keyframes dart { 0%, 100% { transform: none; } 18% { transform: translateY(-2.4px); } }
+@keyframes dblBlinkT { 0%, 100% { transform: none; } 15%, 22% { transform: translateY(10.9px); } 38% { transform: none; } 55%, 62% { transform: translateY(10.9px); } 78% { transform: none; } }
+@keyframes dblBlinkB { 0%, 100% { transform: none; } 15%, 22% { transform: translateY(-10.9px); } 38% { transform: none; } 55%, 62% { transform: translateY(-10.9px); } 78% { transform: none; } }
+@keyframes slowBlinkT { 0%, 100% { transform: none; } 30%, 52% { transform: translateY(10.9px); } 80% { transform: none; } }
+@keyframes slowBlinkB { 0%, 100% { transform: none; } 30%, 52% { transform: translateY(-10.9px); } 80% { transform: none; } }
+@keyframes squint { 0%, 100% { transform: none; } 20%, 72% { transform: translateY(4.2px); } }
+@keyframes hmmLid { 0%, 100% { transform: translateY(calc(var(--lt, -10.8) * 1px)); } 20%, 78% { transform: translateY(-5.4px) rotate(calc(var(--side, 1) * -13deg)); } }
+@keyframes browUp { 0%, 100% { transform: translateY(calc(var(--lt, -10.8) * 1px)); } 20%, 78% { transform: translateY(-12.4px); } }
+@keyframes hmmTilt { 0%, 100% { transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); } 25%, 75% { transform: rotate(-5deg) translateX(-.4px); } }
+@keyframes curious { 0%, 100% { transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); } 22%, 70% { transform: translateY(-.4px) rotate(11deg); } 84% { transform: rotate(-2.5deg); } }
+@keyframes buzz { 0%, 100% { transform: none; } 25% { transform: translateX(.22px); } 75% { transform: translateX(-.22px); } }
+@keyframes hop { 0% { transform: none; } 12% { transform: scale(1.12, .86); } 30% { transform: translateY(-6.4px) scale(.93, 1.08); } 48% { transform: translateY(0) scale(1.1, .9); } 60% { transform: translateY(-1.8px) scale(.98, 1.02); } 72% { transform: scale(1.03, .97); } 100% { transform: none; } }
+@keyframes hopShadow { 0%, 48%, 100% { transform: scale(1); } 30% { transform: scale(.66); opacity: .2; } }
+@keyframes pulseOut { 0% { opacity: .75; transform: scale(.92); } 100% { opacity: 0; transform: scale(1.4); } }
+@keyframes nod { 0%, 100% { transform: none; } 28% { transform: translateY(.6px) rotate(-2deg); } 52% { transform: translateY(1px) scale(1.01, .985); } 74% { transform: translateY(-.4px); } }
+@keyframes perk { 0%, 100% { transform: none; } 30% { transform: translateY(-1.6px) scale(.98, 1.03); } 60% { transform: scale(1.02, .98); } }
+@keyframes jolt { 0%, 100% { transform: none; } 12% { transform: translateY(-2.6px) scale(.95, 1.06); } 30% { transform: translateY(.4px) scale(1.04, .96); } 50% { transform: none; } }
+@keyframes slump { 0% { transform: none; } 32% { transform: translateY(1.7px) rotate(-4deg) scale(1.03, .95); } 55% { transform: translateY(.7px) rotate(-3deg) scale(1, 1.01); } 72%, 92% { transform: translateY(1.8px) rotate(-4deg) scale(1.03, .95); } 100% { transform: translateY(.6px) rotate(-1deg); } }
+@keyframes powerDown { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(.55); opacity: .9; } 42% { opacity: .2; } 48% { opacity: .85; } 56% { opacity: .15; } 100% { transform: scale(.3); opacity: .3; } }
+@keyframes bootUp { 0% { transform: scale(.3); opacity: .2; } 18% { opacity: 1; } 28% { opacity: .3; } 40% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(var(--is, 1)); opacity: 1; } }
+@keyframes helloPop { 0% { transform: translateY(6px) scale(.3); opacity: 0; } 42% { transform: translateY(-1.6px) scale(1.07, 1.03); opacity: 1; } 62% { transform: scale(.97, 1.02); } 100% { transform: none; } }
+@keyframes helloOpenT { 0%, 45% { transform: translateY(10.9px); } 70%, 100% { transform: none; } }
+@keyframes helloOpenB { 0%, 45% { transform: translateY(-10.9px); } 70%, 100% { transform: none; } }
+@keyframes waggle { 0%, 55%, 100% { transform: none; } 68% { transform: rotate(9deg); } 84% { transform: rotate(-5deg); } }
+@keyframes byeTilt { 0% { transform: none; } 40%, 100% { transform: rotate(-9deg); } }
+@keyframes byeCloseT { 0%, 30% { transform: none; } 60%, 100% { transform: translateY(10.9px); } }
+@keyframes byeCloseB { 0%, 30% { transform: none; } 60%, 100% { transform: translateY(-10.9px); } }
+@keyframes byeSink { 0% { transform: none; } 40% { transform: translateY(-1.2px) scale(1.02); opacity: 1; } 100% { transform: translateY(7px) scale(.25); opacity: 0; } }
+@keyframes squash { 0%, 100% { transform: none; } 14% { transform: scale(1.15, .84); } 38% { transform: translateY(-1.2px) scale(.94, 1.08); } 62% { transform: scale(1.03, .98); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="sharedDefs"></defs>
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 16 16"><path d="M1.8 8c1.5-2.8 3.6-4.2 6.2-4.2s4.7 1.4 6.2 4.2c-1.5 2.8-3.6 4.2-6.2 4.2S3.3 10.8 1.8 8z"/><circle cx="8" cy="8" r="1.8"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 16 16"><path d="M8 2.6c3 0 5 2.3 5 5.4 0 3-2.1 5.4-5 5.4S3 11 3 8c0-3.1 2-5.4 5-5.4z"/><path d="M6.2 7.4h.01M9.8 7.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+  <symbol id="i-back" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost avatars, round seven: Lensbot and Peeper</h1>
+    <p class="lede">A deeper pass on the two families you picked. No mouths and no glow: every bot has clean white eyes with dark pupils and a small highlight, and each shape has its own eye shape. Seven eye styles to choose from, eighteen Lensbots and fifteen Peepers. The eyes also carry information: a "?" when a bot is asking you, an "!" when it's stuck, a spinner while it works, a check when it's done. Move your pointer and every bot looks at you. Nothing in the app changes until you pick.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="Lensbots and Peepers in different states"></div>
+  </header>
+
+  <section class="section" aria-labelledby="secR">
+    <h2 id="secR">The rules for this round</h2>
+    <div class="rules">
+      <div class="rule"><b>White eyes, no glow</b><p>Solid white sclera, a dark pupil and a small hard highlight. A faint shade under the top edge makes it feel like a real eye. <span class="no">No</span> glow, <span class="no">no</span> blur, <span class="no">no</span> coloured light in the eyes. Lensbot's eyes sit in a dark visor; Peeper's sit in a bezel set into the body.</p></div>
+      <div class="rule"><b>No mouth, ever</b><p>All the feeling comes from the lids (tilt, squint, droop), the pupils (dilate, pinch, dart), the lens zoom and how the body moves. Our shapes and eyes are our own: regular, symmetric curves and seven geometric eye shapes.</p></div>
+      <div class="rule"><b>Info lives in the eye field</b><p>The bot's need is a small dark glyph drawn inside the eye: it replaces the pupil in one eye, or both pupils while working. Glyphs read at 40 px. Below 32 px a tiny coloured dot in the corner says the same thing.</p></div>
+      <div class="rule"><b>Cinematic, not anime</b><p>Motion with weight: anticipation, overshoot, settle. Lenses focus, irises zoom, lids tilt. <span class="no">No</span> sparkle eyes, <span class="no">no</span> blush, <span class="no">no</span> sweat drops, <span class="no">no</span> ^^ eyes. Calm robots and reduced motion keep the glyph but stop it moving, and leave only slow blinks.</p></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secP">
+    <h2 id="secP">Playground <small>family · shape · eyes · colour · state · animation</small></h2>
+    <p>Pick a family, a shape, an eye style, a colour and a state, then press an animation. "Shape's own" uses the eye style that shape ships with. The big bot and its four neighbours each follow your pointer: come close and their lenses focus on you, pass by quickly and the nearest one does a double-take. Hover to make one lean in, click to poke it.</p>
+    <div class="pg" id="pg">
+      <div class="pg-controls" id="pgControls"></div>
+      <div class="pg-stage" id="pgStage"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secG">
+    <h2 id="secG">Info in the eye field <small>at 64 · 40 · 24 px</small></h2>
+    <p>Each state as Lensbot and Peeper at 64 and 40 px, then at 24 px, where only the coloured dot shows. Glyphs are dark ink on the white eye, so each reads as a shape and not a colour: "?" for asking, "!" for stuck, a cursor for take control, an envelope for a new message, a check for done. On it turns both pupils into a spinner (Peeper) or a scanning bar (Lensbot), and thinking sends three dots across both eyes.</p>
+    <div class="glegend" id="glegend"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secD">
+    <h2 id="secD">The two families <small>shapes · eyes · colours · states · star · picture</small></h2>
+    <p>For each family: every silhouette at the picker's 56 px, shown with its own eye style. Then the seven eye styles on two shapes, six colours at 96, 40 and 24 px, all nine states, the main bot's star, and an uploaded picture inside the body.</p>
+    <div id="dirs" style="display:grid;gap:24px"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">In context <small>sidebar · hero · chat · avatar card</small></h2>
+    <p>The cozy-kit pieces the bots live in: pinned tiles (3 per row, 64 px, with names), the Profile's panel hero, the chat header pill (24 px, with its dot cue), and the avatar card with a Shape tab and an Eyes tab. The card works: switch tabs, then pick a shape or an eye style.</p>
+    <div class="pg-row" id="ctxDirs"></div>
+    <div class="kit-row" id="kit"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secAcc">
+    <h2 id="secAcc">Performance and accessibility</h2>
+    <p>One shared <code>requestAnimationFrame</code> loop owns the pointer and every live bot. It reads the pointer once per frame, caches each bot's box until scroll or resize, and only touches bots an <code>IntersectionObserver</code> reports on screen (the others get their CSS animations paused). It stops when the tab is hidden, when nothing moves, and when motion is turned down. Each frame it writes four CSS variables (<code>--ex</code>, <code>--ey</code> for the pupils, <code>--lx</code>, <code>--lr</code> for the lean). Everything else is a CSS animation on a class or an attribute. Each eye style sets how far its pupil travels (<code>--pkx</code>, <code>--pky</code>), so the loop stays the same for every shape. Every bot is one <code>role="img"</code> named with its name and state (for example "Scout, Asking you"), so a glyph is never the only signal. The pill next to the bot says it in words too.</p>
+    <div class="cz-setting cz"><div><b>Calm robots</b><small>Bots keep still: no following, no idle life, no events. Glyphs stay, but they don't move. Blinks only, slowly.</small></div><button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i><span class="hint">Calm</span></button></div>
+  </section>
+
+  <section class="section" aria-labelledby="secRec">
+    <h2 id="secRec">Recommendation <small>what to build</small></h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Build Lensbot first, and give Peeper the same eyes as a second family.</b> The dark visor is what makes this round work. It frames two white eyes with high contrast on every body colour, so the pupils and the glyphs read at 40 px even on Butter or Stone, where a white eye on a pale body loses its edge. The visor also turns a whole-face tilt into one clear gesture, and because its frame varies (band, pill, goggle, screen, brow, mask), eighteen Lensbots still look like eighteen different bots. Peeper is the softer, friendlier family. It shares the eye renderer, the glyphs and the motion, so it costs one shape table and a bezel drawer, and can ship right after Lensbot without new engine work.</p>
+      <div class="verdicts" id="verdicts"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secMap">
+    <h2 id="secMap">How this maps to code</h2>
+    <div class="reco" style="border-color:var(--color-border)">
+      <p><b>It plugs into the robot engine we already have</b> (<code>web/src/components/robot/</code>): SVG plus CSS animations, with no new dependency and no new loop.</p>
+      <div class="map">
+        <div><code>lookAt.ts · useLookAt.ts</code><p>The same module-level loop still writes <code>--ex/--ey/--lx/--lr</code>, caches boxes, pauses off screen and when the tab is hidden, and fires the double-take, the look-around and idle life by flashing <code>robot--ev-*</code> classes. Additions: a <b>notice</b> event (the pointer comes within 1.6 bot-widths: lens zoom and pupil dilate, once per approach), <code>whirr</code> and <code>hmm</code> in the idle list, and no tracking while both pupils are replaced by a glyph. <code>LIVE_OVER_PX</code> stays 32: below it a bot only blinks and shows its dot cue.</p></div>
+        <div><code>moments.ts · events.ts</code><p><code>RobotFaceLids</code> becomes <code>open · wide · focus · narrow · sad · happy · closed</code>. A new <code>RobotGlyph</code> (<code>onit · think · ask · stuck · ctrl · msg · done · off</code>) has one table from status to glyph and one from live frames to short-lived glyphs. In <code>events.ts</code>: the thinking set gives <code>think</code>, a new unread reply flashes <code>msg</code>, a finished run flashes <code>done</code> plus a satisfied blink, a Stuck card waiting on Take control gives <code>ctrl</code>, and a <code>bot_status</code> frame into <code>off_duty</code> fires <code>power</code>, which ends on <code>off</code>. Creating a bot fires the <code>created</code> hop.</p></div>
+        <div><code>shapes/lensbot.ts · shapes/peeper.ts (new, replace ghost.ts)</code><p>Each silhouette is a row of a few numbers (width, height, top and bottom roundness, taper, lean, dents and bumps, ears, feet, a nub), plus its own eye style and its visor or bezel. One pure <code>bodyPath(shape)</code> samples 48 points and returns the path, the box and the face layout. Same point count for every shape, so the picker can morph between them.</p></div>
+        <div><code>RobotFace.tsx · eyes.tsx · glyphs.tsx · fx.tsx</code><p><code>RobotFace</code> keeps its props and gains <code>eyes</code> and <code>glyph</code>. <code>eyes.tsx</code> draws one eye per style in eye units: white sclera, pupil and highlight, two lids in a group scaled to the eye's height, so every face number works for every style. <code>glyphs.tsx</code> holds the eight glyphs as tiny paths, only for bots at 32 px and up. Below that it draws the corner dot. <code>fx.tsx</code> keeps the pulse ring and the off-duty z.</p></div>
+        <div><code>avatar JSON · api/types.ts · roost/constants.py</code><p>A new optional <code>eyes</code> field on the avatar: <code>"round" | "oval" | "tall" | "square" | "half" | "almond" | "ring"</code>. Missing or <code>null</code> means the shape's own eyes, so every stored avatar stays valid and nothing migrates. The avatar JSON is already plaintext (look only, never user content). The gateway validates it with a pydantic <code>Literal</code> from <code>EYE_STYLES</code> in <code>roost/constants.py</code>, templates (<code>.roost-bot.json</code>) carry it, and <code>AvatarLook</code> in <code>look.ts</code> sends it from the avatar card.</p></div>
+        <div><code>robot.css · tokens.css</code><p>The face variables (<code>--lt --la --lbt --lba --is --lz --ft --fy</code>), the glyph rules, the status loops and the event keyframes above, scoped by <code>html:not(.calm)</code> and <code>.robot--live</code>. The sclera white, pupil ink, visor and dot-cue colours join <code>tokens.css</code>. Calm and reduced motion keep glyphs visible but still.</p></div>
+        <div><code>look.ts</code><p>New names go in <code>LENSBOT_SHAPES</code> and <code>PEEPER_SHAPES</code>, plus an <code>EYE_STYLES</code> list and <code>eyesFor(shape, eyes)</code>. Names are unique across both families and every old name, so the family is known from the name alone. Old saved shapes draw through one table, <code>shape → lensbot</code>, shown below. <code>roost/constants.py</code>, <code>api/types.ts</code> and <code>tests/test_bot_look.py</code> change together.</p></div>
+      </div>
+      <h4>Old saved shapes still draw, through look.ts's table</h4>
+      <div class="tbl-wrap"><table><thead><tr><th>Stored shape</th><th>Where it came from</th><th>Draws as</th></tr></thead><tbody id="legacyRows"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+/* Pure builders up top (node can load and check them); the page wiring at the bottom runs only in a browser. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8];
+/* A state is the bot's posture (s), the glyph in its eye field (g) and its lids (face). */
+const STATES = [
+  ["rest", "Resting", { s: "rest", g: "", face: "open" }, "", "Breathes, blinks, glances around. No glyph."],
+  ["onit", "On it", { s: "onit", g: "onit", face: "open" }, "#6ea8fe", "Both pupils become a spinner (Peeper) or a scanning bar (Lensbot)."],
+  ["think", "Thinking", { s: "onit", g: "think", face: "focus" }, "#6ea8fe", "Lids lower to focus; three dots travel across both eyes."],
+  ["ask", "Asking you", { s: "ask", g: "ask", face: "wide" }, "#ffffff", "A \"?\" in the right eye; the left eye looks up at it; the face tilts."],
+  ["stuck", "Stuck", { s: "stuck", g: "stuck", face: "sad" }, "#f5b04a", "An \"!\" in the right eye; the left lid droops; the body slumps."],
+  ["ctrl", "Take control", { s: "stuck", g: "ctrl", face: "open" }, "#f2827a", "Waiting for you to take control: a cursor in the right eye, tapping."],
+  ["msg", "New message", { s: "rest", g: "msg", face: "wide" }, "#b2a6f6", "An envelope pops into the right eye; the left eye glances at it."],
+  ["done", "Done", { s: "rest", g: "done", face: "happy" }, "#86d27a", "A check draws itself in the right eye; the left eye does a satisfied blink."],
+  ["off", "Off duty", { s: "off", g: "off", face: "closed" }, "#6b6b78", "Lids shut into lines, a small z drifts up, colour dims."],
+];
+const STATE = Object.fromEntries(STATES.map(([k, name, spec, cue]) => [k, { ...spec, name, cue }]));
+const TRACK_FACES = ["open", "wide", "focus"];
+const EVENTS = [
+  ["dblblink", "Double blink", "Idle", { ms: 800 }],
+  ["saccade", "Saccade", "Idle", { ms: 600 }],
+  ["camera", "Look at camera", "Idle", { ms: 1900 }],
+  ["tilt", "Curious tilt", "Idle", { ms: 2600 }],
+  ["whirr", "Focus", "Idle", { ms: 1400 }],
+  ["notice", "Notice · lens zoom", "Pointer", { ms: 1000 }],
+  ["dbl", "Double-take", "Pointer", { ms: 1100 }],
+  ["around", "Look around", "Pointer", { ms: 1800 }],
+  ["hmm", "Skeptical lid", "Feeling", { ms: 2300 }],
+  ["sad", "Sad lid tilt", "Feeling", { face: "sad", ms: 2700 }],
+  ["startle", "Startle", "Feeling", { face: "wide", ms: 950 }],
+  ["satisfied", "Satisfied blink", "Feeling", { face: "happy", ms: 1800 }],
+  ["think", "Thinking", "Info", { face: "focus", g: "think", ms: 3600 }],
+  ["msg", "New message", "Info", { face: "wide", g: "msg", ms: 2600 }],
+  ["done", "Done · check", "Info", { face: "happy", g: "done", ms: 2800 }],
+  ["created", "Created · hop", "Life", { face: "wide", ms: 1500 }],
+  ["power", "Power down", "Life", { status: "off", face: "closed", g: "off", ms: 5200 }],
+  ["hello", "Hello", "Life", { ms: 1400 }],
+  ["bye", "Bye, then hello", "Life", { ms: 2600 }],
+  ["poke", "Poke", "Life", { ms: 800 }],
+];
+const EVENT_GROUPS = ["Idle", "Pointer", "Feeling", "Info", "Life"];
+const EXTRA_MS = { boot: 1250, poked: 800 };
+const RING = "#0e0e12";
+const STAR = "#f6c453";
+const INK = "#191a24";
+const PUPIL = "#14151d";
+const VISOR = "#161823";
+const GROUND = 43;
+const LIVE_MIN = 32; // px: below this a bot only blinks, and a dot carries the glyph
+const N_PTS = 48; // points per body, every shape alike, so paths interpolate
+
+/* ---- Eye styles, in eye units. d: the white; top/bot: its extent; hw: half width; pr/py: pupil radius
+   and offset; pkx/pky: how far the pupil travels; gs: glyph scale; clip: lids and glyphs clip to it. ---- */
+const ell = (rx, ry) => `M${-rx} 0A${rx} ${ry} 0 1 0 ${rx} 0A${rx} ${ry} 0 1 0 ${-rx} 0Z`;
+const rrect = (hw, hh, r) => `M${-hw + r} ${-hh}H${hw - r}C${hw - r * .45} ${-hh} ${hw} ${-hh + r * .45} ${hw} ${-hh + r}V${hh - r}C${hw} ${hh - r * .45} ${hw - r * .45} ${hh} ${hw - r} ${hh}H${-hw + r}C${-hw + r * .45} ${hh} ${-hw} ${hh - r * .45} ${-hw} ${hh - r}V${-hh + r}C${-hw} ${-hh + r * .45} ${-hw + r * .45} ${-hh} ${-hw + r} ${-hh}Z`;
+const EYE_STYLES = {
+  round: { label: "Round", d: ell(10, 10), top: -10, bot: 10, hw: 10, pr: 4.4, pkx: 2.6, pky: 2.6, gs: .95 },
+  oval: { label: "Oval", d: ell(10.8, 7.8), top: -7.8, bot: 7.8, hw: 10.8, pr: 4, pkx: 3.3, pky: 1.6, gs: .76 },
+  tall: { label: "Tall oval", d: ell(7.4, 11.2), top: -11.2, bot: 11.2, hw: 7.4, pr: 3.9, pkx: 1.6, pky: 3.4, gs: .74 },
+  square: { label: "Soft square", d: rrect(9.2, 9.2, 5), top: -9.2, bot: 9.2, hw: 9.2, pr: 4.2, pkx: 2.5, pky: 2.5, gs: .9 },
+  half: { label: "Half-moon", d: "M-10 -2.6C-5 -4.6 5 -4.6 10 -2.6A10.4 10.4 0 1 1 -10 -2.6Z", top: -4.1, bot: 10.7, hw: 10.4, pr: 4.1, py: 3.4, pkx: 2.7, pky: 1.3, gs: .7 },
+  almond: { label: "Wide almond", d: "M-12.6 0C-7.8 -9.6 7.8 -9.6 12.6 0C7.8 9.6 -7.8 9.6 -12.6 0Z", top: -7.2, bot: 7.2, hw: 12.6, pr: 3.9, pkx: 3.8, pky: 1, gs: .66 },
+  ring: { label: "Ring lens", d: ell(8.4, 8.4), clip: ell(11.1, 11.1), top: -11.1, bot: 11.1, hw: 11.1, pr: 3.7, pkx: 2.1, pky: 2.1, gs: .8, ring: true },
+};
+const EYE_KEYS = Object.keys(EYE_STYLES);
+for (const S of Object.values(EYE_STYLES)) { S.mid = (S.top + S.bot) / 2; S.hh = (S.bot - S.top) / 2; S.py = S.py || 0; }
+
+/* ---- The families. A shape is [id, label, numbers, own eye style, visor or bezel].
+   Numbers: w, h (units on the 48 grid), nt/nb (top/bottom roundness: 2 is an ellipse, more is squarer,
+   less is pointier), taper (+ wider at the bottom), lean, rot (degrees), dents ([angle°, depth, width°];
+   a negative depth is a bump), ears ({a: degrees from the top, r, kind}), feet, nub (a knob on top). ---- */
+const VISORS = {
+  band: { f: .88, h: 16, dx: .25 }, pill: { f: .72, h: 15.5, dx: .25 }, goggle: { f: .8, h: 16, dx: .25 },
+  screen: { f: .76, h: 19, dx: .24 }, brow: { f: .84, h: 16.5, dx: .25 }, mask: { f: .92, h: 17, dx: .25 },
+};
+const BEZELS = { thin: 1.16, thick: 1.32, none: 1.08, hood: 1.16, double: 1.36 };
+const DIRS = {
+  lens: { name: "Lensbot", tag: "A · soft body, one dark visor, two white eyes", onit: "scan",
+    blurb: "A soft body with one dark visor across its face, and two white eyes inside it. The visor gives the eyes contrast on every colour and frames the glyphs. Its frame changes from shape to shape: a band, a pill, goggles, a screen, a brow or a mask. So do the eyes, the ears, the feet and the bottom cut. On it, the pupils turn into a scanning bar that sweeps across the visor.",
+    shapes: [
+      ["mochi", "Mochi", { w: 38, h: 30, nt: 2.2, nb: 3.4, taper: .06 }, "round", "band"],
+      ["loaf", "Loaf", { w: 40, h: 27, nt: 2.1, nb: 4.4 }, "oval", "band"],
+      ["gumdrop", "Gumdrop", { w: 35, h: 34, nt: 1.8, nb: 3.4, taper: .22 }, "tall", "pill"],
+      ["pebble", "Pebble", { w: 38, h: 30, nt: 2.3, nb: 2.3, rot: -4 }, "ring", "goggle"],
+      ["bun", "Bun", { w: 37, h: 30, nt: 2, nb: 2.8, dents: [[-90, .07, 26]], feet: 1 }, "half", "band"],
+      ["acorn", "Acorn", { w: 34, h: 35, nt: 2.6, nb: 1.9, taper: -.16 }, "almond", "brow"],
+      ["marsh", "Marshmallow", { w: 31, h: 36, nt: 3.3, nb: 3.3 }, "square", "screen"],
+      ["dumpling", "Dumpling", { w: 42, h: 28, nt: 1.7, nb: 3.6, taper: .15 }, "half", "mask"],
+      ["muffs", "Muffs", { w: 33, h: 32, nt: 2.4, nb: 2.8, ears: { a: 90, r: 4.6, kind: "side" } }, "oval", "pill"],
+      ["squish", "Squish", { w: 43, h: 24, nt: 2.6, nb: 2.8, vh: 14 }, "almond", "band"],
+      ["cub", "Cub", { w: 36, h: 30, nt: 2.3, nb: 2.6, ears: { a: 42, r: 5, kind: "round" } }, "round", "goggle"],
+      ["sprout", "Sprout", { w: 34, h: 31, nt: 2.2, nb: 3, dents: [[-62, -.1, 11], [-118, -.1, 11]] }, "tall", "pill"],
+      ["cheeky", "Cheeky", { w: 40, h: 30, nt: 2, nb: 2.4, dents: [[25, -.07, 28], [155, -.07, 28]] }, "round", "band"],
+      ["tower", "Tower", { w: 28, h: 33, nt: 2.6, nb: 3.6, feet: 1 }, "square", "screen"],
+      ["helmet", "Helmet", { w: 38, h: 31, nt: 1.9, nb: 7 }, "half", "mask"],
+      ["bell", "Bell", { w: 35, h: 33, nt: 2, nb: 5, taper: .3 }, "almond", "brow"],
+      ["puck", "Puck", { w: 42, h: 22, nt: 3.6, nb: 3.6, feet: 1, vh: 14.5 }, "oval", "band"],
+      ["pod", "Pod", { w: 34, h: 32, nt: 2.4, nb: 2.4, rot: 7, nub: 2.4 }, "ring", "goggle"],
+    ] },
+  peep: { name: "Peeper", tag: "B · pebble with two porthole eyes", onit: "spin",
+    blurb: "A pebble with two white eyes set straight into its surface like portholes, each in a bezel that follows the eye's shape: thin, thick, double, flush, or hooded with a little brow. The lids are the body's own colour, so a closed eye becomes a soft line in the skin. On it, the pupils turn into two small spinners.",
+    shapes: [
+      ["river", "River", { w: 38, h: 30, nt: 2.1, nb: 2.3, rot: -5 }, "round", "thin"],
+      ["plum", "Plum", { w: 35, h: 34, nt: 2, nb: 2.1, dents: [[-90, .06, 40]] }, "oval", "thick"],
+      ["fig", "Fig", { w: 32, h: 36, nt: 2, nb: 2.2, taper: .24 }, "tall", "thin"],
+      ["onigiri", "Onigiri", { w: 38, h: 34, nt: 1.5, nb: 3, taper: .32 }, "almond", "thick"],
+      ["tater", "Tater", { w: 38, h: 31, nt: 2.2, nb: 2.4, dents: [[-25, .06, 30], [155, .05, 30]] }, "half", "hood"],
+      ["squat", "Squat", { w: 42, h: 25, nt: 2.3, nb: 2.8 }, "oval", "none"],
+      ["menhir", "Menhir", { w: 30, h: 37, nt: 2.3, nb: 2.6, rot: 4 }, "tall", "double"],
+      ["slant", "Slant", { w: 36, h: 31, nt: 2.2, nb: 2.4, lean: 3.5 }, "square", "thin"],
+      ["berry", "Berry", { w: 38, h: 33, nt: 2.2, nb: 2, taper: .16, dents: [[-90, .1, 24]] }, "round", "double"],
+      ["button", "Button", { w: 36, h: 33, nt: 2.9, nb: 2.9 }, "ring", "none"],
+      ["kidney", "Kidney", { w: 39, h: 28, nt: 2.3, nb: 2.3, dents: [[90, .14, 34]] }, "almond", "hood"],
+      ["cloud", "Cloud", { w: 40, h: 30, nt: 2.2, nb: 3.2, dents: [[-50, -.06, 16], [-90, -.08, 16], [-130, -.06, 16]] }, "half", "thin"],
+      ["tufty", "Tufty", { w: 36, h: 32, nt: 2.4, nb: 2.4, dents: [[-58, -.12, 10], [-122, -.12, 10]] }, "round", "hood"],
+      ["peanut", "Peanut", { w: 34, h: 37, nt: 2.2, nb: 2.2, dents: [[0, .12, 26], [180, .12, 26]] }, "square", "thick"],
+      ["drop", "Drop", { w: 32, h: 34, nt: 1.5, nb: 2.2, lean: 2, rot: -6 }, "oval", "double"],
+    ] },
+};
+const DIR_KEYS = Object.keys(DIRS);
+const RECOMMENDED = "lens";
+const GHOST_TO_LENS = { dome: "mochi", tall: "marsh", wide: "squish", round: "bun", droopy: "gumdrop", spire: "acorn", comet: "pebble", cape: "helmet", puff: "cub", hooded: "bell" };
+const LEGACY_TO_GHOST = { classic: "dome", soft: "round", cube: "cape", monitor: "hooded", egg: "puff", pear: "droopy", plump: "comet", crest: "spire" };
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+let seed = 11;
+const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+const colorOf = (i) => PALETTE[i % PALETTE.length][0];
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const rgb = (c) => `rgb(${c.map((x) => clamp(Math.round(x), 0, 255)).join(", ")})`;
+const tint = (hex, a) => rgb(channels(hex).map((x) => x + (255 - x) * a));
+const shade = (hex, k) => rgb(channels(hex).map((x) => x * k));
+
+/* ---- Geometry: one smooth body path from a few numbers ---------------- */
+function angDiff(a, b) {
+  const d = (a - b) % (2 * Math.PI);
+  return d > Math.PI ? d - 2 * Math.PI : d < -Math.PI ? d + 2 * Math.PI : d;
+}
+function blobPts(o, cx, cy) {
+  const pts = [];
+  for (let i = 0; i < N_PTS; i++) {
+    const t = -Math.PI / 2 + (i / N_PTS) * 2 * Math.PI, c = Math.cos(t), s = Math.sin(t);
+    const n = s < 0 ? o.nt : o.nb;
+    let x = Math.sign(c) * Math.pow(Math.abs(c), 2 / n) * o.w / 2;
+    let y = Math.sign(s) * Math.pow(Math.abs(s), 2 / n) * o.h / 2;
+    x *= 1 + (o.taper || 0) * (y / (o.h / 2));
+    for (const [a, depth, width] of o.dents || []) {
+      const k = depth * Math.exp(-Math.pow(angDiff(t, (a * Math.PI) / 180) / ((width * Math.PI) / 180), 2));
+      x *= 1 - k; y *= 1 - k;
+    }
+    x += (o.lean || 0) * (-y / (o.h / 2));
+    pts.push([cx + x, cy + y]);
+  }
+  return pts;
+}
+function smooth(p) {
+  const n = p.length, at = (i) => p[(i + n) % n];
+  let d = `M${f(p[0][0])} ${f(p[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+    d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+}
+function widthAt(pts, y) {
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    if ((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue;
+    const x = a[0] + ((y - a[1]) / (b[1] - a[1])) * (b[0] - a[0]);
+    lo = Math.min(lo, x); hi = Math.max(hi, x);
+  }
+  return hi > lo ? [lo, hi] : [24 - 10, 24 + 10];
+}
+
+/* Lensbot: a visor, and two eyes sized to fit it. Returns the visor's outline pieces too. */
+function visorLayout(o, kind, pts, cy, S) {
+  const V = VISORS[kind], ey = cy - o.h * 0.07, [l, r] = widthAt(pts, ey), mid = (l + r) / 2;
+  const vw = clamp((r - l) * V.f, 22, 37), vh = o.vh || V.h, dx = vw * V.dx;
+  const k = Math.min((vh / 2 - 1.5) / S.hh, (dx - 1.2) / S.hw, 0.74);
+  const eyes = [-1, 1].map((side) => ({ x: mid + side * dx, y: ey - S.mid * k, k, side }));
+  const x = mid - vw / 2, y = ey - vh / 2;
+  let pieces;
+  if (kind === "goggle") {
+    const R = Math.max(S.hw, S.hh) * k + 2.3;
+    pieces = [`<circle cx="${f(mid - dx)}" cy="${f(ey)}" r="${f(R)}" FILL/>`, `<circle cx="${f(mid + dx)}" cy="${f(ey)}" r="${f(R)}" FILL/>`,
+      `<rect x="${f(mid - dx)}" y="${f(ey - R * .42)}" width="${f(dx * 2)}" height="${f(R * .84)}" FILL/>`];
+  } else if (kind === "brow") {
+    const rr = vh / 2;
+    pieces = [`<path d="M${f(x + 2.2)} ${f(y)}H${f(x + vw - 2.2)}Q${f(x + vw)} ${f(y)} ${f(x + vw)} ${f(y + 2.2)}V${f(y + vh - rr)}A${f(rr)} ${f(rr)} 0 0 1 ${f(x + vw - rr)} ${f(y + vh)}H${f(x + rr)}A${f(rr)} ${f(rr)} 0 0 1 ${f(x)} ${f(y + vh - rr)}V${f(y + 2.2)}Q${f(x)} ${f(y)} ${f(x + 2.2)} ${f(y)}Z" FILL/>`];
+  } else if (kind === "mask") {
+    pieces = [`<path d="M${f(x)} ${f(y + 3.4)}Q${f(mid)} ${f(y - 3.2)} ${f(x + vw)} ${f(y + 3.4)}Q${f(x + vw + 1.4)} ${f(y + vh / 2 + 1)} ${f(x + vw - 1.6)} ${f(y + vh - 2.2)}Q${f(mid)} ${f(y + vh + 2.6)} ${f(x + 1.6)} ${f(y + vh - 2.2)}Q${f(x - 1.4)} ${f(y + vh / 2 + 1)} ${f(x)} ${f(y + 3.4)}Z" FILL/>`];
+  } else {
+    const rx = kind === "screen" ? 4.6 : vh / 2;
+    pieces = [`<rect x="${f(x)}" y="${f(y)}" width="${f(vw)}" height="${f(vh)}" rx="${f(rx)}" FILL/>`];
+  }
+  const sheen = kind === "goggle" ? "" : `<path d="M${f(x + vh * .45)} ${f(y + 1.3)}H${f(x + vw - vh * .45)}" stroke="#fff" stroke-opacity=".14" stroke-width=".8" stroke-linecap="round"/>`;
+  const ew = S.hw * k;
+  return { ey, eyes, pieces, sheen, z: { x: mid + dx + ew * .7, y: y - 2.6 } };
+}
+
+/* Peeper: two eyes set into the body, each in its bezel; shrink until both fit with room to spare. */
+function portLayout(o, bezel, pts, cy, S) {
+  const ey = cy - o.h * 0.06, [l, r] = widthAt(pts, ey), mid = (l + r) / 2, W = r - l, B = BEZELS[bezel];
+  let k = clamp(W * 0.2, 5, 7.4) / Math.max(S.hw * .88, S.hh), dx = 0, ew = 0;
+  for (let i = 0; i < 12; i++) {
+    ew = S.hw * k * B; dx = Math.max(W * 0.215, ew + 0.9);
+    if (dx + ew <= W / 2 - 1.3) break;
+    k *= 0.94;
+  }
+  const eyes = [-1, 1].map((side) => ({ x: mid + side * dx, y: ey - S.mid * k, k, side }));
+  return { ey, eyes, bezel, z: { x: mid + dx + ew * .8, y: ey - S.hh * k * B - 2.2 } };
+}
+
+function earsOf(o, pts, cy) {
+  if (!o.ears) return [];
+  const { a, r, kind } = o.ears;
+  return [-1, 1].map((sd) => {
+    const idx = (Math.round(((sd * a) / 360) * N_PTS) + N_PTS) % N_PTS, [px, py] = pts[idx];
+    const dx = px - 24, dy = py - cy, d = Math.hypot(dx, dy) || 1;
+    const inset = kind === "side" ? -0.12 : 0.35; // muffs sit on the outside; round ears tuck in
+    return { x: px - (dx / d) * r * inset, y: py - (dy / d) * r * inset, r, kind };
+  });
+}
+
+/** Everything a body needs: path, box, face layout, ears, feet, nub and the ground. */
+function geom(dir, o, extra, eyeKey) {
+  const feetH = o.feet ? 4.2 : 0, bottom = GROUND - feetH;
+  const cy = Math.max(o.h / 2 + 4.6, bottom - o.h / 2);
+  const pts = blobPts(o, 24, cy);
+  const ys = pts.map((p) => p[1]), xs = pts.map((p) => p[0]);
+  const box = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  const S = EYE_STYLES[eyeKey];
+  const face = dir === "lens" ? visorLayout(o, extra, pts, cy, S) : portLayout(o, extra, pts, cy, S);
+  return { d: smooth(pts), pts, cy, box, face, eye: eyeKey, ears: earsOf(o, pts, cy), feet: o.feet ? { h: feetH, w: o.w } : null,
+    nub: o.nub ? { x: pts[0][0], y: pts[0][1] - o.nub * 0.35, r: o.nub } : null, rot: o.rot || 0 };
+}
+
+/* ---- Drawing ---------------------------------------------------------- */
+/** The glyphs for one eye, in eye units, centred on the eye's middle. The right eye holds the one-eye glyphs. */
+function glyphSvg(S, side) {
+  const t = `translate(0 ${f(S.mid)}) scale(${S.gs})`, ink = `stroke="${INK}" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  const both = `<g class="g g-spin"><circle class="spn" r="4.7" ${ink} stroke-width="2.5" stroke-dasharray="19 11"/></g>` +
+    `<g class="g g-scan"><rect class="sb" x="-1.5" y="-7.6" width="3" height="15.2" rx="1.5" fill="${INK}"/></g>` +
+    `<g class="g g-dots">${[-4.9, 0, 4.9].map((x, i) => `<circle class="d d${i}" cx="${x}" r="2" fill="${INK}"/>`).join("")}</g>`;
+  const one = side < 0 ? "" :
+    `<g class="g g-q"><path d="M-3.5 -3.7C-3.5 -7.8 3.7 -7.8 3.7 -3.5C3.7 -.6 0 -.5 0 2.3" ${ink} stroke-width="2.8"/><circle cy="6.3" r="1.7" fill="${INK}"/></g>` +
+    `<g class="g g-bang"><path d="M0 -7V2" ${ink} stroke-width="3.1"/><circle cy="6.3" r="1.8" fill="${INK}"/></g>` +
+    `<g class="g g-env"><rect x="-6" y="-4.3" width="12" height="8.6" rx="1.6" ${ink} stroke-width="1.9"/><path d="M-5.2 -3.3L0 1L5.2 -3.3" ${ink} stroke-width="1.9"/></g>` +
+    `<g class="g g-chk"><path class="ck" d="M-5.4 .2L-1.7 3.9L5.4 -4" ${ink} stroke-width="3" pathLength="1" stroke-dasharray="1 1"/></g>` +
+    `<g class="g g-cur"><path d="M-3.4 -6.6V5L-.6 2.4L1.6 7L3.8 6L1.6 1.5L5.4 1.3Z" fill="${INK}" stroke="${INK}" stroke-width=".8" stroke-linejoin="round"/></g>`;
+  return `<g class="gl" transform="${t}">${both}${one}</g>`;
+}
+
+/** Peeper's bezel: the eye's own outline, scaled, in rings of the body's colour. */
+function bezelSvg(S, color, kind) {
+  const ring = (s, fill) => `<path d="${S.d}" transform="translate(0 ${f(S.mid)}) scale(${s}) translate(0 ${f(-S.mid)})" fill="${fill}"/>`;
+  const dark = shade(color, .7), light = tint(color, .4);
+  if (kind === "thick") return ring(1.32, dark) + ring(1.22, light) + ring(1.08, shade(color, .48));
+  if (kind === "double") return ring(1.36, dark) + ring(1.28, light) + ring(1.18, dark) + ring(1.1, tint(color, .25));
+  if (kind === "none") return ring(1.08, shade(color, .5));
+  const thin = ring(1.16, dark) + ring(1.08, light);
+  if (kind !== "hood") return thin;
+  const top = S.top * 1.16 - 1.4, w = S.hw * 1.05;
+  return thin + `<path d="M${f(-w)} ${f(top + 2.6)}Q0 ${f(top - 3.4)} ${f(w)} ${f(top + 2.6)}" fill="none" stroke="${shade(color, .55)}" stroke-width="2.6" stroke-linecap="round"/>`;
+}
+
+/** One white eye: sclera, pupil and highlights, glyphs, and two lids scaled to the eye's height. */
+function eyeSvg(e, key, o) {
+  const S = EYE_STYLES[key];
+  const ring = S.ring ? `<circle r="10" fill="none" stroke="${tint(o.color, .3)}" stroke-width="1.2"/><circle class="ring" r="10" fill="none" stroke="${INK}" stroke-opacity=".5" stroke-width="1.25" stroke-dasharray=".7 2.4"/>` : "";
+  const pupil = `<g class="pw"><g class="dtg"><g class="look"><g class="pupil"><circle cy="${S.py}" r="${S.pr}" fill="${PUPIL}"/>` +
+    `<circle cx="-1.55" cy="${f(S.py - 1.75)}" r="1.45" fill="#fff"/><circle cx="1.75" cy="${f(S.py + 1.6)}" r=".62" fill="#fff" opacity=".7"/></g></g></g></g>`;
+  const lid = (cls, inner, y, op) => `<g class="${cls}"><g class="${inner}"><rect x="-17" y="${y}" width="34" height="30" fill="${o.lid}" stroke="${o.lidEdge}" stroke-opacity="${op}" stroke-width="1.2"/></g></g>`;
+  const lids = `<g transform="translate(0 ${f(S.mid)}) scale(1 ${f(S.hh / 10)})">${lid("bt", "lt", -30, .6)}${lid("bb", "lb", 0, .45)}</g>`;
+  return `<g class="eye ${e.side < 0 ? "e-l" : "e-r"}" style="--side:${e.side};--pkx:${S.pkx};--pky:${S.pky}" transform="translate(${f(e.x)} ${f(e.y)}) scale(${f(e.k)})">` +
+    `${o.bezel ? bezelSvg(S, o.color, o.bezel) : ""}<g class="lens"><path class="sclera" d="${S.d}" fill="url(#scl)"/>${ring}` +
+    `<g clip-path="url(#ec-${key})">${pupil}${o.glyphs ? glyphSvg(S, e.side) : ""}${lids}</g></g></g>`;
+}
+
+function zSvg(z) {
+  const p = "M-2.6 -2.6H2.6L-2.6 2.6H2.6";
+  return `<g class="zz" transform="translate(${f(z.x)} ${f(z.y)})"><g class="zf"><path d="${p}" fill="none" stroke="#dcdce8" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="${p}" transform="translate(4.4 -4) scale(.6)" fill="none" stroke="#dcdce8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/></g></g>`;
+}
+
+function faceSvg(dir, g, color, glyphs) {
+  const fc = g.face;
+  if (dir === "lens") {
+    const under = fc.pieces.map((p) => p.replace("FILL", `fill="none" stroke="${shade(color, .5)}" stroke-width="1.8"`)).join("");
+    const over = fc.pieces.map((p) => p.replace("FILL", `fill="${VISOR}"`)).join("");
+    const eyes = fc.eyes.map((e) => eyeSvg(e, g.eye, { color, lid: VISOR, lidEdge: "#ffffff", glyphs })).join("");
+    return `<g class="face tilter">${under}${over}${fc.sheen}${eyes}${glyphs ? zSvg(fc.z) : ""}</g>`;
+  }
+  const eyes = fc.eyes.map((e) => eyeSvg(e, g.eye, { color, lid: tint(color, .1), lidEdge: shade(color, .4), bezel: fc.bezel, glyphs })).join("");
+  return `<g class="face tilter">${eyes}${glyphs ? zSvg(fc.z) : ""}</g>`;
+}
+
+function photo(g, id) {
+  const b = g.box;
+  return `<g clip-path="url(#${id}c)"><rect x="${f(b.x - 1)}" y="${f(b.y - 1)}" width="${f(b.w + 2)}" height="${f(b.h + 2)}" fill="url(#picSky)"/>` +
+    `<circle cx="${f(b.x + b.w * .68)}" cy="${f(b.y + b.h * .36)}" r="${f(b.w * .13)}" fill="#ffe2a8"/>` +
+    `<path d="M${f(b.x - 2)} ${f(b.y + b.h * .74)}Q${f(b.x + b.w * .3)} ${f(b.y + b.h * .5)} ${f(b.x + b.w * .58)} ${f(b.y + b.h * .72)}T${f(b.x + b.w + 2)} ${f(b.y + b.h * .62)}V${f(b.y + b.h + 2)}H${f(b.x - 2)}Z" fill="#4b3f78"/>` +
+    `<path d="M${f(b.x - 2)} ${f(b.y + b.h * .86)}Q${f(b.x + b.w * .5)} ${f(b.y + b.h * .7)} ${f(b.x + b.w + 2)} ${f(b.y + b.h * .84)}V${f(b.y + b.h + 2)}H${f(b.x - 2)}Z" fill="#2e2752"/></g>`;
+}
+
+function starSvg(ring) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 2.4 : 5.4;
+    pts.push(`${f(41 + Math.cos(a) * r)} ${f(8 + Math.sin(a) * r)}`);
+  }
+  return `<path d="M${pts.join("L")}Z" fill="${STAR}" stroke="${ring}" stroke-width="1.8" stroke-linejoin="round" paint-order="stroke"/>`;
+}
+
+/** What sits behind the skin: ears, a nub, feet. */
+function backSvg(g, color, id) {
+  const fill = `url(#${id}g)`, inner = shade(color, .8);
+  const ears = g.ears.map((e) => e.kind === "side"
+    ? `<rect x="${f(e.x - e.r * .65)}" y="${f(e.y - e.r * 1.3)}" width="${f(e.r * 1.3)}" height="${f(e.r * 2.6)}" rx="${f(e.r * .65)}" fill="${fill}"/><rect x="${f(e.x - e.r * .3)}" y="${f(e.y - e.r * .8)}" width="${f(e.r * .6)}" height="${f(e.r * 1.6)}" rx="${f(e.r * .3)}" fill="${inner}"/>`
+    : `<circle cx="${f(e.x)}" cy="${f(e.y)}" r="${e.r}" fill="${fill}"/><circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(e.r * .5)}" fill="${inner}"/>`).join("");
+  const nub = g.nub ? `<circle cx="${f(g.nub.x)}" cy="${f(g.nub.y)}" r="${g.nub.r}" fill="${tint(color, .18)}"/>` : "";
+  const ft = g.feet ? [-1, 1].map((s) => `<rect x="${f(24 + s * g.feet.w * .22 - 3.6)}" y="${f(GROUND - g.feet.h - 3)}" width="7.2" height="${f(g.feet.h + 3)}" rx="3" fill="${shade(color, .74)}"/>`).join("") : "";
+  return ft + ears + nub;
+}
+
+function bodySvg(dir, g, color, id, pic, picEyes, glyphs) {
+  const b = g.box, sheen = `<ellipse cx="${f(b.x + b.w * .32)}" cy="${f(b.y + b.h * .2)}" rx="${f(b.w * .16)}" ry="${f(b.h * .08)}" transform="rotate(-22 ${f(b.x + b.w * .32)} ${f(b.y + b.h * .2)})" fill="#fff" opacity=".2"/>`;
+  const skin = pic
+    ? `${photo(g, id)}<path d="${g.d}" fill="none" stroke="${color}" stroke-width="1.8"/>`
+    : `<path class="skin" d="${g.d}" fill="url(#${id}g)"/>${sheen}`;
+  const face = !pic || picEyes ? faceSvg(dir, g, color, glyphs) : "";
+  return `<g transform="rotate(${g.rot} 24 ${f(g.cy)})">${backSvg(g, color, id)}${skin}${face}</g>`;
+}
+
+function avatar({ dir = RECOMMENDED, v = 0, color, st = "rest", eyes = "auto", onit, star = false, pic = false, picEyes = true, size = 96, ring = RING, extra = "", name = "" }) {
+  const D = DIRS[dir], shape = D.shapes[v % D.shapes.length], eyeKey = EYE_STYLES[eyes] ? eyes : shape[3];
+  const g = geom(dir, shape[2], shape[4], eyeKey), S = STATE[st];
+  const live = size >= LIVE_MIN, id = uid("b");
+  const sty = `--tint:${tint(color, .55)};--blink-dur:${f(5.2 + rnd() * 2.8)}s;--blink-delay:${f(-rnd() * 6)}s;--idle-delay:${f(-rnd() * 4)}s`;
+  const label = `${name || `${D.name} ${shape[1]}`}, ${S.name}`;
+  const defs = `<defs><radialGradient id="${id}g" cx=".36" cy=".26" r=".9"><stop offset="0" stop-color="${tint(color, .34)}"/><stop offset=".55" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, .72)}"/></radialGradient>` +
+    (pic ? `<clipPath id="${id}c"><path d="${g.d}"/></clipPath>` : "") + `</defs>`;
+  const shadow = `<ellipse class="shadow" cx="24" cy="45" rx="${f(g.box.w * .36)}" ry="1.6" fill="#000" opacity=".38"/>`;
+  const pulse = `<ellipse class="pulse" cx="24" cy="${f(g.cy)}" rx="${f(g.box.w / 2 + 1)}" ry="${f(g.box.h / 2 + 1)}" fill="none" stroke="${tint(color, .5)}" stroke-width="1.2"/>`;
+  const cue = live ? "" : `<circle class="cue" cx="41.5" cy="40.5" r="4.4" stroke="${ring}" stroke-width="2.2"/>`;
+  const cls = `bot${live ? " live" : ""}${extra ? ` ${extra}` : ""}`;
+  return `<svg class="${cls}" data-dir="${dir}" data-st="${st}" data-base="${st}" data-s="${S.s}" data-g="${S.g}" data-face="${S.face}" data-onit="${onit || D.onit}" data-ey="${f(g.face.ey)}" style="${sty}" width="${size}" height="${size}" viewBox="0 0 48 48" role="img" aria-label="${label}"${live && extra.includes("tab") ? ' tabindex="0"' : ""}>` +
+    `${defs}${shadow}<g class="pose"><g class="float"><g class="evt">${pulse}<g class="lean"><g class="body">${bodySvg(dir, g, color, id, pic, picEyes, live)}</g></g></g></g></g>${star ? starSvg(ring) : ""}${cue}</svg>`;
+}
+
+/** Shared defs: one clip per eye style, the sclera's shade, the sample picture. */
+function sharedDefs() {
+  const clips = EYE_KEYS.map((k) => `<clipPath id="ec-${k}" clipPathUnits="userSpaceOnUse"><path d="${EYE_STYLES[k].clip || EYE_STYLES[k].d}"/></clipPath>`).join("");
+  return `<linearGradient id="scl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6d7e0"/><stop offset=".28" stop-color="#f5f5f8"/><stop offset="1" stop-color="#ffffff"/></linearGradient>` +
+    `<linearGradient id="picSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6b37f"/><stop offset=".55" stop-color="#e98a8f"/><stop offset="1" stop-color="#7d6bb8"/></linearGradient>${clips}`;
+}
+
+/* ---- Sections --------------------------------------------------------- */
+const cell = (inner, label, sub = "") => `<div class="cell">${inner}<b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</div>`;
+const sizes = (list) => `<div class="sizes">${list.join("")}</div>`;
+function shapesBlock(dir) {
+  const D = DIRS[dir];
+  const cells = D.shapes.map((sh, v) => cell(avatar({ dir, v, color: colorOf(SIX[v % 6]), size: 56 }), sh[1], `${EYE_STYLES[sh[3]].label} · ${sh[4]}`)).join("");
+  return `<section class="blk"><h4>${D.shapes.length} silhouettes · 56 px · picker size · each with its own eyes</h4><div class="grid10">${cells}</div></section>`;
+}
+function eyesBlock(dir) {
+  const rows = [0, 6].map((v) => `<div class="grid10">${EYE_KEYS.map((k, i) => cell(avatar({ dir, v, color: colorOf(SIX[(i + v) % 6]), eyes: k, size: 72 }), EYE_STYLES[k].label)).join("")}</div>`).join("");
+  return `<section class="blk"><h4>Seven eye styles · on ${DIRS[dir].shapes[0][1]} and ${DIRS[dir].shapes[6][1]} · 72 px</h4>${rows}</section>`;
+}
+function colourBlock(dir) {
+  const cols = SIX.map((ci, i) => cell(sizes([96, 40, 24].map((size) => avatar({ dir, v: (i * 3) % DIRS[dir].shapes.length, color: colorOf(ci), size }))), PALETTE[ci][1])).join("");
+  return `<section class="blk"><h4>Six colours · 96 · 40 · 24 px (24 px only blinks)</h4><div class="row">${cols}</div></section>`;
+}
+function stateBlock(dir) {
+  const cells = STATES.map(([st, name], i) => cell(sizes([72, 40, 24].map((size) => avatar({ dir, v: i * 2, color: colorOf(SIX[i % 6]), st, size }))), name)).join("");
+  return `<section class="blk"><h4>Nine states · 72 · 40 · 24 px</h4><div class="row">${cells}</div></section>`;
+}
+function starPicBlock(dir) {
+  const c = colorOf(3);
+  const main = avatar({ dir, v: 0, color: colorOf(0), st: "onit", star: true, size: 96, name: "Chief" });
+  const mainS = avatar({ dir, v: 0, color: colorOf(0), star: true, size: 40, name: "Chief" });
+  const picOnly = avatar({ dir, v: 3, color: c, pic: true, picEyes: false, size: 96 });
+  const picEyes = avatar({ dir, v: 3, color: c, pic: true, size: 96, st: "ask" });
+  const picSmall = avatar({ dir, v: 3, color: c, pic: true, size: 40 }) + avatar({ dir, v: 3, color: c, pic: true, size: 24, st: "msg" });
+  return `<section class="blk"><h4>Main bot star · an uploaded picture inside the body</h4><div class="row">` +
+    `${cell(sizes([main, mainS]), "Main bot", "star at 96 and 40")}${cell(picOnly, "Picture, eyes hidden")}${cell(picEyes, "Picture, eyes kept", "asking you")}${cell(sizes([picSmall]), "40 · 24 px")}</div>` +
+    `<p class="why">The picture fills the silhouette inside a rim of the bot's colour. With eyes kept (the default) the ${dir === "lens" ? "visor" : "bezelled eyes"} sit on top of the photo, still tracking and still showing glyphs. With eyes hidden, the state shows through posture, the dot cue at small sizes, and the status pill.</p></section>`;
+}
+function dirArticle(dir) {
+  const D = DIRS[dir];
+  return `<article class="dir" id="dir-${dir}"><div class="dir-head"><span class="tag">${D.tag}</span><h3>${D.name}${dir === RECOMMENDED ? " · build first" : " · second family"}</h3><p>${D.blurb}</p></div>` +
+    `<div class="blocks">${shapesBlock(dir)}${eyesBlock(dir)}${colourBlock(dir)}${stateBlock(dir)}${starPicBlock(dir)}</div></article>`;
+}
+function glyphLegend() {
+  return STATES.map(([st, name, , cue, desc], i) => {
+    const pair = (dir, v) => sizes([64, 40, 24].map((size) => avatar({ dir, v, color: colorOf(SIX[(i + (dir === "lens" ? 0 : 3)) % 6]), st, size })));
+    return `<div class="gcard"><header>${cue ? `<i class="cue-dot" style="background:${cue}"></i>` : ""}<b>${name}</b></header>` +
+      `<div class="pair">${pair("lens", i * 2)}${pair("peep", i + 4)}</div><p>${desc}</p></div>`;
+  }).join("");
+}
+
+/* In context: the cozy-kit pieces. */
+const TEAM = [
+  { name: "Chief", job: "Leads the team", c: 0, v: 0, st: "onit", star: true, line: "I've added the three tasks for Monday." },
+  { name: "Scout", job: "Finds flats", c: 1, v: 1, st: "ask", line: "Which flat should I book a viewing for?" },
+  { name: "Ledger", job: "Money", c: 3, v: 4, st: "done", line: "The October total is ready." },
+  { name: "Quill", job: "Writes", c: 7, v: 5, st: "ctrl", line: "A sign-in page: take control?" },
+  { name: "Pixel", job: "Designs", c: 2, v: 10, st: "msg", line: "Sent you three mockups." },
+  { name: "Archivist", job: "Files", c: 8, v: 13, st: "off", line: "Off duty" },
+];
+function sidebarPiece(dir) {
+  const pin = (b) => `<div class="cz-pin">${avatar({ dir, v: b.v, color: colorOf(b.c), st: b.st, star: b.star, size: 64, name: b.name })}<b>${b.name}</b><small>${b.job}</small>${b.st === "ask" || b.st === "msg" ? '<i class="unread"></i>' : ""}</div>`;
+  const row = (b, i) => `<div class="cz-row${i === 0 ? " on" : ""}">${avatar({ dir, v: b.v, color: colorOf(b.c), st: b.st, size: 32, name: b.name })}<div><b>${b.name}</b><small>${b.line}</small></div>${b.st === "ask" || b.st === "ctrl" ? '<i class="unread"></i>' : ""}</div>`;
+  return `<div class="cz-side cz"><div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>` +
+    `<div class="cz-grid">${TEAM.map(pin).join("")}</div><div class="cz-sep"></div>${TEAM.slice(1, 4).map(row).join("")}</div>`;
+}
+function heroPiece(dir) {
+  const c = colorOf(1);
+  return `<div class="cz-hero"><div class="cz-hero-band" style="background:linear-gradient(180deg, ${c}40, ${c}00)"></div><div class="cz-hero-body">` +
+    `<div class="cz-hero-top">${avatar({ dir, v: 1, color: c, st: "onit", size: 72, name: "Scout" })}<div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>` +
+    `<div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div><span class="cz-status"><i class="dot" style="background:${STATE.onit.cue}"></i>On it · comparing three listings</span>` +
+    `<div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div></div></div>`;
+}
+function chatBarPiece(dir) {
+  return `<div class="cz-bar cz"><span class="cz-btn icon" aria-label="Back"><svg class="ico"><use href="#i-back"/></svg></span>` +
+    `<span class="cz-pill">${avatar({ dir, v: 1, color: colorOf(1), st: "ask", size: 24, name: "Scout" })}Scout<small><i class="dot" style="background:${STATE.ask.cue}"></i>Asking you</small></span>` +
+    `<div class="acts"><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>`;
+}
+const CTX = { dir: RECOMMENDED, v: 1, eyes: "auto", tab: "shape", c: 1 };
+function cardPanel(ctx) {
+  const D = DIRS[ctx.dir], c = colorOf(ctx.c);
+  if (ctx.tab === "shape") {
+    return `<div class="cz-tiles">${D.shapes.map((sh, v) => `<button type="button" class="cz-tile" data-card-v="${v}" aria-pressed="${v === ctx.v}" title="${sh[1]}" aria-label="${sh[1]}">${avatar({ dir: ctx.dir, v, color: c, eyes: ctx.eyes, size: 34 })}</button>`).join("")}</div>`;
+  }
+  if (ctx.tab === "eyes") {
+    const own = `<button type="button" class="cz-tile auto" data-card-eyes="auto" aria-pressed="${ctx.eyes === "auto"}" title="The shape's own eyes">OWN</button>`;
+    return `<div class="cz-tiles">${own}${EYE_KEYS.map((k) => `<button type="button" class="cz-tile" data-card-eyes="${k}" aria-pressed="${ctx.eyes === k}" title="${EYE_STYLES[k].label}" aria-label="${EYE_STYLES[k].label}">${avatar({ dir: ctx.dir, v: ctx.v, color: c, eyes: k, size: 34 })}</button>`).join("")}</div>`;
+  }
+  return `<div class="cz-upload">Your picture fills the body. Keep the eyes on top, or hide them.<div class="row" style="gap:10px">${avatar({ dir: ctx.dir, v: ctx.v, color: c, eyes: ctx.eyes, pic: true, size: 48 })}${avatar({ dir: ctx.dir, v: ctx.v, color: c, pic: true, picEyes: false, size: 48 })}</div></div>`;
+}
+function cardPiece(ctx) {
+  const D = DIRS[ctx.dir], c = colorOf(ctx.c), sh = D.shapes[ctx.v % D.shapes.length];
+  const eyeName = ctx.eyes === "auto" ? `${EYE_STYLES[sh[3]].label} (own)` : EYE_STYLES[ctx.eyes].label;
+  const tab = (k, icon, label) => `<button type="button" class="cz-tab" role="tab" data-card-tab="${k}" aria-selected="${ctx.tab === k}"><svg class="ico"><use href="#i-${icon}"/></svg>${label}</button>`;
+  const dots = PALETTE.map(([hex, name], i) => `<i class="cz-sw${i === ctx.c ? " on" : ""}" style="background:${hex}" title="${name}"></i>`).join("");
+  return `<div class="cz-surface cz-pop cz" id="card"><div class="cz-pop-head">${avatar({ dir: ctx.dir, v: ctx.v, color: c, eyes: ctx.eyes, size: 48, name: "Scout" })}<div><b>Scout</b><small>${D.name} · ${sh[1]} · ${eyeName} · ${PALETTE[ctx.c][1]}</small></div></div>` +
+    `<div class="cz-tabs" role="tablist">${tab("shape", "bot", "Shape")}${tab("eyes", "eye", "Eyes")}${tab("upload", "upload", "Upload")}</div>` +
+    `${cardPanel(ctx)}<div class="cz-swatches">${dots}</div></div>`;
+}
+function kitSlots(ctx) {
+  return `<div class="kit-slot"><h4>Sidebar · pinned 3 per row at 64 px · rows 32 px</h4>${sidebarPiece(ctx.dir)}</div>` +
+    `<div class="kit-slot"><h4>Panel hero · and the chat header pill · 24 px</h4>${heroPiece(ctx.dir)}${chatBarPiece(ctx.dir)}</div>` +
+    `<div class="kit-slot" style="grid-column:1/-1"><h4>Avatar card · Shape and Eyes tabs</h4>${cardPiece(ctx)}</div>`;
+}
+const ctxChips = (dir) => DIR_KEYS.map((k) => `<button type="button" class="chip" data-ctx-dir="${k}" aria-pressed="${k === dir}">${DIRS[k].name}</button>`).join("");
+
+const VERDICTS = {
+  lens: "The visor gives white eyes and glyphs strong contrast on every colour and at every size. The whole-face tilt reads clearly. Six visor frames keep eighteen bodies distinct. It hides a little more of an uploaded picture.",
+  peep: "The softest and friendliest. Lids in the body's colour make a closed eye a gentle line. On pale colours (Butter, Stone) the white eye needs its bezel to hold an edge, so bezels stay required. It shares every eye, glyph and motion with Lensbot.",
+};
+function verdicts() {
+  return DIR_KEYS.map((k, i) => `<div class="verdict${k === RECOMMENDED ? " pick" : ""}"><div class="row" style="gap:8px">${avatar({ dir: k, v: 0, color: colorOf(SIX[i + 1]), st: k === RECOMMENDED ? "ask" : "done", size: 48 })}<b>${DIRS[k].name}${k === RECOMMENDED ? " · build first" : " · second family"}</b></div>${VERDICTS[k]}</div>`).join("");
+}
+function legacyRows() {
+  const idx = (id) => DIRS.lens.shapes.findIndex((sh) => sh[0] === id);
+  const ghostRows = Object.entries(GHOST_TO_LENS).map(([ghost, lens]) => [ghost, "Ghost (v5, shipping now)", lens]);
+  const oldRows = Object.entries(LEGACY_TO_GHOST).map(([old, ghost]) => [old, `Older (via ghost ${ghost})`, GHOST_TO_LENS[ghost]]);
+  return [...ghostRows, ...oldRows].map(([stored, from, lens], i) =>
+    `<tr><td><code>${stored}</code></td><td>${from}</td><td>${avatar({ dir: "lens", v: idx(lens), color: colorOf(i), size: 24 })}<code>${lens}</code></td></tr>`).join("");
+}
+
+/* The playground. */
+const PG = { dir: RECOMMENDED, v: 0, c: 1, st: "rest", eyes: "auto", onit: "", life: true };
+function pgControls(state) {
+  const c = colorOf(state.c), D = DIRS[state.dir], onit = state.onit || D.onit;
+  const chips = (items, key, on) => items.map(([id, name, cue]) => `<button type="button" class="chip" data-${key}="${id}" aria-pressed="${on === id}">${cue ? `<i class="cue-dot" style="background:${cue}"></i>` : ""}${name}</button>`).join("");
+  const tiles = D.shapes.map((sh, v) => `<button type="button" class="tile" data-pg-v="${v}" aria-pressed="${v === state.v}" title="${sh[1]}" aria-label="${sh[1]}">${avatar({ dir: state.dir, v, color: c, eyes: state.eyes, size: 34 })}</button>`).join("");
+  const own = `<button type="button" class="tile auto" data-pg-eyes="auto" aria-pressed="${state.eyes === "auto"}" title="The shape's own eyes">OWN</button>`;
+  const eyeTiles = own + EYE_KEYS.map((k) => `<button type="button" class="tile" data-pg-eyes="${k}" aria-pressed="${state.eyes === k}" title="${EYE_STYLES[k].label}" aria-label="${EYE_STYLES[k].label}">${avatar({ dir: state.dir, v: state.v, color: c, eyes: k, size: 34 })}</button>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<button type="button" class="sw-dot" data-pg-c="${i}" aria-pressed="${i === state.c}" style="background:${hex}" aria-label="${name}" title="${name}"></button>`).join("");
+  const groups = EVENT_GROUPS.map((gr) => `<div class="evgroup"><h4>${gr}</h4><div class="pg-row">${EVENTS.filter((e) => e[2] === gr).map(([id, name]) => `<button type="button" class="chip ev" data-pg-ev="${id}">${name}</button>`).join("")}</div></div>`).join("");
+  const eyeName = state.eyes === "auto" ? `Shape's own (${EYE_STYLES[D.shapes[state.v][3]].label})` : EYE_STYLES[state.eyes].label;
+  return `<div class="ctl"><h4>Family</h4><div class="pg-row">${chips(DIR_KEYS.map((k) => [k, DIRS[k].name]), "pg-dir", state.dir)}</div></div>` +
+    `<div class="ctl"><h4>Shape · ${D.shapes[state.v][1]}</h4><div class="tiles">${tiles}</div></div>` +
+    `<div class="ctl"><h4>Eyes · ${eyeName}</h4><div class="tiles">${eyeTiles}</div></div>` +
+    `<div class="ctl"><h4>Colour · ${PALETTE[state.c][1]}</h4><div class="dots">${dots}</div></div>` +
+    `<div class="ctl"><h4>State · the glyph in the eyes</h4><div class="pg-row">${chips(STATES.map(([k, n, , cue]) => [k, n, cue]), "pg-st", state.st)}</div></div>` +
+    `<div class="ctl"><h4>On it shows</h4><div class="pg-row">${chips([["spin", "Spinner pupils"], ["scan", "Scanning bar"]], "pg-onit", onit)}</div></div>` +
+    `<div class="ctl"><h4>Animations</h4><div class="evgroups">${groups}</div></div>` +
+    `<div class="ctl"><div class="pg-row" style="gap:16px"><button type="button" class="sw" role="switch" aria-checked="${state.life}" data-life><i></i>Random life</button>` +
+    `<button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i>Calm robots</button><span class="hint">Hover to lean in · click to poke</span></div></div>`;
+}
+function pgStage(state) {
+  const n = DIRS[state.dir].shapes.length, onit = state.onit || DIRS[state.dir].onit;
+  const big = avatar({ dir: state.dir, v: state.v, color: colorOf(state.c), st: state.st, eyes: state.eyes, onit, size: 176, star: true, extra: "big tab", name: "Chief" });
+  const others = [3, 7, 10, 13].map((k, i) => avatar({ dir: state.dir, v: (state.v + k) % n, color: colorOf((state.c + 2 * (i + 1)) % PALETTE.length), st: state.st, eyes: state.eyes, onit, size: 88, extra: "tab" })).join("");
+  return `<div>${big}</div><div class="neighbours">${others}</div><small>Each one follows your pointer on its own. Animations play on all five.</small>`;
+}
+
+function buildAll() {
+  const hero = [["lens", 0, "rest"], ["peep", 0, "ask"], ["lens", 3, "onit"], ["peep", 4, "done"], ["lens", 10, "think"], ["peep", 9, "rest"],
+    ["lens", 6, "msg"], ["peep", 12, "stuck"], ["lens", 14, "ctrl"], ["peep", 2, "off"]];
+  return {
+    defs: sharedDefs(),
+    hero: hero.map(([dir, v, st], i) => avatar({ dir, v, st, color: colorOf([0, 1, 3, 5, 7, 8, 2, 6, 4, 9][i]), star: i === 0, size: 84 })).join(""),
+    legend: glyphLegend(),
+    dirs: DIR_KEYS.map(dirArticle).join(""),
+    kit: kitSlots(CTX),
+    ctx: ctxChips(CTX.dir),
+    reco: PALETTE.slice(0, 8).map(([c], i) => avatar({ dir: RECOMMENDED, v: [0, 10, 2, 13, 4, 7, 16, 11][i], color: c, st: STATES[i][0], star: i === 0, size: 56 })).join(""),
+    verdicts: verdicts(),
+    legacy: legacyRows(),
+    pgControls: pgControls(PG),
+    pgStage: pgStage(PG),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, avatar, geom, blobPts, smooth, widthAt, DIRS, DIR_KEYS, PALETTE, STATES, STATE, EVENTS, EYE_STYLES, EYE_KEYS, GHOST_TO_LENS, LEGACY_TO_GHOST, pgControls, pgStage, kitSlots, CTX };
+}
+
+/* ---- The page: one pointer loop, events, random life, the playground ---- */
+if (typeof document !== "undefined") (function page() {
+  const html = document.documentElement, reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let calmPref = false;
+  const isCalm = () => html.classList.contains("calm");
+  const EYE_MAX = 1.5, NOTICE_IN = 1.6, NOTICE_OUT = 2.6, NOTICE_GAP_MS = 4000;
+
+  /* The shared pointer loop. One entry per live bot; only visible ones are touched. */
+  const live = new Map();
+  const pointer = { x: NaN, y: NaN, t: 0, movedAt: -1e9, speed: 0 };
+  let rectsDirty = true, running = false, idleTimer = 0, lastDbl = -1e9;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const st = live.get(e.target);
+      if (st) st.visible = e.isIntersecting;
+      e.target.classList.toggle("offscreen", !e.isIntersecting);
+    }
+    schedule();
+  }, { rootMargin: "48px" });
+
+  function register(root) {
+    for (const [svg] of live) if (!svg.isConnected) { io.unobserve(svg); live.delete(svg); }
+    root.querySelectorAll("svg.bot.live").forEach((svg) => {
+      if (live.has(svg)) return;
+      live.set(svg, { ex: 0, ey: 0, lx: 0, lr: 0, rect: null, visible: false, wrote: false, near: false, noticeAt: -1e9,
+        glanceAt: performance.now() + 1500 + Math.random() * 4000, glancing: false, gx: 0, gy: 0, dblAt: 0, cameraUntil: 0 });
+      io.observe(svg);
+    });
+    rectsDirty = true;
+    schedule();
+  }
+  function schedule() {
+    if (running || document.hidden || isCalm()) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+  const faceTracks = (svg) => !svg.dataset.hold && TRACK_FACES.includes(svg.dataset.face) && svg.dataset.g !== "onit" && svg.dataset.g !== "think";
+
+  function glance(st, now) {
+    if (now > st.glanceAt) {
+      st.glancing = !st.glancing;
+      st.gx = st.glancing ? (Math.random() - 0.5) * 2 * EYE_MAX * 0.8 : 0;
+      st.gy = st.glancing ? (Math.random() - 0.5) * EYE_MAX * 0.6 : 0;
+      st.glanceAt = now + (st.glancing ? 500 + Math.random() * 900 : 2500 + Math.random() * 6000);
+    }
+    return [st.gx, st.gy];
+  }
+  function notice(svg, st, now, dist, width) {
+    if (!st.near && dist < width * NOTICE_IN && now - st.noticeAt > NOTICE_GAP_MS) { st.near = true; st.noticeAt = now; flash(svg, "notice"); }
+    else if (st.near && dist > width * NOTICE_OUT) st.near = false;
+  }
+  function frame(now) {
+    running = false;
+    if (document.hidden || isCalm()) return;
+    const fresh = now - pointer.movedAt < 4000, fast = pointer.speed > 2.4 && now - lastDbl > 1500;
+    let busy = false, nearest = null, nearestDist = Infinity;
+    for (const [svg, st] of live) {
+      if (!st.visible) continue;
+      if (rectsDirty || !st.rect) st.rect = svg.getBoundingClientRect();
+      const r = st.rect, cx = r.left + r.width / 2, cy = r.top + r.height * ((Number(svg.dataset.ey) || 22) / 48);
+      const dx = pointer.x - cx, dy = pointer.y - cy, dist = Math.hypot(dx, dy) || 1;
+      let tx = 0, ty = 0;
+      if (now >= st.cameraUntil && faceTracks(svg)) {
+        if (fresh) {
+          const m = EYE_MAX * (dist / (dist + r.width * 0.5));
+          tx = (dx / dist) * m; ty = (dy / dist) * m;
+          if (fast && now - st.dblAt > 2600 && dist < r.width * 4 && dist < nearestDist) { nearest = svg; nearestDist = dist; }
+          notice(svg, st, now, dist, r.width);
+        } else [tx, ty] = glance(st, now);
+      }
+      const over = fresh && pointer.x > r.left - 4 && pointer.x < r.right + 4 && pointer.y > r.top - 4 && pointer.y < r.bottom + 4;
+      const lx = over ? clamp((dx / r.width) * 3, -1.5, 1.5) : 0;
+      const lr = over ? clamp((dx / r.width) * 12, -6, 6) : (fresh ? clamp(dx / (r.width * 4), -1, 1) * 2.5 : 0);
+      st.ex += (tx - st.ex) * 0.16; st.ey += (ty - st.ey) * 0.16;
+      const moving = Math.abs(tx - st.ex) > 0.01 || Math.abs(ty - st.ey) > 0.01;
+      if (moving || st.wrote) { svg.style.setProperty("--ex", st.ex.toFixed(2)); svg.style.setProperty("--ey", st.ey.toFixed(2)); st.wrote = moving; }
+      if (Math.abs(lx - st.lx) > 0.05 || Math.abs(lr - st.lr) > 0.1) { st.lx = lx; st.lr = lr; svg.style.setProperty("--lx", lx.toFixed(2)); svg.style.setProperty("--lr", lr.toFixed(1)); }
+      busy = busy || moving || over;
+    }
+    if (nearest) { /* a fast pass: only the nearest bot does a double-take */
+      const st = live.get(nearest), r = st.rect;
+      st.dblAt = now; lastDbl = now;
+      nearest.style.setProperty("--dtx", pointer.x > r.left + r.width / 2 ? "1" : "-1");
+      flash(nearest, "dbl");
+    }
+    rectsDirty = false;
+    pointer.speed *= 0.85;
+    if (busy || fresh) schedule();
+    else { clearTimeout(idleTimer); idleTimer = setTimeout(schedule, 250); } // idle: only the glances are due
+  }
+  function stillAll() {
+    for (const [svg, st] of live) { st.ex = st.ey = st.lx = st.lr = 0; ["--ex", "--ey", "--lx", "--lr"].forEach((k) => svg.style.removeProperty(k)); }
+  }
+  window.addEventListener("pointermove", (e) => {
+    const now = performance.now(), dt = Math.max(1, now - pointer.t);
+    if (Number.isFinite(pointer.x)) pointer.speed = pointer.speed * 0.5 + (Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) / dt) * 0.5;
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = now; pointer.movedAt = now;
+    schedule();
+  }, { passive: true });
+  /* The pointer leaves the window: a short look-around, then back to idle. */
+  function pointerLeft() {
+    if (pointer.movedAt < 0) return;
+    pointer.movedAt = -1e9; pointer.speed = 0;
+    let i = 0;
+    for (const [svg, st] of live) if (st.visible && faceTracks(svg)) setTimeout(() => flash(svg, "around"), (i++ % 12) * 60);
+    schedule();
+  }
+  html.addEventListener("mouseleave", pointerLeft);
+  window.addEventListener("pointerout", (e) => { if (!e.relatedTarget) pointerLeft(); });
+  window.addEventListener("scroll", () => { rectsDirty = true; schedule(); }, { passive: true });
+  window.addEventListener("resize", () => { rectsDirty = true; schedule(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { rectsDirty = true; schedule(); } });
+
+  /* Calm: the system preference or the setting. */
+  function applyCalm() {
+    const on = calmPref || reduce.matches;
+    html.classList.toggle("calm", on);
+    document.querySelectorAll("[data-calm]").forEach((b) => b.setAttribute("aria-checked", String(calmPref)));
+    if (on) stillAll(); else schedule();
+  }
+  reduce.addEventListener("change", applyCalm);
+
+  /* State, events and pokes: attribute flips on one SVG. */
+  const timers = new WeakMap(), flashes = new WeakMap();
+  const EVENT = Object.fromEntries(EVENTS.map(([id, , , spec]) => [id, spec]));
+  function setState(svg, key, asBase = true) {
+    const S = STATE[key];
+    svg.dataset.st = key; svg.dataset.s = S.s; svg.dataset.g = S.g; svg.dataset.face = S.face;
+    if (asBase) svg.dataset.base = key;
+    svg.setAttribute("aria-label", `${svg.getAttribute("aria-label").split(",")[0]}, ${S.name}`);
+  }
+  /** A micro-event: a class for a moment, beside whatever else is running. */
+  function flash(svg, name) {
+    const key = `ev-${name}`, ms = EVENT[name] ? EVENT[name].ms : EXTRA_MS[name] || 800;
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get(key));
+    svg.classList.remove(key); void svg.getBoundingClientRect(); svg.classList.add(key);
+    box.set(key, setTimeout(() => svg.classList.remove(key), ms));
+    flashes.set(svg, box);
+  }
+  function endEvent(svg) {
+    clearTimeout(timers.get(svg));
+    const name = svg.dataset.ev;
+    if (!name) return;
+    delete svg.dataset.ev; delete svg.dataset.hold;
+    svg.classList.remove(`ev-${name}`);
+    setState(svg, svg.dataset.base, false);
+    if (name === "power" && svg.dataset.base !== "off") flash(svg, "boot");
+  }
+  const MICRO = {
+    saccade: (svg) => { const st = live.get(svg); if (st) { st.glancing = false; st.glanceAt = 0; } },
+    camera: (svg) => { const st = live.get(svg); if (st) st.cameraUntil = performance.now() + 1700; },
+    dbl: (svg) => { if (!svg.style.getPropertyValue("--dtx")) svg.style.setProperty("--dtx", Math.random() < .5 ? "1" : "-1"); },
+  };
+  const LIFE_ACTIONS = { poke: (svg) => poke(svg), hello: (svg) => flash(svg, "hello"), bye: (svg) => bye(svg) };
+  function fire(svg, name) {
+    if (LIFE_ACTIONS[name]) { LIFE_ACTIONS[name](svg); return; }
+    const ev = EVENT[name];
+    if (!ev) return;
+    if (MICRO[name]) MICRO[name](svg);
+    if (!ev.face && !ev.status && ev.g === undefined) { flash(svg, name); schedule(); return; }
+    endEvent(svg);
+    void svg.getBoundingClientRect(); // so a repeated event restarts its animation
+    if (ev.status) svg.dataset.s = ev.status;
+    if (ev.face) svg.dataset.face = ev.face;
+    if (ev.g !== undefined) svg.dataset.g = ev.g;
+    svg.classList.add(`ev-${name}`);
+    svg.dataset.ev = name;
+    timers.set(svg, setTimeout(() => endEvent(svg), ev.ms));
+  }
+  function poke(svg) {
+    svg.classList.remove("poked"); void svg.getBoundingClientRect(); svg.classList.add("poked");
+    const startled = svg.dataset.s !== "off" && svg.dataset.s !== "stuck" && !svg.dataset.ev;
+    if (startled) svg.dataset.face = "wide";
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get("poked"));
+    box.set("poked", setTimeout(() => { svg.classList.remove("poked"); if (!svg.dataset.ev) svg.dataset.face = STATE[svg.dataset.st].face; }, EXTRA_MS.poked));
+    flashes.set(svg, box);
+  }
+  function bye(svg) {
+    if (isCalm()) return;
+    flash(svg, "bye");
+    setTimeout(() => svg.classList.add("gone"), 780);
+    setTimeout(() => { svg.classList.remove("gone"); flash(svg, "hello"); }, 1500);
+  }
+  document.addEventListener("click", (e) => {
+    const svg = e.target.closest("svg.bot.live");
+    if (svg && !e.target.closest("button")) poke(svg);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches("svg.bot.live")) { e.preventDefault(); poke(e.target); }
+  });
+
+  /* Random life: now and then one visible bot does one small idle thing. */
+  const LIFE = [["dblblink", 2], ["saccade", 4], ["camera", 1], ["tilt", 1.2], ["whirr", 1.2], ["hmm", .6]];
+  function lifeTick() {
+    const wait = 900 + Math.random() * 2200;
+    if (!PG.life || document.hidden || isCalm()) { setTimeout(lifeTick, wait); return; }
+    const cands = [];
+    for (const [svg, st] of live) if (st.visible && !svg.dataset.ev && faceTracks(svg)) cands.push(svg);
+    if (cands.length) {
+      const svg = cands[Math.floor(Math.random() * cands.length)], total = LIFE.reduce((a, [, w]) => a + w, 0);
+      let pick = Math.random() * total, name = LIFE[0][0];
+      for (const [id, w] of LIFE) { pick -= w; if (pick <= 0) { name = id; break; } }
+      fire(svg, name);
+    }
+    setTimeout(lifeTick, wait);
+  }
+
+  /* Build the page. */
+  const built = buildAll();
+  const SLOTS = [["sharedDefs", "defs"], ["heroStrip", "hero"], ["glegend", "legend"], ["dirs", "dirs"], ["kit", "kit"], ["ctxDirs", "ctx"], ["recoRow", "reco"], ["verdicts", "verdicts"], ["legacyRows", "legacy"], ["pgControls", "pgControls"], ["pgStage", "pgStage"]];
+  for (const [id, key] of SLOTS) document.getElementById(id).innerHTML = built[key];
+  register(document);
+  applyCalm();
+  setTimeout(lifeTick, 1500);
+
+  /* The playground and the context switcher. */
+  const pg = document.getElementById("pg");
+  const stageBots = () => Array.from(document.querySelectorAll("#pgStage svg.bot"));
+  function rerender(controls) {
+    if (controls) document.getElementById("pgControls").innerHTML = pgControls(PG);
+    document.getElementById("pgStage").innerHTML = pgStage(PG);
+    register(pg);
+    stageBots().forEach((svg) => flash(svg, "hello"));
+  }
+  pg.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const d = b.dataset;
+    if (d.pgDir) { PG.dir = d.pgDir; PG.v = 0; PG.onit = ""; rerender(true); }
+    else if (d.pgV !== undefined) { PG.v = Number(d.pgV); rerender(true); }
+    else if (d.pgEyes) { PG.eyes = d.pgEyes; rerender(true); }
+    else if (d.pgC !== undefined) { PG.c = Number(d.pgC); rerender(true); }
+    else if (d.pgOnit) {
+      PG.onit = d.pgOnit;
+      stageBots().forEach((svg) => { svg.dataset.onit = PG.onit; });
+      pg.querySelectorAll("[data-pg-onit]").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.pgOnit === PG.onit)));
+    }
+    else if (d.pgSt) {
+      PG.st = d.pgSt;
+      stageBots().forEach((svg) => { endEvent(svg); setState(svg, PG.st); if (PG.st === "off") fire(svg, "power"); });
+      pg.querySelectorAll("[data-pg-st]").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.pgSt === PG.st)));
+    }
+    else if (d.pgEv) { stageBots().forEach((svg, i) => setTimeout(() => fire(svg, d.pgEv), i * 90)); }
+    else if (b.hasAttribute("data-life")) { PG.life = !PG.life; b.setAttribute("aria-checked", String(PG.life)); }
+  });
+  const kit = document.getElementById("kit");
+  function rerenderKit() { kit.innerHTML = kitSlots(CTX); document.getElementById("ctxDirs").innerHTML = ctxChips(CTX.dir); register(kit); }
+  document.getElementById("ctxDirs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ctx-dir]");
+    if (!b) return;
+    CTX.dir = b.dataset.ctxDir; CTX.v = 1; CTX.eyes = "auto";
+    rerenderKit();
+  });
+  kit.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const d = b.dataset;
+    if (d.cardTab) CTX.tab = d.cardTab;
+    else if (d.cardV !== undefined) CTX.v = Number(d.cardV);
+    else if (d.cardEyes) CTX.eyes = d.cardEyes;
+    else return;
+    rerenderKit();
+    const head = kit.querySelector("#card .cz-pop-head svg.bot");
+    if (head && (d.cardV !== undefined || d.cardEyes)) flash(head, "notice");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-calm]")) return;
+    calmPref = !calmPref;
+    applyCalm();
+  });
+})();
+</script>
+</body>
+</html>

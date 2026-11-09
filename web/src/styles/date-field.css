@@ -1,0 +1,52 @@
+/* ---------------------------------------------------------------------
+   DatePicker and DateTimePicker (redesign P1): the typeable box, its
+   calendar button, the reading line under it, and the popover's chips.
+   The month grid's own styles are calendar.css, loaded with its chunk.
+   --------------------------------------------------------------------- */
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.date-field__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.date-field__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.date-field__preview {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-caption);
+}
+
+.date-field__preview--error {
+  color: var(--color-danger);
+}
+
+.date-field__preview--reading {
+  color: var(--color-text-faint);
+}
+
+.date-pop__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.date-pop__loading {
+  margin: 0;
+  padding: var(--space-4) 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  text-align: center;
+}

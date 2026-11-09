@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.coverage
+htmlcov/
+web/node_modules/
+web/dist/
+web/test-results/
+*.secret
+*.egg-info/
+dist/
+build/
+.env
+docs/design/reference/

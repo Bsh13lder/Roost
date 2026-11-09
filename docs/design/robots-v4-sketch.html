@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Avatars v4</title>
+<meta name="description" content="Round four of Roost's bot avatars: the Chick family made alive (eyes that follow you, idle life, event animations), plus Penguin and Ghost, all eyes only.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost avatars, round four. Self-contained: no fonts, images or scripts
+   from anywhere else. Dark only (V4). The :root values are copied from
+   web/src/styles/tokens.css; the --new-* values are round two's cozy kit.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-accent-soft: #c4b5fd;
+  --color-danger: #f87171;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px #b2a6f6;
+
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-fs-menu: 0.8125rem;
+  --new-gap: 4px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: 0.8em; color: var(--color-accent-soft); word-break: break-word; }
+.lede { color: var(--color-text-secondary); max-width: 72ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 74ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; align-items: flex-end; }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--color-panel); border-radius: 14px; padding: 14px; box-shadow: var(--new-edge-inner); display: grid; gap: 6px; align-content: start; }
+.rule b { font-family: var(--font-round); font-size: var(--fs-body); }
+.rule p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.rule .no { color: var(--color-danger); font-weight: 600; }
+
+/* ---- Playground ------------------------------------------------------- */
+.pg { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+@media (max-width: 900px) { .pg { grid-template-columns: minmax(0, 1fr); } }
+.pg-controls { display: grid; gap: 14px; align-content: start; }
+.ctl { display: grid; gap: 6px; }
+.pg-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { font: inherit; font-size: var(--fs-label); font-weight: 600; height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip:hover { background: #26262f; }
+.chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.chip[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.chip.ev { background: var(--color-bg); }
+.chip.ev:hover { background: var(--color-raised); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, 38px); gap: var(--new-gap); }
+.tile { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.tile:hover { background: var(--new-hover); }
+.tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tile[aria-pressed="true"] { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-dot { width: 22px; height: 22px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.sw-dot:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.sw-dot[aria-pressed="true"] { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--color-panel), 0 0 0 3.5px var(--color-text); }
+.pg-stage { background: var(--color-bg); border-radius: 14px; padding: 28px 16px 20px; display: grid; justify-items: center; align-content: center; gap: 22px; min-height: 380px; }
+.pg-stage .neighbours { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.pg-stage small { color: var(--color-text-faint); font-size: var(--fs-caption); text-align: center; }
+.sw { display: inline-flex; align-items: center; gap: 10px; font: inherit; font-size: var(--fs-label); color: var(--color-text); background: none; border: 0; padding: 0; cursor: pointer; }
+.sw:focus-visible { outline: none; border-radius: 999px; box-shadow: var(--focus-ring); }
+.sw i { width: 34px; height: 20px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); position: relative; transition: background .2s; flex: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--color-text); transition: transform .2s; }
+.sw[aria-checked="true"] i { background: var(--new-accent); }
+.sw[aria-checked="true"] i::after { transform: translateX(14px); }
+.hint { color: var(--color-text-faint); font-size: var(--fs-caption); }
+
+/* ---- Family cards ------------------------------------------------------ */
+.dirs { display: grid; gap: 24px; }
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 20px; }
+.dir-head { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.dir-num { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--color-raised); font-family: var(--font-round); font-weight: 800; color: var(--color-text-secondary); flex: none; }
+.dir-title { flex: 1 1 260px; min-width: 0; display: grid; gap: 2px; }
+.dir-title p { color: var(--color-text-secondary); }
+.dir-title .hook { color: var(--color-accent-soft); font-size: var(--fs-label); }
+.blocks { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.blk { grid-column: span 6; background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.blk.full { grid-column: 1 / -1; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.grid12 { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 12px 8px; }
+.cell { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.sizes { display: flex; gap: 8px; align-items: flex-end; }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+@media (max-width: 860px) { .blk { grid-column: 1 / -1; } }
+
+/* ---- The avatar: a stateful SVG ------------------------------------------
+   data-s     the status: rest · onit · ask · stuck · off
+   data-face  the eyes: open · wide · happy · closed · squint · dizzy
+   .live      32 px and up: tracks the pointer, breathes, hops. .xs: blinks only.
+   .ev-*      a transient event; .poked a click. --ex/--ey/--lx/--lr come from
+              the shared pointer loop (see the script).                           */
+.bot { display: block; overflow: visible; flex: none; }
+.bot.live { cursor: pointer; }
+.bot.live:focus-visible { outline: none; border-radius: 50%; box-shadow: var(--focus-ring); }
+.pose, .anim, .poke, .lean { transform-box: view-box; transform-origin: 24px 44px; }
+.pose { transition: transform .35s ease, opacity .35s ease; }
+.bot[data-s="ask"] .pose { transform: rotate(-9deg); }
+.bot[data-s="off"] .pose { transform: translateY(1px); opacity: .62; }
+.bot[data-s="off"] .body { filter: saturate(.45); }
+.lean { transform: translate(calc(var(--lx, 0) * 1px), 0) rotate(calc(var(--lr, 0) * 1deg)); transition: transform .28s ease; }
+.pupil { transform: translate(calc(var(--ex, 0) * 1px), calc(var(--ey, 0) * 1px)) scale(var(--ps, 1)); transform-box: fill-box; transform-origin: center; transition: transform .12s linear; }
+.hl { transform: translate(calc(var(--ex, 0) * -0.45px), calc(var(--ey, 0) * -0.45px)); }
+.bot[data-face="wide"] { --ps: 1.22; }
+.eye > g { display: none; }
+.bot[data-face="open"] .blink, .bot[data-face="wide"] .blink { display: inline; }
+.bot[data-face="happy"] .f-happy { display: inline; }
+.bot[data-face="closed"] .f-closed { display: inline; }
+.bot[data-face="squint"] .f-squint { display: inline; }
+.bot[data-face="dizzy"] .f-dizzy { display: inline; }
+.blink { animation: blink var(--blink-dur, 5.6s) ease-in-out var(--blink-delay, 0s) infinite; transform-box: fill-box; transform-origin: center; }
+html.calm .blink { animation-duration: 9s; }
+.blush { opacity: 0; transition: opacity .3s; }
+.bot[data-face="happy"] .blush, .bot[data-s="ask"] .blush, .bot.poked .blush { opacity: .55; }
+.g-ask, .g-off, .sparks { display: none; }
+.bot[data-s="ask"] .g-ask, .bot[data-s="off"] .g-off, .bot.ev-created .sparks { display: inline; }
+.sparks path { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.spin, .pulse { transform-box: fill-box; transform-origin: center; }
+
+/* Motion, only for people who have not asked for less (html.calm is set from
+   prefers-reduced-motion or the Calm robots setting) and only on live sizes. */
+html:not(.calm) .bot.live[data-s="rest"] .anim,
+html:not(.calm) .bot.live[data-s="ask"] .anim { animation: idle 7s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .anim { animation: bounce 1.1s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .gaze { animation: look 3.4s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .anim { animation: wobble .7s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-fam="ghost"][data-s="rest"] .anim,
+html:not(.calm) .bot.live[data-fam="ghost"][data-s="ask"] .anim { animation: float 4.2s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-fam="ghost"][data-s="off"] .anim { animation: float 6.5s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-fam="ghost"][data-s="onit"] .anim { animation: floatBusy 1.4s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-created .anim { animation: hop 1s ease-out; }
+html:not(.calm) .bot.live.ev-done .anim { animation: bounce2 1.1s ease-out; }
+html:not(.calm) .bot.live.ev-msg .anim { animation: perk .6s ease-out; }
+html:not(.calm) .bot.live.ev-think .gaze { animation: think 2.4s ease-in-out; }
+html:not(.calm) .bot.live.poked .poke { animation: poke .7s ease-out; }
+html:not(.calm) .bot.live.ev-created .sparks path { animation: spark .9s ease-out both; animation-delay: calc(var(--i, 0) * 60ms); }
+html:not(.calm) .bot.live .spin { animation: spin 1.3s linear infinite; }
+html:not(.calm) .bot.live .pulse { animation: glint 1.8s ease-in-out infinite; }
+html:not(.calm) .bot.live .zed { animation: zed 3s ease-in-out infinite; }
+html.calm .lean { transition: none; transform: none; }
+html.calm .pupil { transform: scale(var(--ps, 1)); }
+@media (prefers-reduced-motion: reduce) {
+  .anim, .gaze, .poke, .sparks path, .spin, .pulse, .zed { animation: none !important; }
+  .lean { transform: none !important; transition: none !important; }
+}
+
+@keyframes blink { 0%, 100% { transform: scaleY(1); } 4%, 8% { transform: scaleY(.1); } 12%, 58% { transform: scaleY(1); } 62%, 65% { transform: scaleY(.1); } 69% { transform: scaleY(1); } }
+@keyframes idle {
+  0%, 100% { transform: scale(1, 1) rotate(0); } 22% { transform: scale(1.022, .978) rotate(0); } 44% { transform: scale(1, 1) rotate(0); }
+  60% { transform: scale(1.018, .982) rotate(0); } 72% { transform: scale(1, 1) rotate(0); }
+  80% { transform: scale(1, 1) rotate(-2.5deg); } 85% { transform: scale(1, 1) rotate(2.5deg); } 90% { transform: scale(1, 1) rotate(0); }
+}
+@keyframes bounce { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-1.6px) scale(.98, 1.03); } }
+@keyframes wobble { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.8px); } }
+@keyframes floatBusy { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-2.6px) scale(.98, 1.03); } }
+@keyframes hop {
+  0% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.1, .88); } 45% { transform: translateY(-6px) scale(.94, 1.08); }
+  75% { transform: translateY(0) scale(1.08, .9); } 100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes bounce2 {
+  0% { transform: translateY(0) scale(1, 1); } 20% { transform: translateY(-4px) scale(.97, 1.04); } 40% { transform: translateY(0) scale(1.06, .94); }
+  60% { transform: translateY(-2.2px) scale(1, 1); } 80% { transform: translateY(0) scale(1.03, .97); } 100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes perk { 0% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(-1.5px) scale(.96, 1.07); } 60% { transform: translateY(0) scale(1.03, .97); } 100% { transform: translateY(0) scale(1, 1); } }
+@keyframes poke {
+  0% { transform: scale(1, 1) rotate(0); } 25% { transform: scale(1.2, .8) rotate(0); } 50% { transform: scale(.92, 1.1) rotate(-4deg); }
+  70% { transform: scale(1.04, .97) rotate(4deg); } 85% { transform: scale(1, 1) rotate(-2deg); } 100% { transform: scale(1, 1) rotate(0); }
+}
+@keyframes think { 0% { transform: translate(0, 0); } 20% { transform: translate(0, -1.3px); } 50% { transform: translate(.7px, -1.4px); } 80% { transform: translate(-.6px, -1.3px); } 100% { transform: translate(0, 0); } }
+@keyframes look { 0%, 18%, 84%, 100% { transform: translate(0, 0); } 28%, 44% { transform: translate(-.8px, -.3px); } 56%, 72% { transform: translate(.8px, -.3px); } }
+@keyframes spark { 0% { opacity: 0; transform: translate(0, 0) scale(.2); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(var(--sx, 0) * 1px), calc(var(--sy, 0) * 1px)) scale(1.1); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes glint { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.16); opacity: .78; } }
+@keyframes zed { 0% { transform: translate(0, 1px); opacity: 0; } 30% { opacity: 1; } 80% { transform: translate(1px, -2.6px); opacity: .9; } 100% { transform: translate(1px, -3px); opacity: 0; } }
+
+/* ---- The cozy kit pieces (from round two) -------------------------------- */
+.kit { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+.kit-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.kit-head p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.kit-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.kit-slot { background: var(--color-bg); border-radius: 14px; padding: 16px; display: grid; gap: 10px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; }
+@media (max-width: 980px) { .kit-row { grid-template-columns: minmax(0, 1fr); } }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14); }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { flex: 1; height: 26px; padding: 0 8px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-secondary); font-weight: 600; white-space: nowrap; }
+.cz-tab.on { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-pop { width: 284px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: grid; grid-template-columns: repeat(6, 36px); gap: var(--new-gap); }
+.cz-tile { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+.cz-tile:hover { background: var(--new-hover); }
+.cz-tile.on { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-side { width: 260px; max-width: 100%; background: var(--color-panel); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-pins { display: flex; gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { flex: 1; display: grid; justify-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin .unread { position: absolute; top: 6px; right: 10px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row:hover { background: var(--new-hover); }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; font-size: var(--new-fs-menu); display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 320px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-panel); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); }
+.cz-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+.cz-setting { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--new-radius-item); background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 440px; }
+.cz-setting div { flex: 1; min-width: 0; }
+.cz-setting b { display: block; font-size: var(--new-fs-menu); }
+.cz-setting small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+
+/* ---- Notes ------------------------------------------------------------- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 520px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td .bot { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 76ch; }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3.2 7.5a5 5 0 1 1 1.4 3.9"/><path d="M3 4v3.6h3.6"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 16 16"><path d="M8 2.6c3 0 5 2.3 5 5.4 0 3-2.1 5.4-5 5.4S3 11 3 8c0-3.1 2-5.4 5-5.4z"/><path d="M6.2 7.4h.01M9.8 7.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost avatars, round four</h1>
+    <p class="lede">Chick stays as the base, now with eyes only and a lot more life: the eyes follow your pointer, the bots breathe, blink and glance about, and each thing that happens to a bot shows on its face and in its body. Two more families join it, Penguin and Ghost. Move your pointer across the page and every bot on it looks your way. The app does not change until this round is picked.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="One bot from each family"></div>
+  </header>
+
+  <section class="section" aria-labelledby="secG">
+    <h2 id="secG">What changed, and what we stay away from</h2>
+    <div class="rules">
+      <div class="rule"><b>Eyes only</b><p><span class="no">No</span> mouth and <span class="no">no</span> beak. The face is two round ink eyes with a highlight. Feeling comes from the eyes (shape, squint, size, lids, sparkle), optional blush, and how the body moves.</p></div>
+      <div class="rule"><b>Alive, but calm</b><p>Eyes follow the pointer, clamped inside the eye. At rest a bot breathes, blinks at its own pace, glances about and wiggles once in a while. On hover it leans to you; a click squishes it (no sound).</p></div>
+      <div class="rule"><b>Our own look</b><p>Named, mirrored shapes on one 48-unit grid and one perch line. <span class="no">Not</span> irregular blobs, <span class="no">not</span> vertical pill eyes, and no borrowed character's proportions. Three families: Chick, Penguin, Ghost.</p></div>
+      <div class="rule"><b>Small stays still</b><p>Under 32 px only blinks remain: no pointer tracking, no hops. <code>prefers-reduced-motion</code> and the Calm robots setting turn tracking, bobs and hops off everywhere and keep slow blinks.</p></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secP">
+    <h2 id="secP">Playground <small>pick · then press an event</small></h2>
+    <p>Pick a family, a shape and a colour, set a status, then press an event. The big bot and its four neighbours each follow your pointer on their own. Hover one to pet it, click to poke it.</p>
+    <div class="pg" id="pg">
+      <div class="pg-controls" id="pgControls"></div>
+      <div class="pg-stage" id="pgStage"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secA">
+    <h2 id="secA">A · Three families <small>eyes only</small></h2>
+    <p>Each family has 8 to 14 shapes, so a team of bots can all look different, and every shape takes any of the ten colours. Bodies keep round three's soft light from the upper left, a gloss and a ground shadow.</p>
+    <div class="dirs" id="dirs"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">B · In context <small>hero · sidebar · picker</small></h2>
+    <p>The same three cozy-kit pieces for each family: the Profile's panel hero, the sidebar with its pinned row, and the avatar picker card with its Robot / Upload / Reset tabs, the shape grid and the colour dots.</p>
+    <div class="dirs" id="kit"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secAcc">
+    <h2 id="secAcc">C · Performance and accessibility</h2>
+    <p>One shared <code>requestAnimationFrame</code> loop moves every eye on the page. It reads the pointer once per frame, keeps each bot's box in a cache that scroll and resize invalidate, and only touches bots an <code>IntersectionObserver</code> says are on screen. It stops when the tab is hidden, when nothing is on screen, and when motion is turned down. Each eye is two CSS variables (<code>--ex</code>, <code>--ey</code>) and the hover lean two more (<code>--lx</code>, <code>--lr</code>); the browser does the rest in CSS.</p>
+    <p>Every decorative part (the "?" sparkle, the z, the sparks) is <code>aria-hidden</code>; the whole bot is one <code>role="img"</code> with its name and status. <code>prefers-reduced-motion</code> turns off tracking, the bob and the hops and keeps only slow blinks. The same switch is a setting:</p>
+    <div class="cz-setting cz"><div><b>Calm robots</b><small>Bots keep still: no eye following, no hops. They only blink, slowly.</small></div><button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i></button></div>
+  </section>
+
+  <section class="section" aria-labelledby="secC">
+    <h2 id="secC">D · How this maps to code</h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Everything stays SVG plus CSS animations, with no new dependency.</b> A bot is one stateful SVG: <code>data-s</code> for its status, <code>data-face</code> for its eyes, a class for an event in flight. The status motions, the event motions and the face swaps are all CSS rules on those attributes, so a status change is an attribute flip, not a redraw. The only JavaScript that runs per frame is the small shared pointer loop.</p>
+      <div class="map">
+        <div><code>web/src/components/robot/RobotFace.tsx</code><p>Draws the body for the shape's family (Chick, Penguin or Ghost), the face, the glints, the sparks and the star, inside the four groups the motion needs: <code>pose</code> (status posture), <code>anim</code> (status and event motion), <code>poke</code> (the click squish) and <code>lean</code> (the hover). Props: <code>shape</code>, <code>color</code>, <code>moment</code>, <code>star</code>, <code>picture</code>, <code>pictureEyes</code>, <code>size</code>, <code>still</code>, <code>events</code>.</p></div>
+        <div><code>shapes/chick.ts · penguin.ts · ghost.ts · eyes.tsx</code><p>Each family is a data table of a few numbers per shape (width, height, squareness, taper, flat base, and a feature) plus one pure path function, as in round three. <code>eyes.tsx</code> draws one eye with all its faces (open, wide, happy, closed, squint, dizzy) in one group; CSS shows one. The blush, the "?" sparkle, the z and the sparks come from <code>glints.tsx</code>.</p></div>
+        <div><code>useLookAt.ts</code><p>A small hook: <code>useLookAt(ref, { eyeY, enabled })</code> registers the SVG with one module-level loop (<code>lookAt.ts</code>) that owns the pointer, the box cache, the <code>IntersectionObserver</code> and the <code>visibilitychange</code> pause. It writes <code>--ex</code>, <code>--ey</code>, <code>--lx</code> and <code>--lr</code> on the element and nothing else. Disabled below 32 px, when <code>still</code> is set, and when a face is not open.</p></div>
+        <div><code>events prop</code><p><code>events: readonly RobotEvent[]</code> (<code>created · think · done · msg · stuck · ask · off</code>, each with a key). A new key adds the event class for its length, then restores the status face. The chat feeds it from live <code>bot_status</code> changes (On it → Resting with a write tool result is <code>done</code>; a <code>create_*</code> result is <code>created</code>; a new reply is <code>msg</code>) and the card routes (Stuck, Ask).</p></div>
+        <div><code>look.ts</code><p>Shape ids gain a family prefix (<code>chick-egg</code>, <code>penguin-classic</code>, <code>ghost-wisp</code>). Old saved shapes still draw through look.ts's table (below): the bare bird and Boxbot names map onto Chick shapes, and stored avatars keep their value. <code>roost/constants.py</code>, <code>api/types.ts</code> and <code>tests/test_bot_look.py</code> move in step.</p></div>
+        <div><code>robot.css · tokens.css · palette.ts</code><p>The keyframes above, scoped by <code>html:not(.calm)</code> and <code>.robot--live</code>. Ink, blush, star and ground-shadow tokens join tokens.css. The Calm robots setting and <code>prefers-reduced-motion</code> both set <code>still</code>; tests see it as <code>robot--still</code>. Bundle: no new dependencies; the family tables are a few hundred bytes each.</p></div>
+      </div>
+      <h4>Old saved shapes still draw, through look.ts's table</h4>
+      <div class="tbl-wrap"><table><thead><tr><th>Stored shape</th><th>Where it came from</th><th>Draws as</th></tr></thead><tbody id="legacyRows"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+/* Pure builders up top (node can load and check them); the page wiring at the bottom runs only in a browser. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8];
+const FAMILY_COLOR = 1;
+const STATUSES = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"]];
+const STATUS_FACE = { rest: "open", onit: "open", ask: "wide", stuck: "dizzy", off: "closed" };
+const EVENTS = [
+  ["created", "Created something", { face: "happy", ms: 1300 }],
+  ["think", "Thinking", { face: "open", ms: 2400, hold: true }],
+  ["done", "Done", { face: "squint", ms: 1300 }],
+  ["msg", "New message", { face: "wide", ms: 900 }],
+  ["stuck", "Error / Stuck", { status: "stuck", ms: 2600 }],
+  ["ask", "Asking you", { status: "ask", ms: 2600 }],
+  ["off", "Off duty", { status: "off", ms: 2600 }],
+];
+const INK = "#1d1b29";
+const ASK = "#f5a524";
+const ZED = "#d9d6e6";
+const RING = "#0e0e12";
+const STAR = "#f6c453";
+const BLUSH = "#ff8fa3";
+const BASE_Y = 44;
+const LIVE_MIN = 32; // px: below this a bot only blinks
+const EYE_MAX = 1.45; // units: how far an eye may slide (0.6 of its radius)
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+let seed = 7;
+const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const toHex = (rgb) => "#" + rgb.map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("");
+const tint = (hex, a) => toHex(channels(hex).map((v) => v + (255 - v) * a));
+const shade = (hex, k) => toHex(channels(hex).map((v) => v * k));
+const isWarm = (hex) => { const [r, , b] = channels(hex); return r > b + 40; };
+
+/* ---- Geometry (round three) ---------------------------------------------- */
+function smooth(pts) {
+  const n = pts.length;
+  let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 0; i < n; i += 1) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+}
+function polarPts(o) {
+  const N = 48, e = o.n || 2, pts = [];
+  for (let i = 0; i < N; i += 1) {
+    const t = (i / N) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+    let r = Math.pow(Math.pow(Math.abs(c), e) + Math.pow(Math.abs(s), e), -1 / e);
+    for (const [k, a] of Object.entries(o.h || {})) r += a * Math.cos(Number(k) * t);
+    pts.push([o.rx * r * s, -o.ry * r * c]);
+  }
+  return o.flat ? pts.map(([x, y]) => [x, Math.min(y, o.ry * o.flat)]) : pts;
+}
+const mirror = (half) => half.concat(half.slice(1, -1).reverse().map(([x, y]) => [-x, y]));
+function place(pts, maxW = 38, maxH = 38) {
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+  const k = Math.min(1, maxW / w, maxH / h), mx = (Math.max(...xs) + Math.min(...xs)) / 2, my = Math.max(...ys);
+  const out = pts.map(([x, y]) => [24 + (x - mx) * k, BASE_Y + (y - my) * k]);
+  return { pts: out, box: { x0: 24 - (w * k) / 2, x1: 24 + (w * k) / 2, y0: BASE_Y - h * k, y1: BASE_Y, w: w * k, h: h * k, cx: 24 } };
+}
+function shapeOf(o) {
+  const raw = o.half ? mirror(o.half) : polarPts(o);
+  const p = place(raw, o.maxW, o.maxH);
+  return { d: smooth(p.pts), box: p.box };
+}
+function rr(x, y, w, h, r) {
+  const q = Math.min(r, w / 2, h / 2);
+  return `M${f(x + q)} ${f(y)}H${f(x + w - q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + w)} ${f(y + q)}V${f(y + h - q)}` +
+    `A${f(q)} ${f(q)} 0 0 1 ${f(x + w - q)} ${f(y + h)}H${f(x + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x)} ${f(y + h - q)}` +
+    `V${f(y + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + q)} ${f(y)}Z`;
+}
+
+/* ---- Shared parts ---------------------------------------------------------- */
+/** The soft body: light from the upper left, a gloss. FILL in `behind` takes the same gradient. */
+function softBody(d, box, color, behind = "") {
+  const g = uid("g"), gx = box.x0 + box.w * 0.34, gy = box.y0 + box.h * 0.3, r = Math.max(box.w, box.h) * 0.85;
+  const gloss = `<ellipse cx="${f(box.x0 + box.w * 0.3)}" cy="${f(box.y0 + box.h * 0.2)}" rx="${f(box.w * 0.12)}" ry="${f(Math.max(1.3, box.h * 0.055))}" fill="#fff" opacity=".3" transform="rotate(-30 ${f(box.x0 + box.w * 0.3)} ${f(box.y0 + box.h * 0.2)})"/>`;
+  return `<defs><radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="${f(gx)}" cy="${f(gy)}" r="${f(r)}">` +
+    `<stop offset="0" stop-color="${tint(color, 0.24)}"/><stop offset=".55" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, 0.74)}"/></radialGradient></defs>` +
+    behind.split("FILL").join(`url(#${g})`) + `<path d="${d}" fill="url(#${g})"/>` + gloss;
+}
+const groundShadow = (box, k = 1) => `<ellipse cx="24" cy="${BASE_Y + 1.3}" rx="${f(box.w * 0.34 * k)}" ry="1.5" fill="#000" opacity="${k < 1 ? ".22" : ".38"}"/>`;
+
+/** A stand-in for an uploaded picture, clipped to the body shrunk a little, so a rim of the colour shows. */
+function photo(d, box, k = 0.84) {
+  const clip = uid("p"), grad = uid("q"), cx = box.cx, cy = box.y0 + box.h / 2;
+  const tf = `translate(${f(cx)} ${f(cy)}) scale(${k}) translate(${f(-cx)} ${f(-cy)})`;
+  const { x0: x, y0: y, w, h } = box;
+  return `<defs><linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5f2"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient></defs>` +
+    `<clipPath id="${clip}"><path d="${d}" transform="${tf}"/></clipPath><g clip-path="url(#${clip})">` +
+    `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="url(#${grad})"/>` +
+    `<circle cx="${f(x + w * 0.66)}" cy="${f(y + h * 0.34)}" r="${f(h * 0.14)}" fill="#fff4d6"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.74)}q${f(w * 0.3)} ${f(-h * 0.34)} ${f(w * 0.62)} 0t${f(w * 0.62)} 0V${f(y + h)}H${f(x)}z" fill="#5fae7a"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.88)}q${f(w * 0.4)} ${f(-h * 0.2)} ${f(w)} ${f(-h * 0.06)}V${f(y + h)}H${f(x)}z" fill="#3f8a63"/></g>`;
+}
+
+function spiral(x, y, r) {
+  const pts = [];
+  for (let i = 0; i <= 22; i += 1) {
+    const t = (i / 22) * Math.PI * 4.2, k = r * (0.15 + 0.85 * (i / 22));
+    pts.push(`${f(x + Math.cos(t) * k)} ${f(y + Math.sin(t) * k)}`);
+  }
+  return "M" + pts.join("L");
+}
+
+/** One eye with every face it can wear. CSS shows one by data-face; the pupil slides by --ex/--ey. */
+function eye(x, y, r, o = {}) {
+  const ink = o.ink || INK, a = r * 0.95, sw = f(Math.max(1.2, r * 0.7));
+  const stroke = `stroke="${ink}" stroke-width="${sw}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+  const ring = o.ring ? `<circle r="${f(r + 1)}" fill="${o.ring}" opacity=".9"/>` : "";
+  return `<g class="eye" transform="translate(${f(x)} ${f(y)})">${ring}` +
+    `<g class="blink"><g class="gaze"><g class="pupil"><circle r="${f(r)}" fill="${ink}"/>` +
+    `<g class="hl"><circle cx="${f(r * 0.32)}" cy="${f(-r * 0.34)}" r="${f(r * 0.36)}" fill="#fff"/></g></g></g></g>` +
+    `<g class="f-happy"><path d="M${f(-a)} ${f(r * 0.35)}q${f(a)} ${f(-r * 1.7)} ${f(a * 2)} 0" ${stroke}/></g>` +
+    `<g class="f-closed"><path d="M${f(-a)} ${f(-r * 0.15)}q${f(a)} ${f(r * 1.1)} ${f(a * 2)} 0" ${stroke}/></g>` +
+    `<g class="f-squint"><path d="M${f(-a)} ${f(r * 0.15)}q${f(a)} ${f(-r * 0.9)} ${f(a * 2)} 0" ${stroke} stroke-width="${f(r * 0.95)}"/></g>` +
+    `<g class="f-dizzy"><g class="spin"><path d="${spiral(0, 0, r * 1.4)}" stroke="${ink}" stroke-width="1.05" fill="none" stroke-linecap="round"/></g></g></g>`;
+}
+
+/** The face: two eyes and the blush, placed by the shape's eye line and gap. */
+function face(box, o, color, opts = {}) {
+  const ey = box.y0 + box.h * (o.ey || 0.42), gap = o.gap || clamp(box.w * 0.18, 4.2, 6.2), r = o.r || 2.4;
+  const blushFill = isWarm(color) ? shade(color, 0.62) : BLUSH;
+  const blush = [-1, 1].map((k) => `<ellipse class="blush" cx="${f(box.cx + k * (gap + 3.4))}" cy="${f(ey + 2.8)}" rx="2.4" ry="1.3" fill="${blushFill}"/>`).join("");
+  return { ey, markup: blush + eye(box.cx - gap, ey, r, opts) + eye(box.cx + gap, ey, r, opts) };
+}
+
+const sparkPath = (k) => `M0 ${f(-2.2 * k)}q${f(0.4 * k)} ${f(1.8 * k)} ${f(2.2 * k)} ${f(2.2 * k)}q${f(-1.8 * k)} ${f(0.4 * k)} ${f(-2.2 * k)} ${f(2.2 * k)}q${f(-0.4 * k)} ${f(-1.8 * k)} ${f(-2.2 * k)} ${f(-2.2 * k)}q${f(1.8 * k)} ${f(-0.4 * k)} ${f(2.2 * k)} ${f(-2.2 * k)}z`;
+
+/** Everything beside the head, pre-drawn and shown by CSS: the ? and its sparkle, the z's, the sparks. */
+function glints(box, ring) {
+  const q = "M-2.6 -2.7a2.8 2.8 0 1 1 3.8 2.6c-.8.3-1.2.9-1.2 1.7";
+  const ask = `<g class="g-ask" aria-hidden="true"><g transform="translate(40.6 8.4)"><g class="pulse">` +
+    `<path d="${q}" stroke="${ring}" stroke-width="5.6" fill="none" stroke-linecap="round"/><circle cy="4.7" r="2.5" fill="${ring}"/>` +
+    `<path d="${q}" stroke="${ASK}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cy="4.7" r="1.3" fill="${ASK}"/></g></g>` +
+    `<g transform="translate(34.4 3.6)"><path class="pulse" d="${sparkPath(0.7)}" fill="${ASK}"/></g></g>`;
+  const z = (x, y, k) => `M${f(x - 3 * k)} ${f(y - 3 * k)}h${f(6 * k)}l${f(-6 * k)} ${f(6 * k)}h${f(6 * k)}`;
+  const drawZ = (d, w) => `<path d="${d}" stroke="${ring}" stroke-width="${w + 3}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="${d}" stroke="${ZED}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const off = `<g class="g-off" aria-hidden="true">${drawZ(z(39.5, 10.5, 1), 2)}<g class="zed">${drawZ(z(45, 3.4, 0.55), 1.5)}</g></g>`;
+  const at = [[-11, 2, -4, -4], [11, 2, 4, -4], [0, -5, 0, -5], [-5, -3, -2.5, -4.5], [6, -3, 2.5, -4.5]];
+  const sparks = `<g class="sparks" aria-hidden="true">` + at.map(([dx, dy, sx, sy], i) =>
+    `<g transform="translate(${f(box.cx + dx)} ${f(box.y0 + dy)})"><path d="${sparkPath(i % 2 ? 0.6 : 0.85)}" fill="${i % 2 ? "#fff" : STAR}" style="--i:${i};--sx:${sx};--sy:${sy}"/></g>`).join("") + `</g>`;
+  return ask + off + sparks;
+}
+
+function starMark(ring) {
+  return `<g transform="translate(40 40)"><circle r="7.4" fill="${STAR}" stroke="${ring}" stroke-width="2.6"/>` +
+    `<path d="M0 -4.3l1.3 2.6 2.9.45-2.1 2.05.5 2.9L0 2.6l-2.6 1.4.5-2.9-2.1-2.05 2.9-.45z" fill="#4a3606"/></g>`;
+}
+
+/** The face or the picture (with or without eyes on it). */
+function faceOrPic(d, box, o, color, ctx, k) {
+  if (!ctx.pic) { const fc = face(box, o, color); return { ey: fc.ey, markup: fc.markup }; }
+  const fc = face(box, o, color, { ring: "#fff" });
+  return { ey: fc.ey, markup: photo(d, box, k) + (ctx.picEyes ? fc.markup : "") };
+}
+
+/* ---- 1. Chick: round three's twelve bodies, no beak, plus Cloud and Cap ---- */
+const CHICK = [
+  { id: "round", label: "Round", rx: 17, ry: 16.5 },
+  { id: "egg", label: "Egg", rx: 15, ry: 18.5, h: { 1: -0.07 } },
+  { id: "bean", label: "Bean", rx: 16, ry: 18, h: { 1: -0.05, 2: -0.03 } },
+  { id: "plump", label: "Plump", rx: 19.5, ry: 16.5, n: 2.3, h: { 1: -0.05 }, flat: 0.86 },
+  { id: "tall", label: "Tall", rx: 13.5, ry: 19, n: 2.2, ey: 0.38 },
+  { id: "tufted", label: "Tufted", rx: 16.5, ry: 16, maxH: 33, feature: "tuft" },
+  { id: "crest", label: "Crest", rx: 15, ry: 17.5, h: { 1: -0.05 }, maxH: 33, feature: "crest" },
+  { id: "pear", label: "Pear", rx: 16.5, ry: 18, h: { 1: -0.15, 2: 0.03 }, ey: 0.38, gap: 4.4 },
+  { id: "wide", label: "Wide", rx: 20, ry: 14.5, n: 2.6, flat: 0.9, ey: 0.44 },
+  { id: "drop", label: "Drop", half: [[0, -20], [1.6, -18.3], [5.2, -13.4], [10.5, -5.5], [13.8, 2.4], [13.4, 9.5], [8.6, 14.6], [0, 16]], ey: 0.58, gap: 4.6 },
+  { id: "wing", label: "Wing", rx: 15.5, ry: 16.5, h: { 1: -0.04 }, maxW: 34, feature: "wing" },
+  { id: "puff", label: "Puff", rx: 17, ry: 16.5, h: { 12: 0.022 } },
+  { id: "cloud", label: "Cloud", rx: 19, ry: 14.5, n: 2.4, h: { 6: 0.045 }, flat: 0.82, ey: 0.44 },
+  { id: "cap", label: "Cap", rx: 15.5, ry: 17, h: { 1: -0.06 }, feature: "cap", maxH: 33 },
+];
+
+function chickFeature(o, box) {
+  const { cx, y0, x0, x1, h } = box;
+  if (o.feature === "tuft") {
+    return [[-3.2, -2.6], [0, 0], [3.2, 2.6]].map(([dx, lean]) => {
+      const x = cx + dx;
+      return `<path d="M${f(x - 2.2)} ${f(y0 + 3)}Q${f(x - 2.4 + lean * 0.3)} ${f(y0 - 3)} ${f(x + lean)} ${f(y0 - 5.8 + Math.abs(dx) * 0.5)}Q${f(x + 1.8)} ${f(y0 - 1)} ${f(x + 2.2)} ${f(y0 + 3)}Z" fill="FILL"/>`;
+    }).join("");
+  }
+  if (o.feature === "crest") {
+    return `<path d="M${f(cx - 3.4)} ${f(y0 + 3)}C${f(cx - 3.6)} ${f(y0 - 4.4)} ${f(cx + 4)} ${f(y0 - 8)} ${f(cx + 8.6)} ${f(y0 - 5.6)}C${f(cx + 4.4)} ${f(y0 - 3.4)} ${f(cx + 3.4)} ${f(y0 - 0.4)} ${f(cx + 3.4)} ${f(y0 + 3)}Z" fill="FILL"/>`;
+  }
+  if (o.feature === "wing") {
+    const wy = y0 + h * 0.6;
+    return [[x0 + 1.4, 24], [x1 - 1.4, -24]].map(([x, a]) =>
+      `<ellipse cx="${f(x)}" cy="${f(wy)}" rx="3.8" ry="7" fill="FILL" transform="rotate(${a} ${f(x)} ${f(wy)})"/>`).join("");
+  }
+  return "";
+}
+
+/** A piece of shell worn as a cap, from the Hatchling idea. (A shell band round the bottom was tried and
+    dropped: at 96 px its zigzag read as a toothy mouth.) */
+function shellCap(box, color) {
+  const { cx, y0 } = box;
+  const d = `M${f(cx - 8)} ${f(y0 + 3.4)}Q${f(cx)} ${f(y0 - 7.2)} ${f(cx + 8)} ${f(y0 + 3.4)}l-2.7 -2.2 -2.6 2.2 -2.7 -2.2 -2.7 2.2 -2.6 -2.2Z`;
+  return `<g transform="rotate(-14 ${f(cx)} ${f(y0 + 1)})"><path d="${d}" fill="${tint(color, 0.74)}"/></g>`;
+}
+
+function chick(o, ctx) {
+  const { d, box } = shapeOf(o), color = ctx.color;
+  const fc = faceOrPic(d, box, o, color, ctx, 0.84);
+  const extra = o.feature === "cap" ? shellCap(box, color) : "";
+  return { shadow: groundShadow(box), box, ey: fc.ey, body: `<g class="body">${softBody(d, box, color, chickFeature(o, box))}${extra}</g>${fc.markup}` };
+}
+
+/* ---- 2. Penguin: tuxedo two-tone in the bot's colour, a lighter belly, flipper bumps ---- */
+const PENGUIN = [
+  { id: "classic", label: "Classic", rx: 15.5, ry: 18.5, h: { 1: -0.06 }, belly: [0.56, 0.6, 0.66], ey: 0.36 },
+  { id: "round", label: "Round", rx: 18, ry: 17, belly: [0.6, 0.6, 0.64], ey: 0.38 },
+  { id: "tall", label: "Tall", rx: 13.5, ry: 19.5, n: 2.2, belly: [0.56, 0.58, 0.66], ey: 0.34 },
+  { id: "chubby", label: "Chubby", rx: 19.5, ry: 16, n: 2.3, flat: 0.88, belly: [0.66, 0.62, 0.66], ey: 0.38 },
+  { id: "emperor", label: "Emperor", rx: 15, ry: 19.5, h: { 1: -0.08 }, belly: [0.54, 0.56, 0.68], ey: 0.34, mask: true },
+  { id: "rockhopper", label: "Rockhopper", rx: 16, ry: 16.5, maxH: 33, belly: [0.58, 0.6, 0.66], ey: 0.4, tuft: true },
+  { id: "flap", label: "Flap", rx: 15.5, ry: 18, h: { 1: -0.05 }, maxW: 34, belly: [0.56, 0.6, 0.66], ey: 0.36, flip: "out" },
+  { id: "pear", label: "Pear", rx: 17, ry: 18, h: { 1: -0.15, 2: 0.03 }, belly: [0.62, 0.56, 0.7], ey: 0.36, gap: 4.4 },
+  { id: "little", label: "Little", rx: 15, ry: 14.5, belly: [0.6, 0.58, 0.66], ey: 0.42, r: 2.7 },
+  { id: "heart", label: "Heart", rx: 16.5, ry: 17.5, h: { 1: -0.05 }, belly: [0.6, 0.62, 0.66], ey: 0.36, heart: true },
+];
+
+function bellyPath(box, o) {
+  const [bw, bh, by] = o.belly, w = box.w * bw, h = box.h * bh, cx = box.cx, cy = box.y0 + box.h * by;
+  if (!o.heart) return `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(w / 2)}" ry="${f(h / 2)}" fill="BELLY"/>`;
+  return `<path d="M${f(cx)} ${f(cy + h / 2)}C${f(cx - w * 0.6)} ${f(cy + h * 0.1)} ${f(cx - w * 0.6)} ${f(cy - h * 0.6)} ${f(cx)} ${f(cy - h * 0.2)}` +
+    `C${f(cx + w * 0.6)} ${f(cy - h * 0.6)} ${f(cx + w * 0.6)} ${f(cy + h * 0.1)} ${f(cx)} ${f(cy + h / 2)}Z" fill="BELLY"/>`;
+}
+
+function penguin(o, ctx) {
+  const { d, box } = shapeOf(o), color = ctx.color, clip = uid("c"), belly = tint(color, 0.72);
+  const fy = box.y0 + box.h * 0.6, a = o.flip === "out" ? 40 : 14;
+  const flippers = [[box.x0 + 2.4, o.flip === "out" ? -a : a], [box.x1 - 2.4, o.flip === "out" ? a : -a]].map(([x, ang]) =>
+    `<ellipse cx="${f(x)}" cy="${f(fy)}" rx="3.6" ry="7.4" fill="${shade(color, 0.78)}" transform="rotate(${ang} ${f(x)} ${f(fy)})"/>`).join("");
+  const tuft = o.tuft ? chickFeature({ feature: "tuft" }, box) : "";
+  const fc = faceOrPic(d, box, o, color, ctx, 0.84);
+  const mask = o.mask ? `<ellipse cx="${f(box.cx)}" cy="${f(fc.ey + 0.4)}" rx="${f(box.w * 0.34)}" ry="${f(box.h * 0.15)}" fill="${tint(color, 0.5)}"/>` : "";
+  const bellyDraw = `<clipPath id="${clip}"><path d="${d}"/></clipPath><g clip-path="url(#${clip})">${bellyPath(box, o).split("BELLY").join(belly)}</g>`;
+  return { shadow: groundShadow(box), box, ey: fc.ey, body: `<g class="body">${flippers}${softBody(d, box, color, tuft)}${ctx.pic ? "" : bellyDraw + mask}</g>${fc.markup}` };
+}
+
+/* ---- 3. Ghost: a dome, soft sides, a wavy hem, a float and an edge glow ---- */
+const GHOST = [
+  { id: "classic", label: "Classic", w: 32, dome: 15, side: 12, n: 3, depth: 3.2, lift: 2, taper: 1 },
+  { id: "wisp", label: "Wisp", w: 24, dome: 13, side: 16, n: 2, depth: 3.5, lift: 3, taper: 2, curl: true, gap: 4.2 },
+  { id: "puff", label: "Puff", w: 36, dome: 14, side: 9, n: 4, depth: 2.8, lift: 2, gap: 6.4 },
+  { id: "tall", label: "Tall", w: 27, dome: 14, side: 18, n: 3, depth: 3.4, lift: 2, taper: 1.5, ey: 0.34 },
+  { id: "sheet", label: "Sheet", w: 32, dome: 9, side: 18, n: 4, depth: 2.4, lift: 2, ey: 0.36 },
+  { id: "bell", label: "Bell", w: 28, dome: 15, side: 12, n: 3, depth: 3, lift: 2, taper: -3 },
+  { id: "dome", label: "Dome", w: 34, dome: 16, side: 6, n: 5, depth: 2.4, lift: 2, ey: 0.5 },
+  { id: "flame", label: "Flame", w: 28, dome: 17, side: 11, n: 3, depth: 3, lift: 2, top: "point", ey: 0.46 },
+  { id: "mini", label: "Mini", w: 26, dome: 12, side: 9, n: 2, depth: 3, lift: 4, taper: 1, r: 2.6, ey: 0.44 },
+  { id: "hood", label: "Hood", w: 30, dome: 14, side: 13, n: 3, depth: 3.2, lift: 2, taper: 1, hood: true },
+];
+
+function ghostPath(o) {
+  const w = o.w, x0 = 24 - w / 2, x1 = 24 + w / 2, t = o.taper || 0;
+  const yH = BASE_Y - o.lift, yEq = yH - o.side, yTop = yEq - o.dome, tx0 = x0 + t, tx1 = x1 - t;
+  let d = `M${f(tx0)} ${f(yH)}C${f(tx0)} ${f(yH - o.side * 0.5)} ${f(x0)} ${f(yEq + o.side * 0.4)} ${f(x0)} ${f(yEq)}`;
+  if (o.top === "point") d += `Q${f(x0)} ${f(yTop + o.dome * 0.3)} 24 ${f(yTop)}Q${f(x1)} ${f(yTop + o.dome * 0.3)} ${f(x1)} ${f(yEq)}`;
+  else d += `A${f(w / 2)} ${f(o.dome)} 0 0 1 ${f(x1)} ${f(yEq)}`;
+  d += `C${f(x1)} ${f(yEq + o.side * 0.4)} ${f(tx1)} ${f(yH - o.side * 0.5)} ${f(tx1)} ${f(yH)}`;
+  const sw = (tx1 - tx0) / o.n;
+  for (let i = 0; i < o.n; i += 1) d += `q${f(-sw / 2)} ${f(o.depth)} ${f(-sw)} 0`;
+  const h = o.dome + o.side + o.depth, left = Math.min(x0, tx0), right = Math.max(x1, tx1);
+  return { d: d + "Z", box: { x0: left, x1: right, y0: yTop, y1: yH + o.depth, w: right - left, h, cx: 24 } };
+}
+
+function ghost(o, ctx) {
+  const { d, box } = ghostPath(o), color = ctx.color;
+  const glowOut = `<path d="${d}" fill="none" stroke="${color}" stroke-opacity=".22" stroke-width="3.2" stroke-linejoin="round"/>`;
+  const glowIn = `<path d="${d}" fill="none" stroke="${tint(color, 0.55)}" stroke-opacity=".55" stroke-width="1"/>`;
+  const curl = o.curl ? `<path d="M24 ${f(box.y0 + 0.6)}q-.4 -3.4 3.2 -4.4" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round"/>` : "";
+  const fc = faceOrPic(d, box, { ey: 0.4, ...o }, color, ctx, 0.86);
+  const hood = o.hood ? `<ellipse cx="24" cy="${f(fc.ey + 1)}" rx="${f(box.w * 0.3)}" ry="${f(box.h * 0.2)}" fill="${tint(color, 0.42)}"/>` : "";
+  return { shadow: groundShadow(box, 0.7), box, ey: fc.ey, body: `<g class="body">${curl}${glowOut}<g opacity=".93">${softBody(d, box, color)}</g>${ctx.pic ? "" : hood}${glowIn}</g>${fc.markup}` };
+}
+
+/* ---- The families ------------------------------------------------------- */
+const FAMILIES = [
+  { id: "chick", name: "Chick", draw: chick, shapes: CHICK,
+    idea: "Round three's bird bodies, now with two round eyes and nothing else on the face. Cloud joins from Mochi and Cap from the Hatchling idea.",
+    hook: "Roost's own story: where birds rest. A curious tilt to ask, a tuck and a z to sleep." },
+  { id: "penguin", name: "Penguin", draw: penguin, shapes: PENGUIN,
+    idea: "Round penguin bodies in a tuxedo two-tone of the bot's colour: a lighter belly patch and little flipper bumps at the sides.",
+    hook: "The belly's shape and the flippers tell them apart; Emperor wears a face mask, Rockhopper a tuft." },
+  { id: "ghost", name: "Ghost", draw: ghost, shapes: GHOST,
+    idea: "Soft floaty bodies with a wavy hem, a gentle float bob and a faint glow at the edge. The only family that does not sit on the perch.",
+    hook: "Dome, sides and hem are three numbers each, so a Wisp, a Bell and a Flame are the same code." },
+];
+const byId = (id) => FAMILIES.find((d) => d.id === id);
+const statusName = (s) => (STATUSES.find(([k]) => k === s) || ["", ""])[1];
+
+/** One bot as an SVG string: a stateful element the CSS and the pointer loop drive. */
+function avatar(fam, { color, v = 0, s = "rest", star = false, pic = false, picEyes = false, size = 96, ring = RING }) {
+  const o = fam.shapes[v % fam.shapes.length], part = fam.draw(o, { color, s, pic, picEyes });
+  const live = size >= LIVE_MIN && (!pic || picEyes);
+  const label = `${fam.name} ${o.label}, ${statusName(s)}${star ? ", main bot" : ""}${pic ? ", with a picture" : ""}`;
+  const style = `--blink-dur:${f(4.2 + rnd() * 3)}s;--blink-delay:${f(-rnd() * 8)}s;--idle-delay:${f(-rnd() * 7)}s`;
+  return `<svg class="bot ${live ? "live" : "xs"}" data-fam="${fam.id}" data-s="${s}" data-base="${s}" data-face="${STATUS_FACE[s]}" data-ey="${f(part.ey)}" ` +
+    `viewBox="0 0 48 48" width="${size}" height="${size}" role="img" aria-label="${label}" style="${style}"${live ? ' tabindex="0"' : ""}>` +
+    part.shadow + `<g class="pose"><g class="anim"><g class="poke"><g class="lean">${part.body}</g></g></g></g>` +
+    glints(part.box, ring) + (star ? starMark(ring) : "") + `</svg>`;
+}
+
+const colorOf = (i) => PALETTE[i % PALETTE.length][0];
+const cell = (svgs, caption) => `<div class="cell"><div class="sizes">${svgs}</div>${caption ? `<b>${caption}</b>` : ""}</div>`;
+
+/* ---- A: the family cards ---------------------------------------------- */
+function familyBlock(fam) {
+  const cells = fam.shapes.map((o, v) => cell(avatar(fam, { color: colorOf(FAMILY_COLOR), v, size: 56 }), o.label)).join("");
+  return `<section class="blk full"><h4>The family · ${fam.shapes.length} shapes in one bot's colour · 56 px · picker style</h4><div class="grid12">${cells}</div></section>`;
+}
+function colourBlock(fam) {
+  const cols = SIX.map((i, n) => {
+    const c = colorOf(i), v = (n * 3) % fam.shapes.length;
+    return `<div class="cell">${avatar(fam, { color: c, v, size: 96 })}<div class="sizes">${avatar(fam, { color: c, v, size: 40 })}${avatar(fam, { color: c, v, size: 24 })}</div><b>${PALETTE[i][1]}</b></div>`;
+  }).join("");
+  return `<section class="blk full"><h4>Six colours · 96 · 40 · 24 px (24 px only blinks)</h4><div class="row">${cols}</div></section>`;
+}
+function statusBlock(fam) {
+  const color = colorOf(FAMILY_COLOR);
+  const cells = STATUSES.map(([s, name], i) => `<div class="cell">${avatar(fam, { color, v: i, s, size: 72 })}<div class="sizes">${avatar(fam, { color, v: i, s, size: 40 })}${avatar(fam, { color, v: i, s, size: 24 })}</div><b>${name}</b></div>`).join("");
+  return `<section class="blk full"><h4>The five statuses, eyes and posture only · 72 · 40 · 24 px</h4><div class="row">${cells}</div></section>`;
+}
+function starPicBlock(fam) {
+  const starRow = [72, 40, 24].map((size) => avatar(fam, { color: colorOf(0), v: 1, star: true, s: "onit", size })).join("");
+  const picRow = [72, 40, 24].map((size) => avatar(fam, { color: colorOf(3), v: 0, pic: true, s: "ask", size })).join("");
+  const picEyesRow = [72, 40, 24].map((size) => avatar(fam, { color: colorOf(7), v: 2, pic: true, picEyes: true, s: "rest", size })).join("");
+  return `<section class="blk"><h4>Main bot star · a picture, without and with eyes</h4><div class="row">${cell(starRow, "Main bot, On it")}${cell(picRow, "Picture only")}${cell(picEyesRow, "Picture with eyes")}</div>` +
+    `<p class="why">A picture fills the shape inside a rim of the bot's colour. Without eyes, the status shows through the posture, the glints and the status pill. With eyes, the eyes sit on the picture in a white ring and keep following you.</p></section>`;
+}
+const TEAM = [
+  { name: "Chief", c: 0, v: 0, s: "onit", star: true, line: "I've added the three tasks for Monday." },
+  { name: "Scout", c: 1, v: 3, s: "ask", line: "Which flat should I book a viewing for?" },
+  { name: "Ledger", c: 3, v: 5, s: "rest", line: "The October total is ready." },
+  { name: "Quill", c: 7, v: 8, s: "stuck", line: "Stuck on a sign-in page." },
+  { name: "Archivist", c: 8, v: 9, s: "off", line: "Off duty" },
+];
+function sideRow(fam, b, size, on) {
+  return `<div class="cz-row${on ? " on" : ""}">${avatar(fam, { color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size, ring: "#16161b" })}` +
+    `<div><b>${b.name}</b><small>${b.line}</small></div>${b.s === "ask" || b.s === "stuck" ? '<i class="unread"></i>' : ""}</div>`;
+}
+function sidebarBlock(fam) {
+  return `<section class="blk"><h4>A sidebar with five bots · 32 px</h4><div class="cz-side">${TEAM.map((b, i) => sideRow(fam, b, 32, i === 0)).join("")}</div></section>`;
+}
+function familyCard(fam, n) {
+  return `<article class="dir" id="d-${fam.id}"><div class="dir-head"><span class="dir-num">${n}</span>` +
+    `<div class="dir-title"><h3>${fam.name}</h3><p>${fam.idea}</p><p class="hook">${fam.hook}</p></div></div>` +
+    `<div class="blocks">${familyBlock(fam)}${colourBlock(fam)}${statusBlock(fam)}${starPicBlock(fam)}${sidebarBlock(fam)}</div></article>`;
+}
+
+/* ---- B: the cozy kit -------------------------------------------------- */
+function heroPiece(fam) {
+  const c = colorOf(1);
+  return `<div class="cz-hero"><div class="cz-hero-band" style="background:linear-gradient(180deg, ${c}40, ${c}00)"></div><div class="cz-hero-body">` +
+    `<div class="cz-hero-top">${avatar(fam, { color: c, v: 3, s: "onit", size: 64, ring: "#16161b" })}<div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>` +
+    `<div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div><span class="cz-status"><i class="dot"></i>On it · comparing three listings</span>` +
+    `<div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div></div></div>`;
+}
+function sidebarPiece(fam) {
+  const pin = (b) => `<div class="cz-pin">${avatar(fam, { color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size: 40, ring: "#16161b" })}${b.name}${b.s === "ask" ? '<i class="unread"></i>' : ""}</div>`;
+  return `<div class="cz-side cz"><div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>` +
+    `<div class="cz-pins">${TEAM.slice(0, 3).map(pin).join("")}</div><div class="cz-sep"></div>${TEAM.slice(3).map((b, i) => sideRow(fam, b, 32, i === 0)).join("")}</div>`;
+}
+function pickerPiece(fam) {
+  const c = colorOf(1);
+  const tiles = fam.shapes.map((o, v) => `<span class="cz-tile${v === 3 ? " on" : ""}" title="${o.label}">${avatar(fam, { color: c, v, size: 30, ring: "#1d1d24" })}</span>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<i class="cz-sw${i === 1 ? " on" : ""}" style="background:${hex}" title="${name}"></i>`).join("");
+  return `<div class="cz-surface cz-pop cz"><div class="cz-pop-head">${avatar(fam, { color: c, v: 3, size: 44, ring: "#1d1d24" })}<div><b>Scout</b><small>${fam.name} · ${fam.shapes[3].label} · Blue</small></div></div>` +
+    `<div class="cz-tabs" role="presentation"><span class="cz-tab on"><svg class="ico"><use href="#i-bot"/></svg>Robot</span><span class="cz-tab"><svg class="ico"><use href="#i-upload"/></svg>Upload</span><span class="cz-tab"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>` +
+    `<div class="cz-tiles">${tiles}</div><div class="cz-swatches">${dots}</div></div>`;
+}
+function kitCard(fam) {
+  return `<article class="kit"><div class="kit-head"><h3>${fam.name}</h3><p>${fam.idea}</p></div><div class="kit-row">` +
+    `<div class="kit-slot"><h4>Panel hero · 64 px</h4>${heroPiece(fam)}</div>` +
+    `<div class="kit-slot"><h4>Sidebar · pinned 40 px, rows 32 px</h4>${sidebarPiece(fam)}</div>` +
+    `<div class="kit-slot"><h4>Avatar picker · 30 px tiles</h4>${pickerPiece(fam)}</div></div></article>`;
+}
+
+/* ---- D: old shapes keep drawing ---------------------------------------- */
+const LEGACY = [
+  ["classic", "Robot head (V1)", "round"], ["tall", "Robot head (V1)", "tall"], ["wide", "Robot head (V1)", "wide"],
+  ["soft", "Robot head (V1)", "bean"], ["cube", "Robot head (V1)", "plump"], ["monitor", "Robot head (V1)", "wide"],
+  ["round", "Bird (S1.6)", "round"], ["egg", "Bird (S1.6)", "egg"], ["pear", "Bird (S1.6)", "pear"],
+  ["plump", "Bird (S1.6)", "plump"], ["crest", "Bird (S1.6)", "crest"],
+];
+function legacyRows() {
+  const fam = FAMILIES[0];
+  return LEGACY.map(([stored, from, to], i) => {
+    const v = CHICK.findIndex((o) => o.id === to);
+    return `<tr><td><code>${stored}</code></td><td>${from}</td><td>${avatar(fam, { color: colorOf(i), v, size: 24, ring: "#16161b" })}<code>chick-${to}</code></td></tr>`;
+  }).join("");
+}
+
+/* ---- The playground --------------------------------------------------- */
+const PG = { fam: "chick", v: 1, c: 1, s: "rest" };
+
+function pgControls(state) {
+  const fam = byId(state.fam), c = colorOf(state.c);
+  const chips = (items, key, on) => items.map(([id, name]) => `<button type="button" class="chip" data-${key}="${id}" aria-pressed="${on === id}">${name}</button>`).join("");
+  const tiles = fam.shapes.map((o, v) => `<button type="button" class="tile" data-pg-v="${v}" aria-pressed="${v === state.v}" title="${o.label}" aria-label="${o.label}">${avatar(fam, { color: c, v, size: 30, ring: "#16161b" })}</button>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<button type="button" class="sw-dot" data-pg-c="${i}" aria-pressed="${i === state.c}" style="background:${hex}" aria-label="${name}" title="${name}"></button>`).join("");
+  return `<div class="ctl"><h4>Family</h4><div class="pg-row">${chips(FAMILIES.map((d) => [d.id, d.name]), "pg-fam", state.fam)}</div></div>` +
+    `<div class="ctl"><h4>Shape · ${fam.shapes[state.v].label}</h4><div class="tiles">${tiles}</div></div>` +
+    `<div class="ctl"><h4>Colour · ${PALETTE[state.c][1]}</h4><div class="dots">${dots}</div></div>` +
+    `<div class="ctl"><h4>Status</h4><div class="pg-row">${chips(STATUSES, "pg-s", state.s)}</div></div>` +
+    `<div class="ctl"><h4>Event</h4><div class="pg-row">${EVENTS.map(([id, name]) => `<button type="button" class="chip ev" data-pg-ev="${id}">${name}</button>`).join("")}</div></div>` +
+    `<div class="ctl"><div class="pg-row" style="gap:16px"><button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i>Calm robots</button><span class="hint">Hover a bot to pet it · click to poke it</span></div></div>`;
+}
+
+function pgStage(state) {
+  const fam = byId(state.fam), n = fam.shapes.length;
+  const big = avatar(fam, { color: colorOf(state.c), v: state.v, s: state.s, size: 176, star: true });
+  const others = [2, 5, 8, 11].map((k, i) => avatar(fam, { color: colorOf((state.c + 2 * (i + 1)) % PALETTE.length), v: (state.v + k) % n, s: state.s, size: 96 })).join("");
+  return `<div class="big">${big}</div><div class="neighbours">${others}</div><small>Each one follows your pointer on its own. Events play on all five.</small>`;
+}
+
+function buildAll() {
+  return {
+    hero: FAMILIES.map((d, i) => avatar(d, { color: colorOf([1, 3, 0][i]), v: [5, 0, 1][i], s: ["rest", "onit", "rest"][i], star: i === 0, size: 72 })).join(""),
+    dirs: FAMILIES.map((d, i) => familyCard(d, i + 1)).join(""),
+    kit: FAMILIES.map(kitCard).join(""),
+    reco: PALETTE.slice(0, 8).map(([c], i) => avatar(FAMILIES[i % 3], { color: c, v: [0, 1, 5, 3, 6, 7, 4, 9][i], s: STATUSES[i % 5][0], star: i === 0, size: 52, ring: "#16161b" })).join(""),
+    legacy: legacyRows(),
+    pgControls: pgControls(PG),
+    pgStage: pgStage(PG),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, avatar, FAMILIES, PALETTE, STATUSES, EVENTS, shapeOf, ghostPath, pgControls, pgStage, tint, shade };
+}
+
+/* ---- The page: one pointer loop, hover and poke, events, the playground ---- */
+if (typeof document !== "undefined") (function page() {
+  const html = document.documentElement, reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let calmPref = false;
+  const isCalm = () => html.classList.contains("calm");
+
+  /* The shared pointer loop. One entry per live bot; only visible ones are touched. */
+  const live = new Map();
+  const pointer = { x: NaN, y: NaN, movedAt: -1e9 };
+  let rectsDirty = true, running = false, idleTimer = 0;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) { const st = live.get(e.target); if (st) st.visible = e.isIntersecting; }
+    schedule();
+  }, { rootMargin: "48px" });
+
+  function register(root) {
+    for (const [svg] of live) if (!svg.isConnected) { io.unobserve(svg); live.delete(svg); }
+    root.querySelectorAll("svg.bot.live").forEach((svg) => {
+      if (live.has(svg)) return;
+      live.set(svg, { ex: 0, ey: 0, lx: 0, lr: 0, rect: null, visible: false, eyeY: Number(svg.dataset.ey) || 20, glanceAt: performance.now() + 1500 + Math.random() * 4000, glancing: false, gx: 0, gy: 0 });
+      io.observe(svg);
+    });
+    rectsDirty = true;
+    schedule();
+  }
+  function schedule() {
+    if (running || document.hidden || isCalm()) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+  const faceTracks = (svg) => !svg.dataset.hold && (svg.dataset.face === "open" || svg.dataset.face === "wide");
+  function frame(now) {
+    running = false;
+    if (document.hidden || isCalm()) return;
+    const fresh = now - pointer.movedAt < 4000;
+    let busy = false;
+    for (const [svg, st] of live) {
+      if (!st.visible) continue;
+      if (rectsDirty || !st.rect) st.rect = svg.getBoundingClientRect();
+      const r = st.rect, cx = r.left + r.width / 2, cy = r.top + r.height * (st.eyeY / 48);
+      let tx = 0, ty = 0;
+      if (faceTracks(svg)) {
+        if (fresh) {
+          const dx = pointer.x - cx, dy = pointer.y - cy, dist = Math.hypot(dx, dy) || 1, m = EYE_MAX * (dist / (dist + r.width * 0.5));
+          tx = (dx / dist) * m; ty = (dy / dist) * m;
+        } else {
+          if (now > st.glanceAt) {
+            st.glancing = !st.glancing;
+            st.gx = st.glancing ? (Math.random() - 0.5) * 2 * EYE_MAX * 0.8 : 0;
+            st.gy = st.glancing ? (Math.random() - 0.5) * EYE_MAX * 0.6 : 0;
+            st.glanceAt = now + (st.glancing ? 500 + Math.random() * 900 : 2500 + Math.random() * 6000);
+          }
+          tx = st.gx; ty = st.gy;
+        }
+      }
+      const over = fresh && pointer.x > r.left - 4 && pointer.x < r.right + 4 && pointer.y > r.top - 4 && pointer.y < r.bottom + 4;
+      const lx = over ? clamp(((pointer.x - cx) / r.width) * 3, -1.5, 1.5) : 0, lr = over ? clamp(((pointer.x - cx) / r.width) * 12, -6, 6) : 0;
+      st.ex += (tx - st.ex) * 0.16; st.ey += (ty - st.ey) * 0.16;
+      const moving = Math.abs(tx - st.ex) > 0.01 || Math.abs(ty - st.ey) > 0.01;
+      if (moving || st.wrote) { svg.style.setProperty("--ex", st.ex.toFixed(2)); svg.style.setProperty("--ey", st.ey.toFixed(2)); st.wrote = moving; }
+      if (lx !== st.lx || lr !== st.lr) { st.lx = lx; st.lr = lr; svg.style.setProperty("--lx", lx.toFixed(2)); svg.style.setProperty("--lr", lr.toFixed(1)); }
+      busy = busy || moving || over;
+    }
+    rectsDirty = false;
+    if (busy || fresh) schedule();
+    else { clearTimeout(idleTimer); idleTimer = setTimeout(schedule, 250); } // idle: only the glances are due
+  }
+  function stillAll() {
+    for (const [svg, st] of live) { st.ex = st.ey = st.lx = st.lr = 0; ["--ex", "--ey", "--lx", "--lr"].forEach((k) => svg.style.removeProperty(k)); }
+  }
+  window.addEventListener("pointermove", (e) => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.movedAt = performance.now(); schedule(); }, { passive: true });
+  window.addEventListener("scroll", () => { rectsDirty = true; schedule(); }, { passive: true });
+  window.addEventListener("resize", () => { rectsDirty = true; schedule(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { rectsDirty = true; schedule(); } });
+
+  /* Calm: the system preference or the setting. */
+  function applyCalm() {
+    const on = calmPref || reduce.matches;
+    html.classList.toggle("calm", on);
+    document.querySelectorAll("[data-calm]").forEach((b) => b.setAttribute("aria-checked", String(calmPref)));
+    if (on) stillAll(); else schedule();
+  }
+  reduce.addEventListener("change", applyCalm);
+
+  /* Status, events and pokes: attribute flips on one SVG. */
+  const timers = new WeakMap();
+  const EVENT = Object.fromEntries(EVENTS.map(([id, , spec]) => [id, spec]));
+  function setStatus(svg, s, asBase = true) {
+    svg.dataset.s = s; svg.dataset.face = STATUS_FACE[s];
+    if (asBase) svg.dataset.base = s;
+  }
+  function endEvent(svg) {
+    clearTimeout(timers.get(svg));
+    const name = svg.dataset.ev;
+    if (!name) return;
+    delete svg.dataset.ev; delete svg.dataset.hold;
+    svg.classList.remove(`ev-${name}`);
+    setStatus(svg, svg.dataset.base, false);
+  }
+  function fire(svg, name) {
+    const ev = EVENT[name];
+    if (!ev) return;
+    endEvent(svg);
+    void svg.getBoundingClientRect(); // so a repeated event restarts its animation
+    if (ev.status) setStatus(svg, ev.status, false);
+    else { svg.dataset.face = ev.face; if (ev.hold) svg.dataset.hold = "1"; svg.classList.add(`ev-${name}`); }
+    svg.dataset.ev = name;
+    timers.set(svg, setTimeout(() => endEvent(svg), ev.ms));
+  }
+  function poke(svg) {
+    if (svg.dataset.ev) return;
+    const s = svg.dataset.s;
+    svg.classList.remove("poked"); void svg.getBoundingClientRect(); svg.classList.add("poked");
+    if (s !== "off" && s !== "stuck") svg.dataset.face = "happy";
+    clearTimeout(timers.get(svg));
+    timers.set(svg, setTimeout(() => { svg.classList.remove("poked"); if (!svg.dataset.ev) svg.dataset.face = STATUS_FACE[svg.dataset.s]; }, 700));
+  }
+  document.addEventListener("click", (e) => {
+    const svg = e.target.closest("svg.bot.live");
+    if (svg) poke(svg);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches("svg.bot.live")) { e.preventDefault(); poke(e.target); }
+  });
+
+  /* Build the page. */
+  const built = buildAll();
+  for (const [id, key] of [["heroStrip", "hero"], ["dirs", "dirs"], ["kit", "kit"], ["recoRow", "reco"], ["legacyRows", "legacy"], ["pgControls", "pgControls"], ["pgStage", "pgStage"]]) {
+    document.getElementById(id).innerHTML = built[key];
+  }
+  register(document);
+  applyCalm();
+
+  const pg = document.getElementById("pg");
+  const stageBots = () => Array.from(document.querySelectorAll("#pgStage svg.bot"));
+  function rerender(controls) {
+    if (controls) document.getElementById("pgControls").innerHTML = pgControls(PG);
+    document.getElementById("pgStage").innerHTML = pgStage(PG);
+    register(document.getElementById("pg"));
+    applyCalm();
+  }
+  pg.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.pgFam) { PG.fam = b.dataset.pgFam; PG.v = Math.min(PG.v, byId(PG.fam).shapes.length - 1); rerender(true); }
+    else if (b.dataset.pgV !== undefined) { PG.v = Number(b.dataset.pgV); rerender(true); }
+    else if (b.dataset.pgC !== undefined) { PG.c = Number(b.dataset.pgC); rerender(true); }
+    else if (b.dataset.pgS) { PG.s = b.dataset.pgS; stageBots().forEach((svg) => { endEvent(svg); setStatus(svg, PG.s); }); pg.querySelectorAll("[data-pg-s]").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.pgS === PG.s))); }
+    else if (b.dataset.pgEv) { stageBots().forEach((svg, i) => setTimeout(() => fire(svg, b.dataset.pgEv), i * 90)); }
+  });
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-calm]");
+    if (!b) return;
+    calmPref = !calmPref;
+    applyCalm();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* ---------------------------------------------------------------------
+   Design tokens (look & feel redesign P1): the one place for every
+   colour, font size, space, radius, control height, shadow, duration and
+   the focus ring of the web face. Every stylesheet and component takes
+   its values from here; web/tests/tokens.test.ts fails on a hard-coded
+   colour or font size anywhere else in web/src, and keeps every text
+   colour at 4.5:1 or more on every surface. Dark only for now (V4).
+   --------------------------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces, darkest first */
+  --color-bg: #0e0e12; /* the page */
+  --color-panel: #16161b; /* lists, cards, the chat */
+  --color-raised: #1f1f26; /* inputs, chips, bubbles */
+  --color-overlay: #1d1d24; /* menus, popovers, sheets, toasts */
+  --color-sunken: #09090c; /* the computer's terminal */
+  --color-scrim: rgb(0 0 0 / 0.55); /* behind a sheet or a dialog */
+
+  /* Text: each one 4.5:1 or more on every surface above */
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+
+  /* Lines */
+  --color-border: #2a2a33; /* the hairline */
+  --color-border-strong: #3a3a45;
+  --avatar-outline: rgb(0 0 0 / 0.18); /* a faint edge on light swatches */
+
+  /* Accent: violet, for actions, selection and focus */
+  --color-accent: #6c5ce0;
+  --color-accent-hover: #6152cf;
+  --color-accent-strong: #b2a6f6; /* links, the focus ring, accent text */
+  --color-accent-soft: #c4b5fd; /* text on an accent tint */
+  --color-accent-tint: rgb(108 92 224 / 0.16);
+  --color-accent-edge: rgb(167 139 250 / 0.42);
+  --color-on-accent: #ffffff;
+  /* The accent swatches in Settings (lib/accent.ts): each choice's own fill, whatever accent is on. */
+  --accent-swatch-violet: #6c5ce0;
+  --accent-swatch-blue: #2563eb;
+  --accent-swatch-teal: #0f766e;
+  --accent-swatch-green: #15803d;
+  --accent-swatch-orange: #c2410c;
+  --accent-swatch-pink: #db2777;
+  --color-hover: rgb(255 255 255 / 0.07); /* hovered and highlighted items */
+  --color-selection: rgb(124 58 237 / 0.4);
+
+  /* Meaning, never decoration */
+  --color-ok: #34d399;
+  --color-warn: #f5a524;
+  --color-danger: #f87171;
+  --color-danger-text: #fecaca;
+  --color-danger-tint: rgb(248 113 113 / 0.1);
+  --color-ok-tint: rgb(52 211 153 / 0.12);
+  --color-warn-tint: rgb(245 165 36 / 0.12);
+  --color-danger-edge: rgb(248 113 113 / 0.38);
+  --color-info: #60a5fa;
+  --color-off: #9ca3af;
+
+  /* Diffs (approval cards) and warnings: tints for a line, text that reads on them */
+  --diff-add-bg: var(--color-ok-tint);
+  --diff-add-text: var(--color-ok);
+  --diff-remove-bg: var(--color-danger-tint);
+  --diff-remove-text: var(--color-danger-text);
+  --diff-note: var(--color-text-faint);
+  --warning-bg: var(--color-warn-tint);
+  --warning-text: var(--color-warn);
+
+  /* The five statuses (Resting is the plain secondary text) */
+  --status-on-it: var(--color-accent-strong);
+  --status-asking: var(--color-warn);
+  --status-stuck: var(--color-danger);
+  --status-off: var(--color-off);
+  --status-sign-in: var(--color-info); /* a Stuck bot waiting for you to sign in: calm, never the red */
+
+  /* The Lensbots (components/robot, avatars v7): the dark visor and the lids, the white eyes (a faint
+     shade under the top edge), the pupils, the glyphs' ink, the highlights, the Off duty z's, the
+     shadow, and the main bot's star. No glow anywhere. The bot's own colour travels as --bot. */
+  --lens-visor: #161823;
+  --lens-lid-edge: #ffffff;
+  --lens-ink: #191a24;
+  --lens-pupil: #14151d;
+  --lens-sclera-top: #d6d7e0;
+  --lens-sclera-mid: #f5f5f8;
+  --lens-sclera: #ffffff;
+  --lens-highlight: #ffffff;
+  --lens-z: #dcdce8;
+  --lens-shadow: #000000;
+  --robot-star: #f6c453;
+  --robot-star-mark: var(--robot-star);
+
+  /* Spacing: n x 4px */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Corners */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Type: the system stack; mono for code */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; /* 12 */
+  --fs-label: 0.8125rem; /* 13 */
+  --fs-body: 0.875rem; /* 14 */
+  --fs-lead: 1rem; /* 16 */
+  --fs-heading: 1.125rem; /* 18 */
+  --fs-title: 1.375rem; /* 22 */
+  --fs-display: 1.75rem; /* 28 */
+  --fs-menu: 0.8125rem; /* 13: menu, select and tab items, toasts */
+
+  /* Control heights */
+  --control-sm: 28px;
+  --control-md: 32px;
+  --control-lg: 40px;
+  --control-item: 30px; /* menu and select rows */
+  --pad-item: 8px; /* item side padding */
+  --icon-size: 16px; /* every kit icon */
+  --gap-tight: var(--space-1); /* tiles, tabs, button groups */
+
+  /* Depth */
+  --edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06); /* a subtle inner border on raised surfaces */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-fast: 140ms;
+  --duration-base: 180ms;
+  --duration-slow: 220ms;
+
+  /* Focus */
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-strong);
+
+  /* Layout */
+  --gutter: 40px;
+  --reading-width: 760px;
+  --board-width: 1120px;
+  --talk-width: 960px;
+  --sidebar-width: 300px;
+  --panel-width: 380px;
+  --rail-width: 208px; /* the Tasks area's list of projects */
+
+  /* C3: the ring where a bot clicks on its computer, and the picture of a button on its card */
+  --pointer-ring-size: 28px;
+  --crop-max-height: 120px;
+  /* The computer card and the activity pill (docs/plans/2026-10-23-roost-computer-card.md): their widest. */
+  --computer-card-width: 440px;
+
+  /* The login card's top edge */
+  --bark: linear-gradient(180deg, #8b7a69 0%, #6a5a4b 55%, #4c4037 100%);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --gutter: 16px;
+  }
+}
+
+/* The accent colour you pick in Settings (restructure slice 3, lib/accent.ts), the phone's same six. Violet is the
+   default above; each other swaps the accent tokens. White keeps 4.5:1 on each fill, and each strong shade reads at
+   4.5:1 on every surface (tests/accent.test.ts). */
+:root[data-accent="blue"] {
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-strong: #93c5fd;
+  --color-accent-soft: #bfdbfe;
+  --color-accent-tint: rgb(37 99 235 / 0.16);
+  --color-accent-edge: rgb(147 197 253 / 0.42);
+  --color-selection: rgb(37 99 235 / 0.4);
+}
+
+:root[data-accent="teal"] {
+  --color-accent: #0f766e;
+  --color-accent-hover: #115e59;
+  --color-accent-strong: #5eead4;
+  --color-accent-soft: #99f6e4;
+  --color-accent-tint: rgb(15 118 110 / 0.16);
+  --color-accent-edge: rgb(94 234 212 / 0.42);
+  --color-selection: rgb(15 118 110 / 0.4);
+}
+
+:root[data-accent="green"] {
+  --color-accent: #15803d;
+  --color-accent-hover: #166534;
+  --color-accent-strong: #86efac;
+  --color-accent-soft: #bbf7d0;
+  --color-accent-tint: rgb(21 128 61 / 0.16);
+  --color-accent-edge: rgb(134 239 172 / 0.42);
+  --color-selection: rgb(21 128 61 / 0.4);
+}
+
+:root[data-accent="orange"] {
+  --color-accent: #c2410c;
+  --color-accent-hover: #9a3412;
+  --color-accent-strong: #fdba74;
+  --color-accent-soft: #fed7aa;
+  --color-accent-tint: rgb(194 65 12 / 0.16);
+  --color-accent-edge: rgb(253 186 116 / 0.42);
+  --color-selection: rgb(194 65 12 / 0.4);
+}
+
+:root[data-accent="pink"] {
+  --color-accent: #db2777;
+  --color-accent-hover: #be185d;
+  --color-accent-strong: #f9a8d4;
+  --color-accent-soft: #fbcfe8;
+  --color-accent-tint: rgb(219 39 119 / 0.16);
+  --color-accent-edge: rgb(249 168 212 / 0.42);
+  --color-selection: rgb(219 39 119 / 0.4);
+}

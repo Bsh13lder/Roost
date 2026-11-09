@@ -1,0 +1,514 @@
+/* ---------------------------------------------------------------------
+   The sidebar (polish R1): a fixed top (search and +), a scrolling middle
+   (your bots' row, My turn, the chats under their labels) and a fixed
+   foot (your initials and Board). Plus the working dots.
+   --------------------------------------------------------------------- */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.sidebar-scroll .error-notice {
+  margin: 0 16px 8px;
+}
+
+/* ---- Top: search and + ------------------------------------------------ */
+
+.sidebar-top {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+}
+
+.sidebar-search {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-search .input {
+  width: 100%;
+  padding-left: 36px;
+  border-radius: var(--radius-pill);
+}
+
+.sidebar-search__icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  display: grid;
+  color: var(--color-text-faint);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.sidebar-top .icon-btn,
+.sidebar-foot .icon-btn {
+  color: var(--color-text-secondary);
+}
+
+.sidebar-top .icon-btn:hover,
+.sidebar-top .icon-btn[aria-expanded="true"],
+.sidebar-foot .icon-btn:hover,
+.sidebar-foot .icon-btn[aria-expanded="true"] {
+  color: var(--color-text);
+  background: var(--color-raised);
+}
+
+/* ---- Your bots: a grid of tiles --------------------------------------- */
+
+.avatar-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1) var(--space-3) var(--space-3);
+  list-style: none;
+}
+
+.avatar-row__item {
+  min-width: 0;
+}
+
+.avatar-row__link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.avatar-row__link:hover {
+  background: var(--color-raised);
+}
+
+.avatar-row__link.active {
+  background: var(--color-panel);
+}
+
+.avatar-row__name,
+.avatar-row__job {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.avatar-row__name {
+  font-size: var(--fs-label);
+  color: var(--color-text);
+}
+
+.avatar-row__job {
+  margin-top: calc(-1 * var(--space-1));
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  .avatar-row__link .robot {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+.avatar-row__item--attention .avatar-row__link {
+  background: var(--color-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--color-accent-edge);
+}
+
+.avatar-row__unread {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+}
+
+/* ---- Foot: your initials and the Board -------------------------------- */
+
+.sidebar-foot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.sidebar-foot__initials {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-tint);
+  color: var(--color-accent-soft);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-foot__board {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.sidebar-foot__board:hover {
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+/* ---- My turn: the Stuck cards waiting on you (stuck flow) ------------ */
+
+.my-turn {
+  margin: 0 16px 12px;
+  padding: 10px 12px 8px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-tint);
+}
+
+.my-turn__title {
+  margin: 0 0 4px;
+  color: var(--color-danger);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.my-turn__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.my-turn__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  text-decoration: none;
+}
+
+.my-turn__row:hover {
+  background: var(--color-raised);
+}
+
+.my-turn__mark {
+  flex: none;
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.my-turn__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A failed Stuck list is said inside My turn, so the notice drops its page gutter. */
+.my-turn .error-notice {
+  margin: 4px 0 6px;
+}
+
+/* ---- Chat list ------------------------------------------------------- */
+
+.chat-section__title {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-1);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0 8px 16px;
+  list-style: none;
+}
+
+.chat-row {
+  position: relative;
+}
+
+/* The row's ⋯ menu shows on hover or focus, and stays while its list is open. */
+.chat-row__menu {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  opacity: 0;
+}
+
+.chat-row:hover .chat-row__menu,
+.chat-row:focus-within .chat-row__menu,
+.chat-row__menu:has([data-state="open"]) {
+  opacity: 1;
+}
+
+.chat-row__error {
+  margin: 0;
+  padding: 2px 10px;
+  font-size: var(--fs-caption);
+  color: var(--color-danger-text);
+}
+
+.chat-row__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 8px 6px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.chat-row__link:hover {
+  background: var(--color-raised);
+}
+
+/* The open chat: a soft fill, no outline (redesign P2). */
+.chat-row__link.active {
+  background: var(--color-accent-tint);
+}
+
+.chat-row--attention .chat-row__link {
+  background: var(--color-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--color-accent-edge);
+}
+
+.chat-row__link .avatar-wrap {
+  flex: none;
+}
+
+.chat-row__room {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-lead);
+}
+
+.chat-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.chat-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-row__name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-row__time {
+  flex: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-row__preview,
+.chat-row__status {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-row__preview--empty {
+  color: var(--color-text-faint);
+}
+
+/* The preview or status line, and the unread dot at its end. */
+.chat-row__bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.chat-row__bottom > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-row__unread {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+}
+
+.chat-row--unread .chat-row__name,
+.chat-row--unread .chat-row__preview {
+  color: var(--color-text);
+}
+
+/* The working line carries its status's own color (tokens.css). */
+.chat-row__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-accent-strong);
+}
+
+.chat-row__status > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-row__status .working-dots,
+.chat-row__status .working-timer {
+  flex: none;
+}
+
+.chat-row__status--asking_you {
+  color: var(--color-warn);
+}
+
+.chat-row__status--stuck {
+  color: var(--color-danger);
+}
+
+.chat-row__status--sign_in {
+  color: var(--status-sign-in);
+}
+
+.chat-list__empty {
+  margin: 0;
+  padding: 12px 20px;
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+}
+
+/* ---- Working indicator (adapted from OpenMausBot) --------------------- */
+
+.working-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.working-dots__dot {
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  animation: roost-status-pulse 1.2s steps(3, end) infinite;
+}
+
+.working-timer {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes roost-status-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .working-dots__dot {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/* One row, always: folded it is the model's name and a chevron; opened, "Try it" joins the same row. */
+.model-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 16px 8px;
+  padding: 2px 2px 2px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-raised);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.model-banner--folded {
+  background: none;
+}
+
+.model-banner__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+}
+
+.model-banner__try {
+  padding: 0 4px;
+  color: var(--color-accent);
+  font-weight: 600;
+}

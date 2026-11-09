@@ -1,0 +1,363 @@
+/* The Workspace (app restructure, R2): the bar with Tasks · Notes · Calendar and the "Add or find anything…" pill
+   (at the top on a desktop, the bottom bar on a phone), the Tasks tabs and project chips, and the project pills. */
+
+.workspace-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: var(--board-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--gutter) 0;
+}
+
+.workspace-bar .seg {
+  flex: none;
+}
+
+.find-pill {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.find-pill__box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-lg);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  box-shadow: var(--edge-inner);
+}
+
+.find-pill__box:focus-within {
+  border-color: var(--color-accent-edge);
+  box-shadow: var(--focus-ring);
+}
+
+.find-pill__glyph {
+  display: inline-flex;
+  color: var(--color-text-faint);
+}
+
+.find-pill__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  outline: none;
+}
+
+.find-pill__input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.find-pill__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+}
+
+.find-pill__chips:empty {
+  display: none;
+}
+
+.workspace-panel {
+  padding-top: var(--space-4);
+}
+
+/* Tasks: Today · Inbox · Upcoming as quiet tabs, More beside them */
+.ws-tasks-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.ws-views {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.ws-view {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ws-view:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.ws-view.is-current {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.ws-view:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.ws-views__more .icon-btn {
+  width: auto;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-body);
+  color: var(--color-text-secondary);
+}
+
+.ws-views__more.is-current .icon-btn {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+/* The project chips: one scrolling row, the menu at its end */
+.ws-chips {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ws-chips__row {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ws-chips__row .chip {
+  flex: none;
+  gap: var(--space-2);
+}
+
+.ws-chips__row .project-dot {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+}
+
+/* A row's project: a pill that opens the project's page */
+.project-pill {
+  justify-content: flex-start;
+  max-width: 100%;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
+a.project-pill:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+a.project-pill:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+/* Move to…: a list of projects */
+.move-to {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.move-to__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.move-to__item:hover {
+  background: var(--color-hover);
+}
+
+.move-to__item.is-current {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+.move-to__item .project-dot {
+  margin: 0;
+}
+
+/* Notes: one tree of notes and documents, a folder per project with its count */
+.ntree {
+  max-width: 760px;
+}
+
+.ntree__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.ntree__title {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 600;
+}
+
+.ntree__list,
+.ntree__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ntree__items {
+  padding-left: var(--space-6);
+}
+
+.ntree__fold,
+.ntree__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ntree__fold {
+  font-weight: 600;
+}
+
+.ntree__fold:hover,
+.ntree__item:hover {
+  background: var(--color-hover);
+}
+
+.ntree__fold:focus-visible,
+.ntree__item:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.ntree__chevron {
+  display: inline-flex;
+  color: var(--color-text-faint);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.ntree__fold.is-open .ntree__chevron {
+  transform: rotate(90deg);
+}
+
+.ntree__dot {
+  width: 8px;
+  height: 8px;
+  margin: 0;
+}
+
+.ntree__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ntree__count {
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  font-weight: 400;
+}
+
+.ntree__icon {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+/* A project's page: its Tasks, then its Money, each under a quiet title with its count */
+.project-section {
+  margin-top: var(--space-6);
+}
+
+.project-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.project-section__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-heading);
+  font-weight: 600;
+}
+
+/* A phone: the bar is the bottom bar, the pill beside the three sections; the page leaves room for it. */
+@media (max-width: 768px) {
+  .workspace .board-scroll {
+    padding-bottom: calc(var(--control-lg) * 2 + var(--space-8));
+  }
+
+  .workspace-bar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 20;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    max-width: none;
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .find-pill {
+    flex: 1 1 auto;
+    flex-direction: column-reverse;
+  }
+}

@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Lens Bots v6</title>
+<meta name="description" content="Round six of Roost's bot avatars: soft, rounded bodies with expressive camera-lens eyes, in four directions, with a playground and in-context views.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost avatars, round six: soft bodies, lens eyes. Self-contained: no
+   fonts, images or scripts from anywhere else. Dark only (V4). The :root
+   values are copied from web/src/styles/tokens.css and round two's cozy kit.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-accent-soft: #c4b5fd;
+  --color-danger: #f87171;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px #b2a6f6;
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-fs-menu: 0.8125rem;
+  --new-gap: 4px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5; overflow-x: hidden;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: 0.8em; color: var(--color-accent-soft); word-break: break-word; }
+.lede { color: var(--color-text-secondary); max-width: 74ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 74ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-top: 22px; align-items: flex-end; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--color-panel); border-radius: 14px; padding: 14px; box-shadow: var(--new-edge-inner); display: grid; gap: 6px; align-content: start; }
+.rule b { font-family: var(--font-round); }
+.rule p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.rule .no { color: var(--color-danger); font-weight: 600; }
+
+/* ---- Playground ---- */
+.pg { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+@media (max-width: 900px) { .pg { grid-template-columns: minmax(0, 1fr); padding: 14px; } }
+.pg-controls { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.pg-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { font: inherit; font-size: var(--fs-label); font-weight: 600; min-height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip:hover { background: #26262f; }
+.chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.chip[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.chip.ev { background: var(--color-bg); }
+.chip.ev:hover { background: var(--color-raised); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, 40px); gap: var(--new-gap); }
+.tile { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.tile:hover { background: var(--new-hover); }
+.tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tile[aria-pressed="true"] { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-dot { width: 22px; height: 22px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.sw-dot:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.sw-dot[aria-pressed="true"] { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--color-panel), 0 0 0 3.5px var(--color-text); }
+.pg-stage { background: var(--color-bg); border-radius: 14px; padding: 28px 12px 20px; display: grid; justify-items: center; align-content: center; gap: 22px; min-height: 420px; min-width: 0; }
+.pg-stage .neighbours { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.pg-stage small { color: var(--color-text-faint); font-size: var(--fs-caption); text-align: center; }
+.sw { display: inline-flex; align-items: center; gap: 10px; font: inherit; font-size: var(--fs-label); color: var(--color-text); background: none; border: 0; padding: 0; cursor: pointer; }
+.sw:focus-visible { outline: none; border-radius: 999px; box-shadow: var(--focus-ring); }
+.sw i { width: 34px; height: 20px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); position: relative; transition: background .2s; flex: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--color-text); transition: transform .2s; }
+.sw[aria-checked="true"] i { background: var(--new-accent); }
+.sw[aria-checked="true"] i::after { transform: translateX(14px); }
+.hint { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.evgroups { display: grid; gap: 8px; }
+.evgroup { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px; align-items: start; }
+.evgroup h4 { padding-top: 8px; }
+
+/* ---- Direction cards ---- */
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 18px; }
+@media (max-width: 640px) { .dir { padding: 14px; } }
+.dir-head { display: grid; gap: 6px; }
+.dir-head p { color: var(--color-text-secondary); max-width: 78ch; }
+.dir-head .tag { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--new-accent-strong); letter-spacing: .06em; text-transform: uppercase; }
+.blocks { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.blk { grid-column: span 6; background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.blk.full { grid-column: 1 / -1; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.grid10 { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 12px 8px; }
+.cell { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.cell > small { font-size: var(--fs-caption); color: var(--color-text-faint); text-align: center; }
+.sizes { display: flex; gap: 8px; align-items: flex-end; }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+@media (max-width: 860px) { .blk { grid-column: 1 / -1; } }
+
+/* ---- In context (cozy kit) ---- */
+.kit-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .kit-row { grid-template-columns: minmax(0, 1fr); } }
+.kit-slot { background: var(--color-panel); border-radius: 14px; padding: 16px; display: grid; gap: 10px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; box-shadow: var(--new-edge-inner); }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { flex: 1; height: 26px; padding: 0 8px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-secondary); font-weight: 600; white-space: nowrap; }
+.cz-tab.on { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-pop { width: 300px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: grid; grid-template-columns: repeat(5, 40px); gap: var(--new-gap); }
+.cz-tile { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; }
+.cz-tile.on { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-side { width: 268px; max-width: 100%; background: var(--color-bg); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { display: grid; justify-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; text-align: center; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin b { font-weight: 600; color: var(--color-text); display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cz-pin small { color: var(--color-text-faint); font-size: 0.6875rem; display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cz-pin .unread { position: absolute; top: 8px; right: 12px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 320px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-bg); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); width: max-content; max-width: 100%; }
+.cz-status .dot, .cz-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--new-accent-strong); display: inline-block; }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+.cz-bar { width: 420px; max-width: 100%; height: 48px; padding: 0 10px 0 8px; border-radius: var(--new-radius-surface); background: var(--color-bg); box-shadow: var(--new-edge-inner); display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cz-pill { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-weight: 600; min-width: 0; }
+.cz-pill small { color: var(--color-text-faint); font-weight: 500; font-size: var(--fs-caption); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.cz-bar .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+@media (max-width: 480px) { .cz-bar .acts .cz-btn:not(.icon) { display: none; } }
+.cz-setting { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--new-radius-item); background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 440px; }
+.cz-setting div { flex: 1; min-width: 0; }
+.cz-setting b { display: block; }
+.cz-setting small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+
+/* ---- Notes ---- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 520px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td .bot { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 78ch; }
+.verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.verdict { background: var(--color-bg); border-radius: 12px; padding: 12px; display: grid; gap: 4px; align-content: start; font-size: var(--fs-label); color: var(--color-text-secondary); }
+.verdict b { color: var(--color-text); font-family: var(--font-round); font-size: var(--fs-body); }
+.verdict.pick { box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------------------------------------------------------------------
+   The avatar: one stateful SVG on a 48-unit grid.
+   data-dir   peep · lens · bean · perch      data-s  rest · onit · ask · stuck · off
+   data-face  open · wide · focus · narrow · sad · happy · closed
+   .live      32 px and up: follows the pointer and plays every motion. Smaller: blinks only.
+   .ev-*      an event in flight (a class for its length).
+   Groups, outside in: pose (status posture) · float (idle loop) · evt (events) ·
+   lean (pointer lean) · tilter (the face or the head: curious tilt, droop).
+   An eye is drawn at radius 10 and scaled into place, so every lid number
+   below is in eye units: lid at -10.8 is open, 0 is shut.
+   --ex/--ey/--lx/--lr/--dtx come from the shared pointer loop (see the script).
+   --------------------------------------------------------------------- */
+.bot { display: block; overflow: visible; flex: none; }
+.bot.live { cursor: pointer; }
+.bot.live:focus-visible { outline: none; border-radius: 50%; box-shadow: var(--focus-ring); }
+.pose, .float, .evt, .lean { transform-box: view-box; transform-origin: 24px var(--oy, 43px); }
+.pose { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .5s; }
+.lean { transform: translate(calc(var(--lx, 0) * 1px), 0) rotate(calc(var(--lr, 0) * 1deg)) scale(var(--hs, 1)); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.bot.live:hover .lean { --hs: 1.035; }
+.tilter { transform-box: fill-box; transform-origin: 50% 70%; transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); transition: transform .55s cubic-bezier(.3, 1.35, .45, 1); }
+.head.tilter { transform-origin: 50% 100%; }
+.strip { transform-box: fill-box; transform-origin: 50% 50%; transform: translate(calc(var(--ex, 0) * 1.5px), calc(var(--ey, 0) * .5px)) rotate(calc(var(--ex, 0) * 2.6deg)); transition: transform .2s cubic-bezier(.3, .8, .3, 1); }
+.shadow, .pulse, .hover-glow { transform-box: fill-box; transform-origin: center; }
+.pulse { opacity: 0; }
+.body { transition: filter .9s; }
+.bot[data-s="off"] .body { filter: saturate(.35) brightness(.78); }
+
+/* Lens parts, in eye units */
+.lens, .iris, .ring, .hl { transform-box: fill-box; transform-origin: 50% 50%; }
+.lens { transform: scale(var(--lz, 1)); transition: transform .4s cubic-bezier(.3, 1.3, .4, 1); }
+.iris { transform: scale(var(--is, 1)); transition: transform .5s cubic-bezier(.3, 1.45, .4, 1), opacity .9s; }
+.look { transform: translate(calc(var(--ex, 0) * var(--pk, 2.2) * 1px), calc((var(--ey, 0) * var(--pk, 2.2) + var(--ly, 0)) * 1px)); transition: transform .14s linear; }
+.bot[data-dir="bean"] { --pk: 1.3; }
+.lt, .bt { transform-box: fill-box; transform-origin: 50% 100%; }
+.lb, .bb { transform-box: fill-box; transform-origin: 50% 0%; }
+.lt { transform: translateY(calc(var(--lt, -10.8) * 1px)) rotate(calc(var(--side, 1) * var(--la, 0) * 1deg)); transition: transform .34s cubic-bezier(.3, .9, .3, 1.1); }
+.lb { transform: translateY(calc(var(--lbt, 10.8) * 1px)) rotate(calc(var(--side, 1) * var(--lba, 0) * -1deg)); transition: transform .34s cubic-bezier(.3, .9, .3, 1.1); }
+.scan { opacity: 0; }
+.bot[data-s="off"] .iris { opacity: .22; }
+.bot[data-s="off"] .hl { opacity: .45; }
+
+/* Faces: lid and iris numbers. The ask tilt squints one eye: curiosity. */
+.bot[data-face="wide"] { --lt: -12.6; --lbt: 12.6; --lz: 1.07; --is: 1.16; }
+.bot[data-face="focus"] { --lt: -7.6; --lbt: 9.4; --is: .8; }
+.bot[data-face="narrow"] { --lt: -4.6; --lbt: 6.6; --is: .6; }
+.bot[data-face="sad"] { --lt: -5.4; --la: 17; --lbt: 9.6; --is: .72; --ly: 2.4; }
+.bot[data-face="happy"] { --lt: -8.4; --la: -6; --lbt: 4.4; --lba: 13; --is: .92; }
+.bot[data-face="closed"] { --lt: .4; --lbt: -.4; --is: .3; }
+.bot[data-s="ask"][data-face="wide"] .e-r { --lt: -7.6; --lz: .96; }
+.bot[data-face="sad"] .lt, .bot[data-face="closed"] .lt, .bot[data-face="closed"] .lb { transition-duration: 1.2s; }
+.bot[data-s="ask"] { --ft: -8deg; }
+.bot[data-s="stuck"] { --ft: 4deg; --fy: .9px; }
+.bot[data-s="onit"] { --fy: .5px; }
+.bot[data-s="off"] { --fy: 1.2px; }
+.bot[data-s="stuck"] .pose { transform: translateY(1.2px) rotate(-2.5deg) scale(1.02, .97); }
+.bot[data-s="off"] .pose { transform: translateY(1.6px) scale(1.02, .97); }
+.bot[data-s="ask"] .pose { transform: translateY(-.8px); }
+
+/* The beacon: a tiny LED that carries the status. */
+.beacon { fill: var(--bc, transparent); opacity: var(--bo, 0); transition: fill .4s, opacity .4s; }
+.bot[data-s="rest"] { --bc: var(--tint); --bo: .35; }
+.bot[data-s="onit"] { --bc: var(--tint); --bo: 1; }
+.bot[data-s="ask"] { --bc: #ffffff; --bo: .95; }
+.bot[data-s="stuck"] { --bc: #f5b04a; --bo: 1; }
+.bot[data-s="off"] { --bc: #f2827a; --bo: .4; }
+
+/* Blinks: everywhere, at every size, calm or not. */
+.bt { animation: blinkT var(--blink-dur, 5.8s) ease-in-out var(--blink-delay, 0s) infinite; }
+.bb { animation: blinkB var(--blink-dur, 5.8s) ease-in-out var(--blink-delay, 0s) infinite; }
+.bot[data-face="closed"] :is(.bt, .bb), .bot[data-face="narrow"] :is(.bt, .bb) { animation: none; }
+html.calm .bt, html.calm .bb { animation-duration: 9s; }
+html.calm .bot * { transition: none !important; }
+.bot.offscreen * { animation-play-state: paused !important; }
+.bot.gone { visibility: hidden; }
+@keyframes blinkT { 0%, 93%, 100% { transform: translateY(0); } 95.5% { transform: translateY(10.9px); } }
+@keyframes blinkB { 0%, 93%, 100% { transform: translateY(0); } 95.5% { transform: translateY(-10.9px); } }
+
+/* Status loops: live bots only, never when calm. */
+html:not(.calm) .bot.live[data-s="rest"] .float { animation: breathe 4.8s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="off"] .float { animation: breathe 9s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-dir="bean"]:is([data-s="rest"], [data-s="ask"]) .float { animation: hover 4.2s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-dir="bean"]:is([data-s="rest"], [data-s="ask"]) .shadow { animation: hoverShadow 4.2s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-dir="perch"][data-s="rest"] .bob { animation: headBob 3.8s ease-in-out var(--idle-delay, 0s) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .float { animation: workBob 1.2s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-dir="perch"][data-s="onit"] .bob { animation: busyNod 1.2s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .ring { animation: whirr 2.4s steps(8, end) infinite; }
+html:not(.calm) .bot.live[data-s="onit"] .beacon { animation: led 1.2s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="ask"]:not([data-dir="bean"]) .float { animation: ahem 2.8s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="ask"] .beacon { animation: led 2.2s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .float { animation: sigh 5.6s ease-in-out infinite; }
+html:not(.calm) .bot.live[data-s="stuck"] .beacon { animation: led 3s steps(2, jump-none) infinite; }
+html:not(.calm) .bot.live[data-s="off"] .beacon { animation: led 6s ease-in-out infinite; }
+
+/* Events */
+html:not(.calm) .bot.live.ev-notice .lens { animation: zoomIn .95s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-notice .iris { animation: dilate .95s cubic-bezier(.3, 1.3, .4, 1); }
+html:not(.calm) .bot.live.ev-notice .ring { animation: focusTick .95s steps(6, end); }
+html:not(.calm) .bot.live.ev-dbl .dtg { animation: dblLook 1.05s cubic-bezier(.3, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-dbl .evt { animation: dblBody 1.05s cubic-bezier(.3, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-dbl .lens { animation: zoomIn .6s cubic-bezier(.2, .8, .2, 1) .42s; }
+html:not(.calm) .bot.live.ev-around .dtg { animation: lookAround 1.75s ease-in-out; }
+html:not(.calm) .bot.live.ev-dblblink .bt { animation: dblBlinkT .75s ease-in-out; }
+html:not(.calm) .bot.live.ev-dblblink .bb { animation: dblBlinkB .75s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .lens { animation: zoomIn 1.8s ease-in-out; }
+html:not(.calm) .bot.live.ev-camera .scan { animation: sweep 1.1s ease-in-out .3s; }
+html:not(.calm) .bot.live.ev-tilt .tilter { animation: curious 2.55s cubic-bezier(.3, 1.2, .4, 1); }
+html:not(.calm) .bot.live.ev-tilt .e-r .bt { animation: squint 2.55s ease-in-out; }
+html:not(.calm) .bot.live.ev-tilt .e-l .lens { animation: zoomHold 2.55s ease-in-out; }
+html:not(.calm) .bot.live.ev-whirr .ring { animation: focusTick 1.3s steps(10, end); }
+html:not(.calm) .bot.live.ev-whirr .iris { animation: refocus 1.3s ease-in-out; }
+html:not(.calm) .bot.live.ev-whirr .evt { animation: buzz .32s linear 2; }
+html:not(.calm) .bot.live.ev-think .ring { animation: whirr 1.2s steps(8, end) infinite; }
+html:not(.calm) .bot.live.ev-think .scan { animation: sweep 1.35s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-think .dtg { animation: scanLook 2.7s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-think .iris { animation: focusPulse 1.35s ease-in-out infinite; }
+html:not(.calm) .bot.live.ev-created .evt { animation: excite 1.45s cubic-bezier(.3, .7, .3, 1); }
+html:not(.calm) .bot.live.ev-created .pulse { animation: pulseOut 1s ease-out .1s; }
+html:not(.calm) .bot.live.ev-created .iris { animation: dilate 1s cubic-bezier(.3, 1.3, .4, 1) .1s; }
+html:not(.calm) .bot.live.ev-done .bt { animation: slowBlinkT 1.7s ease-in-out; }
+html:not(.calm) .bot.live.ev-done .bb { animation: slowBlinkB 1.7s ease-in-out; }
+html:not(.calm) .bot.live.ev-done .evt { animation: nod 1.7s cubic-bezier(.3, .7, .2, 1); }
+html:not(.calm) .bot.live.ev-msg .evt { animation: perk .8s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-msg .lens { animation: zoomIn .8s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.ev-stuck .evt { animation: slump 3.3s cubic-bezier(.4, 0, .3, 1); }
+html:not(.calm) .bot.live.ev-stuck .tilter { animation: droop 3.3s cubic-bezier(.4, 0, .3, 1); }
+html:not(.calm) .bot.live.ev-power :is(.lt, .lb) { transition-duration: 2s; transition-delay: .5s; }
+html:not(.calm) .bot.live.ev-power .pose { transition-duration: 2.4s; }
+html:not(.calm) .bot.live.ev-power .tilter { transition-duration: 2.2s; transition-timing-function: cubic-bezier(.4, 0, .3, 1); }
+html:not(.calm) .bot.live.ev-power .iris { animation: powerDown 2.2s ease-in both; }
+html:not(.calm) .bot.live.ev-power .beacon { animation: flicker 2.2s steps(1, end) both; }
+html:not(.calm) .bot.live.ev-boot .iris { animation: bootUp 1.2s ease-out; }
+html:not(.calm) .bot.live.ev-boot .lens { animation: zoomIn 1.2s ease-out .2s; }
+html:not(.calm) .bot.live.ev-hello .evt { animation: helloPop 1.35s cubic-bezier(.3, .8, .3, 1); }
+html:not(.calm) .bot.live.ev-hello .bt { animation: helloOpenT 1.35s ease-out; }
+html:not(.calm) .bot.live.ev-hello .bb { animation: helloOpenB 1.35s ease-out; }
+html:not(.calm) .bot.live.ev-hello .tilter { animation: waggle 1.35s ease-in-out; }
+html:not(.calm) .bot.live.ev-bye .evt { animation: byeSink .8s cubic-bezier(.5, 0, .7, .4) both; }
+html:not(.calm) .bot.live.ev-bye .bt { animation: byeCloseT .8s ease-in both; }
+html:not(.calm) .bot.live.ev-bye .bb { animation: byeCloseB .8s ease-in both; }
+html:not(.calm) .bot.live.ev-bye .tilter { animation: byeTilt .8s ease-in-out both; }
+html:not(.calm) .bot.live.poked .evt { animation: squash .75s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.poked .lens { animation: zoomIn .75s cubic-bezier(.2, .8, .2, 1); }
+html:not(.calm) .bot.live.poked .dtg { animation: dart .75s ease-out; }
+html:not(.calm) .bot.live.poked .ring { animation: focusTick .75s steps(5, end); }
+
+@keyframes breathe { 0%, 100% { transform: none; } 50% { transform: scale(1.012, .985); } }
+@keyframes hover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.7px); } }
+@keyframes hoverShadow { 0%, 100% { transform: scale(1); opacity: .38; } 50% { transform: scale(.82); opacity: .24; } }
+@keyframes headBob { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-.7px) rotate(.8deg); } 65% { transform: translateY(-.2px) rotate(-.6deg); } }
+@keyframes busyNod { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(.7px) rotate(-.6deg); } }
+@keyframes workBob { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-.55px); } }
+@keyframes ahem { 0%, 68%, 100% { transform: none; } 76% { transform: translateY(-1.8px) scale(.98, 1.03); } 85% { transform: scale(1.03, .97); } 92% { transform: none; } }
+@keyframes sigh { 0%, 100% { transform: none; } 38% { transform: translateY(-.7px) scale(.99, 1.025); } 58% { transform: translateY(.3px) scale(1.02, .97); } }
+@keyframes led { 0%, 100% { opacity: var(--bo); } 50% { opacity: calc(var(--bo) * .3); } }
+@keyframes whirr { to { transform: rotate(360deg); } }
+@keyframes focusTick { to { transform: rotate(150deg); } }
+@keyframes zoomIn { 0%, 100% { transform: scale(var(--lz, 1)); } 28% { transform: scale(1.16); } 55% { transform: scale(1.05); } 74% { transform: scale(1.09); } }
+@keyframes zoomHold { 0%, 100% { transform: scale(1); } 20%, 75% { transform: scale(1.1); } }
+@keyframes dilate { 0%, 100% { transform: scale(var(--is, 1)); } 30% { transform: scale(1.36); } 60% { transform: scale(1.12); } }
+@keyframes refocus { 0%, 100% { transform: scale(var(--is, 1)); } 30% { transform: scale(.7); } 65% { transform: scale(1.14); } }
+@keyframes focusPulse { 0%, 100% { transform: scale(.6); } 50% { transform: scale(.52); } }
+@keyframes dblLook { 0% { transform: none; } 16%, 40% { transform: translateX(calc(var(--dtx, 1) * -3.4px)); } 50% { transform: translateX(calc(var(--dtx, 1) * 1.4px)); } 66%, 100% { transform: none; } }
+@keyframes dblBody { 0%, 42% { transform: none; } 52% { transform: translateY(-1.3px) rotate(calc(var(--dtx, 1) * -3deg)) scale(.98, 1.03); } 72% { transform: scale(1.01, .99); } 100% { transform: none; } }
+@keyframes lookAround { 0%, 100% { transform: none; } 18%, 40% { transform: translateX(-3.2px); } 58%, 80% { transform: translateX(3.2px) translateY(-.6px); } }
+@keyframes scanLook { 0%, 100% { transform: translateX(-2.6px); } 50% { transform: translateX(2.6px); } }
+@keyframes dart { 0%, 100% { transform: none; } 18% { transform: translateY(-2.4px); } }
+@keyframes dblBlinkT { 0%, 100% { transform: none; } 15%, 22% { transform: translateY(10.9px); } 38% { transform: none; } 55%, 62% { transform: translateY(10.9px); } 78% { transform: none; } }
+@keyframes dblBlinkB { 0%, 100% { transform: none; } 15%, 22% { transform: translateY(-10.9px); } 38% { transform: none; } 55%, 62% { transform: translateY(-10.9px); } 78% { transform: none; } }
+@keyframes slowBlinkT { 0%, 100% { transform: none; } 30%, 52% { transform: translateY(10.9px); } 80% { transform: none; } }
+@keyframes slowBlinkB { 0%, 100% { transform: none; } 30%, 52% { transform: translateY(-10.9px); } 80% { transform: none; } }
+@keyframes squint { 0%, 100% { transform: none; } 20%, 72% { transform: translateY(4.2px); } }
+@keyframes sweep { 0% { transform: translateX(-16px) rotate(24deg); opacity: 0; } 20% { opacity: .55; } 80% { opacity: .55; } 100% { transform: translateX(16px) rotate(24deg); opacity: 0; } }
+@keyframes curious { 0%, 100% { transform: translateY(var(--fy, 0px)) rotate(var(--ft, 0deg)); } 22%, 70% { transform: translateY(-.4px) rotate(11deg); } 84% { transform: rotate(-2.5deg); } }
+@keyframes buzz { 0%, 100% { transform: none; } 25% { transform: translateX(.22px); } 75% { transform: translateX(-.22px); } }
+@keyframes excite { 0% { transform: none; } 10% { transform: scale(1.14, .84); } 26% { transform: translateY(-5.2px) scale(.9, 1.1); } 42% { transform: scale(1.12, .86); } 56% { transform: translateY(-2.2px) scale(.96, 1.04); } 68% { transform: scale(1.05, .95); } 80% { transform: scale(.99, 1.01); } 100% { transform: none; } }
+@keyframes pulseOut { 0% { opacity: .75; transform: scale(.92); } 100% { opacity: 0; transform: scale(1.4); } }
+@keyframes nod { 0%, 100% { transform: none; } 28% { transform: translateY(.6px) rotate(-2deg); } 52% { transform: translateY(1px) scale(1.01, .985); } 74% { transform: translateY(-.4px); } }
+@keyframes perk { 0%, 100% { transform: none; } 30% { transform: translateY(-1.6px) scale(.98, 1.03); } 60% { transform: scale(1.02, .98); } }
+@keyframes slump { 0% { transform: none; } 32% { transform: translateY(1.7px) rotate(-4deg) scale(1.03, .95); } 55% { transform: translateY(.7px) rotate(-3deg) scale(1, 1.01); } 72%, 92% { transform: translateY(1.8px) rotate(-4deg) scale(1.03, .95); } 100% { transform: translateY(.6px) rotate(-1deg); } }
+@keyframes droop { 0%, 100% { transform: none; } 30%, 90% { transform: translateY(1px) rotate(5deg); } }
+@keyframes powerDown { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(.55); opacity: .9; } 42% { opacity: .2; } 48% { opacity: .85; } 56% { opacity: .15; } 100% { transform: scale(.3); opacity: .22; } }
+@keyframes flicker { 0% { opacity: 1; } 40% { opacity: .1; } 48% { opacity: .9; } 56% { opacity: .1; } 100% { opacity: .4; } }
+@keyframes bootUp { 0% { transform: scale(.3); opacity: .2; } 18% { opacity: 1; } 28% { opacity: .3; } 40% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(var(--is, 1)); opacity: 1; } }
+@keyframes helloPop { 0% { transform: translateY(6px) scale(.3); opacity: 0; } 42% { transform: translateY(-1.6px) scale(1.07, 1.03); opacity: 1; } 62% { transform: scale(.97, 1.02); } 100% { transform: none; } }
+@keyframes helloOpenT { 0%, 45% { transform: translateY(10.9px); } 70%, 100% { transform: none; } }
+@keyframes helloOpenB { 0%, 45% { transform: translateY(-10.9px); } 70%, 100% { transform: none; } }
+@keyframes waggle { 0%, 55%, 100% { transform: none; } 68% { transform: rotate(9deg); } 84% { transform: rotate(-5deg); } }
+@keyframes byeTilt { 0% { transform: none; } 40%, 100% { transform: rotate(-9deg); } }
+@keyframes byeCloseT { 0%, 30% { transform: none; } 60%, 100% { transform: translateY(10.9px); } }
+@keyframes byeCloseB { 0%, 30% { transform: none; } 60%, 100% { transform: translateY(-10.9px); } }
+@keyframes byeSink { 0% { transform: none; } 40% { transform: translateY(-1.2px) scale(1.02); opacity: 1; } 100% { transform: translateY(7px) scale(.25); opacity: 0; } }
+@keyframes squash { 0%, 100% { transform: none; } 14% { transform: scale(1.15, .84); } 38% { transform: translateY(-1.2px) scale(.94, 1.08); } 62% { transform: scale(1.03, .98); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="glass" cx=".42" cy=".36" r=".7"><stop offset="0" stop-color="#252a40"/><stop offset=".6" stop-color="#11131f"/><stop offset="1" stop-color="#06070c"/></radialGradient>
+    <linearGradient id="visorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2232"/><stop offset="1" stop-color="#0b0c14"/></linearGradient>
+    <linearGradient id="picSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6b37f"/><stop offset=".55" stop-color="#e98a8f"/><stop offset="1" stop-color="#7d6bb8"/></linearGradient>
+    <clipPath id="lensClip" clipPathUnits="userSpaceOnUse"><circle r="10.15"/></clipPath>
+  </defs>
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3.2 7.5a5 5 0 1 1 1.4 3.9"/><path d="M3 4v3.6h3.6"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 16 16"><path d="M8 2.6c3 0 5 2.3 5 5.4 0 3-2.1 5.4-5 5.4S3 11 3 8c0-3.1 2-5.4 5-5.4z"/><path d="M6.2 7.4h.01M9.8 7.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+  <symbol id="i-back" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost avatars, round six: soft bodies, lens eyes</h1>
+    <p class="lede">A soft, squeezable body you could hold in one hand, and a pair of camera lenses that do all the feeling. The bodies stay simple: smooth, rounded, no limbs and no mouth. The machine soul lives in the lenses: irises that dilate and focus with a mechanical tick, shutters that close at an angle, a face that tilts and a body that squashes. Four directions below, ten silhouettes each. Move your pointer: every bot looks your way, and one you come close to zooms its lenses on you. The app does not change until a direction is picked.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="Two bots from each direction"></div>
+  </header>
+
+  <section class="section" aria-labelledby="secR">
+    <h2 id="secR">The design language, and what we stay away from</h2>
+    <div class="rules">
+      <div class="rule"><b>Soft body, lens soul</b><p>Every body is one smooth closed curve (a superellipse with a few gentle dents or bumps), shaded like matte vinyl. The face is two camera lenses: a dark glass, a coloured iris with a focus ring, a pupil and a hard highlight. Feeling comes from shutters, irises, tilt and squash, never from a mouth.</p></div>
+      <div class="rule"><b>Cinematic, not anime</b><p>Motion with weight: anticipation, overshoot, settle. Light, not symbols. <span class="no">No</span> sweat drops, <span class="no">no</span> sparkle eyes, <span class="no">no</span> blush, <span class="no">no</span> ^^ eyes, <span class="no">no</span> "?" or "z" glyphs. A status is a posture plus a tiny LED.</p></div>
+      <div class="rule"><b>Clean room</b><p><span class="no">No</span> binocular head on a neck, <span class="no">no</span> egg body with glowing LED eyes, <span class="no">no</span> film-robot look-alike of any kind. <span class="no">No</span> irregular blob with two vertical pill eyes. Our eyes are round lenses with shutters and irises; our bodies are regular, symmetric curves.</p></div>
+      <div class="rule"><b>Small stays still</b><p>Under 32 px a bot only blinks. <code>prefers-reduced-motion</code> and the Calm robots setting leave only slow blinks everywhere. One shared frame loop moves the eyes and pauses when the tab is hidden or a bot is off screen.</p></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secP">
+    <h2 id="secP">Playground <small>pick · then press an animation</small></h2>
+    <p>Pick a direction, a shape, a colour and a status, then press any animation. The big bot and its four neighbours each follow your pointer on their own: come close and their lenses zoom; pass fast and the nearest one does a double-take. Hover to make one lean in, click to poke it. Random life plays the idle variety by itself.</p>
+    <div class="pg" id="pg">
+      <div class="pg-controls" id="pgControls"></div>
+      <div class="pg-stage" id="pgStage"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secD">
+    <h2 id="secD">The four directions <small>shapes · colours · statuses · star · picture</small></h2>
+    <p>For each: ten silhouettes at the picker's 56 px, six colours at 96, 40 and 24 px, the five statuses at 72, 40 and 24 px, the main bot's star, and an uploaded picture inside the shape, with and without its lenses.</p>
+    <div id="dirs" style="display:grid;gap:24px"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">In context <small>sidebar · hero · chat · avatar card</small></h2>
+    <p>The cozy-kit pieces the bots live in: pinned tiles (3 per row, 64 px, with names), the Profile's panel hero, the chat header pill, and the avatar card. Switch the direction to compare.</p>
+    <div class="pg-row" id="ctxDirs"></div>
+    <div class="kit-row" id="kit"></div>
+  </section>
+
+  <section class="section" aria-labelledby="secAcc">
+    <h2 id="secAcc">Performance and accessibility</h2>
+    <p>One shared <code>requestAnimationFrame</code> loop owns the pointer and every live bot. It reads the pointer once per frame, caches each bot's box until scroll or resize, and only touches bots an <code>IntersectionObserver</code> reports on screen (the others get their CSS animations paused). It stops when the tab is hidden, when nothing moves, and when motion is turned down. Per frame it writes four CSS variables (<code>--ex</code>, <code>--ey</code> for the lenses, <code>--lx</code>, <code>--lr</code> for the lean); every other motion is a CSS animation on a class or an attribute. Every bot is one <code>role="img"</code> with its name and status; the LED, the pulse ring and the glint are decoration.</p>
+    <div class="cz-setting cz"><div><b>Calm robots</b><small>Bots keep still: no following, no idle life, no events. They only blink, slowly.</small></div><button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i><span class="hint">Calm</span></button></div>
+  </section>
+
+  <section class="section" aria-labelledby="secRec">
+    <h2 id="secRec">Recommendation <small>which direction and why</small></h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Pick Peeper.</b> It is the closest to what you love about soft avatars (one calm, squeezable silhouette with a small, simple face) while giving the lenses the most room to act. Two separate porthole lenses, each with its own shutter, can do every emotion on the list by themselves: the shutters slope for sad, rise from below for a satisfied squint, part wide for a startle, and close one at a time for a curious squint, while the irises dilate on notice and narrow to focus. Nothing sits between the eyes, so it reads at 24 px as "two lenses on a pebble", which no other product's avatar looks like.</p>
+      <div class="verdicts" id="verdicts"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="secMap">
+    <h2 id="secMap">How this maps to code</h2>
+    <div class="reco" style="border-color:var(--color-border)">
+      <p><b>It plugs into the robot engine we already have</b> (<code>web/src/components/robot/</code>): SVG plus CSS animations, no new dependency, no new loop.</p>
+      <div class="map">
+        <div><code>lookAt.ts · useLookAt.ts</code><p>Unchanged in shape: the one module-level loop still writes <code>--ex/--ey/--lx/--lr</code>, caches boxes, pauses off screen and when hidden, fires the double-take, the look-around and the idle life by flashing <code>robot--ev-*</code> classes. Two additions: a <b>notice</b> event (the pointer comes within 1.6 bot-widths: iris zoom, once per approach) and <code>whirr</code> in the idle list. <code>faceTracks</code> also follows while the face is <code>focus</code> (On it). <code>LIVE_OVER_PX</code> stays 32.</p></div>
+        <div><code>moments.ts · events.ts</code><p><code>RobotFaceLids</code> becomes <code>open · wide · focus · narrow · sad · happy · closed</code>; <code>MOMENT_FACE</code> maps On it → focus and Stuck → sad. New events <code>notice</code>, <code>whirr</code>, <code>power</code> (the slow power down when a bot goes Off duty) and <code>boot</code> join <code>EVENT_MS</code>; <code>done</code> sets the happy face. <code>events.ts</code> adds one rule: a <code>bot_status</code> frame into <code>off_duty</code> fires <code>power</code>.</p></div>
+        <div><code>shapes/peeper.ts (new, replaces ghost.ts)</code><p>The ten silhouettes as a table of a few numbers each (width, height, top and bottom roundness, taper, lean, dents, tilt) and one pure <code>bodyPath(shape)</code> that samples 48 points and returns the smooth path, its box, the eye line and the lens radius. Same point count for every shape, so the picker can still morph.</p></div>
+        <div><code>RobotFace.tsx · eyes.tsx · fx.tsx</code><p><code>RobotFace</code> keeps its props (<code>shape</code>, <code>color</code>, <code>moment</code>, <code>star</code>, <code>picture</code>, <code>pictureEyes</code>, <code>size</code>, <code>still</code>, <code>events</code>) and the groups the motion needs: <code>pose · float · evt · lean · tilter</code>. <code>eyes.tsx</code> draws one lens at radius 10 (glass, iris with focus ring, pupil, highlights, scan glint, two shutters in one clip) and scales it into place. <code>fx.tsx</code> shrinks to the LED and the pulse ring.</p></div>
+        <div><code>robot.css · tokens.css</code><p>The face variables (<code>--lt --la --lbt --lba --is --lz --ft --fy</code>), the status loops and the event keyframes above, scoped by <code>html:not(.calm)</code> and <code>.robot--live</code>. Glass, LED amber and star colours join <code>tokens.css</code>.</p></div>
+        <div><code>look.ts</code><p>New names go in <code>PEEPER_SHAPES</code>. Nothing stored migrates: the ten ghost names and every older shape draw through one table, <code>shape → peeper</code>, below. <code>roost/constants.py</code>, <code>api/types.ts</code> and <code>tests/test_bot_look.py</code> move in step.</p></div>
+      </div>
+      <h4>Old saved shapes still draw, through look.ts's table</h4>
+      <div class="tbl-wrap"><table><thead><tr><th>Stored shape</th><th>Where it came from</th><th>Draws as</th></tr></thead><tbody id="legacyRows"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+/* Pure builders up top (node can load and check them); the page wiring at the bottom runs only in a browser. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8];
+const STATUSES = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"]];
+const STATUS_FACE = { rest: "open", onit: "focus", ask: "wide", stuck: "sad", off: "closed" };
+const TRACK_FACES = ["open", "wide", "focus"];
+const EVENTS = [
+  ["dblblink", "Double blink", "Idle", { ms: 800 }],
+  ["saccade", "Saccade", "Idle", { ms: 600 }],
+  ["camera", "Look at camera", "Idle", { ms: 1900 }],
+  ["tilt", "Curious tilt", "Idle", { ms: 2600 }],
+  ["whirr", "Focus whirr", "Idle", { ms: 1400 }],
+  ["notice", "Notice · iris zoom", "Pointer", { ms: 1000 }],
+  ["dbl", "Double-take", "Pointer", { ms: 1100 }],
+  ["around", "Look around", "Pointer", { ms: 1800 }],
+  ["think", "Thinking", "Work", { face: "narrow", hold: true, ms: 3400 }],
+  ["created", "Created · bounce", "Work", { face: "wide", ms: 1500 }],
+  ["done", "Done · satisfied blink", "Work", { face: "happy", ms: 1800 }],
+  ["msg", "New message", "Work", { ms: 1000 }],
+  ["stuck", "Stuck · sad lids", "Status", { face: "sad", hold: true, ms: 3400 }],
+  ["ask", "Asking you", "Status", { status: "ask", ms: 3000 }],
+  ["power", "Power down", "Status", { status: "off", ms: 4800 }],
+  ["hello", "Hello", "Life", { ms: 1400 }],
+  ["bye", "Bye, then hello", "Life", { ms: 2600 }],
+  ["poke", "Poke", "Life", { ms: 800 }],
+];
+const EVENT_GROUPS = ["Idle", "Pointer", "Work", "Status", "Life"];
+const EXTRA_MS = { boot: 1250, poked: 800 };
+const RING = "#0e0e12";
+const STAR = "#f6c453";
+const SHUTTER = "#2c3148"; // the visor's and the strip's shutters: lighter than the glass, so they read
+const GROUND = 43;
+const LIVE_MIN = 32; // px: below this a bot only blinks
+const N_PTS = 48; // points per body, every shape alike, so paths interpolate
+
+/* The four directions. A shape is [id, label, numbers]: w, h (units on the 48 grid), nt/nb (top/bottom
+   roundness: 2 is an ellipse, more is squarer, less is pointier), taper (+ wider at the bottom), lean,
+   dents ([angle°, depth, width°]; a negative depth is a bump), rot (degrees), bw (Percher's base width). */
+const DIRS = {
+  peep: { name: "Peeper", face: "ports", tag: "A · pebble + porthole lenses",
+    blurb: "A pebble with two separate round lenses set into its surface like portholes, each in a soft bezel. Each lens has its own shutter, a lid in the body's colour that closes at an angle: sloped down and out for sad, rising from below for a satisfied squint, one lower than the other for curiosity. The LED is a tiny button low on the belly.",
+    shapes: [
+      ["river", "River", { w: 38, h: 30, nt: 2.1, nb: 2.3, rot: -5 }],
+      ["plum", "Plum", { w: 35, h: 34, nt: 2, nb: 2.1, dents: [[-90, .06, 40]] }],
+      ["pear", "Pear", { w: 32, h: 36, nt: 2, nb: 2.2, taper: .24 }],
+      ["onigiri", "Onigiri", { w: 37, h: 34, nt: 1.5, nb: 3, taper: .32 }],
+      ["tater", "Tater", { w: 38, h: 31, nt: 2.2, nb: 2.4, dents: [[-25, .06, 30], [155, .05, 30]] }],
+      ["squat", "Squat", { w: 41, h: 26, nt: 2.3, nb: 2.8 }],
+      ["menhir", "Menhir", { w: 30, h: 37, nt: 2.3, nb: 2.6, rot: 4 }],
+      ["slant", "Slant", { w: 36, h: 31, nt: 2.2, nb: 2.4, lean: 3.5 }],
+      ["berry", "Berry", { w: 38, h: 33, nt: 2.2, nb: 2, taper: .16, dents: [[-90, .1, 24]] }],
+      ["button", "Button", { w: 36, h: 33, nt: 2.9, nb: 2.9 }],
+    ] },
+  lens: { name: "Lensbot", face: "visor", tag: "B · soft body + one visor, two lenses",
+    blurb: "A soft, grounded body with one wide dark visor across the face, holding two round camera lenses. The visor is the expressive part: it tilts for curiosity and droops for sad, and its shutters slide inside the glass. The LED lives at the visor's right end, like a camera's record light.",
+    shapes: [
+      ["mochi", "Mochi", { w: 38, h: 30, nt: 2.2, nb: 3.4, taper: .06 }],
+      ["loaf", "Loaf", { w: 39, h: 28, nt: 2.1, nb: 4 }],
+      ["gumdrop", "Gumdrop", { w: 35, h: 34, nt: 1.8, nb: 3.4, taper: .22 }],
+      ["pebble", "Pebble", { w: 38, h: 30, nt: 2.3, nb: 2.3, rot: -4 }],
+      ["bun", "Bun", { w: 37, h: 32, nt: 2, nb: 2.8, dents: [[-90, .07, 26]] }],
+      ["acorn", "Acorn", { w: 34, h: 35, nt: 2.6, nb: 1.9, taper: -.16 }],
+      ["marsh", "Marshmallow", { w: 32, h: 35, nt: 3.3, nb: 3.3 }],
+      ["dumpling", "Dumpling", { w: 41, h: 28, nt: 1.7, nb: 3.6, taper: .15 }],
+      ["lean", "Lean", { w: 34, h: 32, nt: 2.2, nb: 2.6, lean: 3.5 }],
+      ["squish", "Squish", { w: 42, h: 25, nt: 2.6, nb: 2.8 }],
+    ] },
+  bean: { name: "Bean scout", face: "strip", tag: "C · floating bean + swivel strip",
+    blurb: "A bean or capsule that hovers over its own soft shadow. Its two small lenses sit on a short dark strip on a swivel, flush with the body, and the whole strip pans and tilts toward you (a scout scanning the room) while the lenses focus inside it. A faint glow underneath keeps it aloft.",
+    shapes: [
+      ["bean", "Bean", { w: 38, h: 28, nt: 2.3, nb: 2.3, dents: [[90, .14, 34]] }],
+      ["capsule", "Capsule", { w: 29, h: 35, nt: 2.6, nb: 2.6 }],
+      ["pill", "Pill", { w: 40, h: 24, nt: 2.6, nb: 2.6 }],
+      ["jelly", "Jelly", { w: 36, h: 27, nt: 2.2, nb: 2.2, dents: [[90, .1, 30]], rot: -12 }],
+      ["peanut", "Peanut", { w: 33, h: 35, nt: 2.2, nb: 2.2, dents: [[0, .13, 26], [180, .13, 26]] }],
+      ["lima", "Lima", { w: 38, h: 29, nt: 2.2, nb: 2.4, dents: [[-90, .1, 34]], rot: 8 }],
+      ["seed", "Seed", { w: 31, h: 34, nt: 1.55, nb: 2.3 }],
+      ["gourd", "Gourd", { w: 34, h: 35, nt: 2.1, nb: 2.3, taper: .28, dents: [[-30, .07, 22], [-150, .07, 22]] }],
+      ["puff", "Puff", { w: 38, h: 32, nt: 2.4, nb: 2.4, dents: [[-45, -.04, 30], [-135, -.04, 30]] }],
+      ["drop", "Drop", { w: 32, h: 33, nt: 1.6, nb: 2.2, lean: 3, rot: -6 }],
+    ] },
+  perch: { name: "Percher", face: "duo", tag: "D · wildcard: a head perched on a cushion",
+    blurb: "Roost's own: a soft head that perches on a soft cushion, joined by a glowing gimbal ring instead of a neck, so it bobs, nods and tilts like a bird on a branch. Its two lenses are different sizes, a main lens and a small one, like a camera with a wide and a tele: the curious tilt zooms the big one. The LED sits on the cushion. Bird names, because they roost.",
+    shapes: [
+      ["pip", "Pip", { w: 34, h: 26, nt: 2.2, nb: 2.6, bw: 22 }],
+      ["wren", "Wren", { w: 30, h: 27, nt: 1.9, nb: 2.4, taper: .12, bw: 18 }],
+      ["owlet", "Owlet", { w: 36, h: 27, nt: 2.4, nb: 2.2, dents: [[-90, .09, 28]], bw: 24 }],
+      ["finch", "Finch", { w: 38, h: 22, nt: 2.2, nb: 3, bw: 27 }],
+      ["dove", "Dove", { w: 32, h: 28, nt: 1.6, nb: 2.6, bw: 20 }],
+      ["robin", "Robin", { w: 34, h: 27, nt: 2.6, nb: 2.2, taper: -.12, bw: 22 }],
+      ["lark", "Lark", { w: 33, h: 26, nt: 2.1, nb: 2.3, lean: 2.5, rot: -4, bw: 20 }],
+      ["puffin", "Puffin", { w: 35, h: 27, nt: 3, nb: 3, bw: 25 }],
+      ["kiwi", "Kiwi", { w: 37, h: 25, nt: 2, nb: 2, dents: [[90, .08, 30]], bw: 18 }],
+      ["tuft", "Tuft", { w: 33, h: 27, nt: 1.9, nb: 2.7, dents: [[-90, -.08, 13]], bw: 21 }],
+    ] },
+};
+const DIR_KEYS = Object.keys(DIRS);
+const RECOMMENDED = "peep";
+const GHOST_TO_PEEP = { dome: "button", tall: "menhir", wide: "squat", round: "plum", droopy: "pear", spire: "onigiri", comet: "slant", cape: "tater", puff: "berry", hooded: "river" };
+const LEGACY_TO_GHOST = { classic: "dome", soft: "round", cube: "cape", monitor: "hooded", egg: "puff", pear: "droopy", plump: "comet", crest: "spire" };
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+let seed = 11;
+const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+const colorOf = (i) => PALETTE[i % PALETTE.length][0];
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const rgb = (c) => `rgb(${c.map((x) => clamp(Math.round(x), 0, 255)).join(", ")})`;
+const tint = (hex, a) => rgb(channels(hex).map((x) => x + (255 - x) * a));
+const shade = (hex, k) => rgb(channels(hex).map((x) => x * k));
+
+/* ---- Geometry: one smooth body path from a few numbers ---------------- */
+function angDiff(a, b) {
+  const d = (a - b) % (2 * Math.PI);
+  return d > Math.PI ? d - 2 * Math.PI : d < -Math.PI ? d + 2 * Math.PI : d;
+}
+function blobPts(o, cx, cy) {
+  const pts = [];
+  for (let i = 0; i < N_PTS; i++) {
+    const t = -Math.PI / 2 + (i / N_PTS) * 2 * Math.PI, c = Math.cos(t), s = Math.sin(t);
+    const n = s < 0 ? o.nt : o.nb;
+    let x = Math.sign(c) * Math.pow(Math.abs(c), 2 / n) * o.w / 2;
+    let y = Math.sign(s) * Math.pow(Math.abs(s), 2 / n) * o.h / 2;
+    x *= 1 + (o.taper || 0) * (y / (o.h / 2));
+    for (const [a, depth, width] of o.dents || []) {
+      const k = depth * Math.exp(-Math.pow(angDiff(t, (a * Math.PI) / 180) / ((width * Math.PI) / 180), 2));
+      x *= 1 - k; y *= 1 - k;
+    }
+    x += (o.lean || 0) * (-y / (o.h / 2));
+    pts.push([cx + x, cy + y]);
+  }
+  return pts;
+}
+function smooth(p) {
+  const n = p.length, at = (i) => p[(i + n) % n];
+  let d = `M${f(p[0][0])} ${f(p[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+    d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+}
+function widthAt(pts, y) {
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    if ((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue;
+    const x = a[0] + ((y - a[1]) / (b[1] - a[1])) * (b[0] - a[0]);
+    lo = Math.min(lo, x); hi = Math.max(hi, x);
+  }
+  return hi > lo ? [lo, hi] : [24 - 10, 24 + 10];
+}
+
+/* The face layout for each kind: eyes [{x, y, r, side}], the extras (visor, strip, base) and the LED. */
+function faceLayout(kind, o, pts, cy) {
+  if (kind === "visor") {
+    const ey = cy - o.h * 0.08, [l, r] = widthAt(pts, ey), mid = (l + r) / 2, vw = clamp((r - l) * 0.86, 24, 34), vh = 14.2;
+    const lr = 5.4, dx = vw * 0.245;
+    return { ey, eyes: [{ x: mid - dx, y: ey, r: lr, side: -1 }, { x: mid + dx, y: ey, r: lr, side: 1 }],
+      visor: { x: mid - vw / 2, y: ey - vh / 2, w: vw, h: vh }, led: { x: mid + vw / 2 - 2.3, y: ey + vh / 2 - 2.3, r: .9 } };
+  }
+  if (kind === "strip") {
+    const ey = cy - o.h * 0.1, [l, r] = widthAt(pts, ey), mid = (l + r) / 2, sw = clamp((r - l) * 0.7, 20, 28), sh = 10.6, er = 4;
+    return { ey, eyes: [{ x: mid - sw * 0.25, y: ey, r: er, side: -1 }, { x: mid + sw * 0.25, y: ey, r: er, side: 1 }],
+      strip: { x: mid - sw / 2, y: ey - sh / 2, w: sw, h: sh, mid }, led: { x: mid, y: cy + o.h * 0.3, r: .9 } };
+  }
+  if (kind === "duo") {
+    const ey = cy - o.h * 0.02, [l, r] = widthAt(pts, ey), mid = (l + r) / 2, W = r - l;
+    return { ey, eyes: [{ x: mid - W * 0.16, y: ey, r: 5.1, side: -1 }, { x: mid + W * 0.2, y: ey + .4, r: 3.7, side: 1 }], led: null };
+  }
+  const ey = cy - o.h * 0.06, [l, r] = widthAt(pts, ey), mid = (l + r) / 2, W = r - l;
+  const er = clamp(W * 0.175, 4.6, 6.6), dx = Math.max(W * 0.215, er * 1.2 + 0.9);
+  return { ey, eyes: [{ x: mid - dx, y: ey, r: er, side: -1 }, { x: mid + dx, y: ey, r: er, side: 1 }], ports: true,
+    led: { x: mid, y: cy + o.h * 0.3, r: .85 } };
+}
+
+/** Everything a body needs: path, box, face layout, the posture origin and the ground. */
+function geom(dirKey, o) {
+  const D = DIRS[dirKey];
+  const float = dirKey === "bean", perch = dirKey === "perch";
+  const bottom = perch ? 33.6 : float ? 37.5 : GROUND;
+  const cy = Math.max(o.h / 2 + 4, bottom - o.h / 2);
+  const pts = blobPts(o, 24, cy);
+  const ys = pts.map((p) => p[1]), xs = pts.map((p) => p[0]);
+  const box = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  const face = faceLayout(D.face, o, pts, cy);
+  const base = perch ? { x: 24 - o.bw / 2, y: 35, w: o.bw, h: 8.4 } : null;
+  if (perch) face.led = { x: 24, y: 39.6, r: .85 };
+  return { d: smooth(pts), pts, cy, box, face, base, float, perch, rot: o.rot || 0, oy: float ? cy : GROUND };
+}
+
+/* ---- Drawing ---------------------------------------------------------- */
+/** One lens at radius 10, scaled into place: glass, iris + focus ring, pupil, highlights, the scan glint and two shutters. */
+function lensEye(e, color, lidColor, bezel, lidEdge = "#ffffff") {
+  const k = e.r / 10;
+  const bez = bezel ? `<circle r="11.9" fill="${shade(color, .78)}"/><circle r="11.1" fill="${tint(color, .4)}"/><circle r="10.5" fill="#0a0b12"/>` : `<circle r="10.9" fill="#07080d" opacity=".9"/>`;
+  return `<g class="eye ${e.side < 0 ? "e-l" : "e-r"}" style="--side:${e.side}" transform="translate(${f(e.x)} ${f(e.y)}) scale(${f(k)})">${bez}` +
+    `<g class="lens"><circle r="10" fill="url(#glass)"/><g class="dtg"><g class="look"><g class="iris">` +
+    `<circle r="6.5" fill="${shade(color, .5)}"/><circle r="6.5" fill="none" stroke="${tint(color, .45)}" stroke-width="1.1" opacity=".9"/>` +
+    `<circle class="ring" r="5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width=".9" stroke-dasharray="1.3 1.3"/>` +
+    `<circle r="3.3" fill="#04050a"/></g><circle cx="2.4" cy="2.6" r="1.1" fill="#fff" opacity=".65"/></g></g>` +
+    `<ellipse class="hl" cx="-3.7" cy="-4" rx="2.7" ry="2.2" fill="#fff" opacity=".92"/></g>` +
+    `<g clip-path="url(#lensClip)"><rect class="scan" x="-1.3" y="-13" width="2.6" height="26" fill="#fff"/>` +
+    `<g class="bt"><g class="lt"><rect x="-14" y="-30" width="28" height="30" fill="${lidColor}" stroke="${lidEdge}" stroke-opacity=".5" stroke-width="1"/></g></g>` +
+    `<g class="bb"><g class="lb"><rect x="-14" y="0" width="28" height="30" fill="${lidColor}" stroke="${lidEdge}" stroke-opacity=".4" stroke-width="1"/></g></g></g></g>`;
+}
+
+function faceSvg(g, color) {
+  const fc = g.face, parts = [];
+  if (fc.visor) {
+    const v = fc.visor;
+    parts.push(`<rect x="${f(v.x)}" y="${f(v.y)}" width="${f(v.w)}" height="${f(v.h)}" rx="${f(v.h / 2)}" fill="url(#visorG)" stroke="${shade(color, .55)}" stroke-width=".7"/>` +
+      `<path d="M${f(v.x + v.h / 2)} ${f(v.y + 1.1)}H${f(v.x + v.w - v.h / 2)}" stroke="#fff" stroke-opacity=".16" stroke-width=".8" stroke-linecap="round"/>`);
+    parts.push(...fc.eyes.map((e) => lensEye(e, color, SHUTTER, false)));
+    return `<g class="face tilter">${parts.join("")}${ledSvg(fc.led)}</g>`;
+  }
+  if (fc.strip) {
+    const s = fc.strip;
+    const inner = `<rect x="${f(s.mid - 1.6)}" y="${f(s.y + s.h - 1)}" width="3.2" height="3" rx="1.2" fill="${shade(color, .6)}"/>` +
+      `<rect x="${f(s.x)}" y="${f(s.y)}" width="${f(s.w)}" height="${f(s.h)}" rx="${f(s.h / 2)}" fill="url(#visorG)" stroke="${shade(color, .55)}" stroke-width=".6"/>` +
+      fc.eyes.map((e) => lensEye(e, color, SHUTTER, false)).join("");
+    return `<g class="face tilter"><g class="strip">${inner}</g></g>`;
+  }
+  const lid = tint(color, .12), edge = shade(color, .45);
+  return `<g class="face${g.perch ? "" : " tilter"}">${fc.eyes.map((e) => lensEye(e, color, lid, true, edge)).join("")}</g>`;
+}
+
+function ledSvg(led) {
+  return led ? `<circle class="beacon" cx="${f(led.x)}" cy="${f(led.y)}" r="${led.r}"/>` : "";
+}
+
+function photo(g, id) {
+  const b = g.box;
+  return `<g clip-path="url(#${id}c)"><rect x="${f(b.x - 1)}" y="${f(b.y - 1)}" width="${f(b.w + 2)}" height="${f(b.h + 2)}" fill="url(#picSky)"/>` +
+    `<circle cx="${f(b.x + b.w * .68)}" cy="${f(b.y + b.h * .36)}" r="${f(b.w * .13)}" fill="#ffe2a8"/>` +
+    `<path d="M${f(b.x - 2)} ${f(b.y + b.h * .74)}Q${f(b.x + b.w * .3)} ${f(b.y + b.h * .5)} ${f(b.x + b.w * .58)} ${f(b.y + b.h * .72)}T${f(b.x + b.w + 2)} ${f(b.y + b.h * .62)}V${f(b.y + b.h + 2)}H${f(b.x - 2)}Z" fill="#4b3f78"/>` +
+    `<path d="M${f(b.x - 2)} ${f(b.y + b.h * .86)}Q${f(b.x + b.w * .5)} ${f(b.y + b.h * .7)} ${f(b.x + b.w + 2)} ${f(b.y + b.h * .84)}V${f(b.y + b.h + 2)}H${f(b.x - 2)}Z" fill="#2e2752"/></g>`;
+}
+
+function starSvg(ring) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 2.4 : 5.4;
+    pts.push(`${f(41 + Math.cos(a) * r)} ${f(8 + Math.sin(a) * r)}`);
+  }
+  return `<path d="M${pts.join("L")}Z" fill="${STAR}" stroke="${ring}" stroke-width="1.8" stroke-linejoin="round" paint-order="stroke"/>`;
+}
+
+function bodySvg(g, color, id, pic, picEyes) {
+  const b = g.box, sheen = `<ellipse cx="${f(b.x + b.w * .32)}" cy="${f(b.y + b.h * .2)}" rx="${f(b.w * .16)}" ry="${f(b.h * .08)}" transform="rotate(-22 ${f(b.x + b.w * .32)} ${f(b.y + b.h * .2)})" fill="#fff" opacity=".2"/>`;
+  const skin = pic
+    ? `${photo(g, id)}<path d="${g.d}" fill="none" stroke="${color}" stroke-width="1.8"/>`
+    : `<path class="skin" d="${g.d}" fill="url(#${id}g)"/>${sheen}`;
+  const face = !pic || picEyes ? faceSvg(g, color) : "";
+  const led = g.face.ports || g.face.strip ? ledSvg(g.face.led) : "";
+  return `<g transform="rotate(${g.rot} 24 ${f(g.cy)})">${skin}${led}${face}</g>`;
+}
+
+function avatar({ dir = RECOMMENDED, v = 0, color, s = "rest", star = false, pic = false, picEyes = true, size = 96, ring = RING, extra = "", name = "" }) {
+  const D = DIRS[dir], shape = D.shapes[v % D.shapes.length], g = geom(dir, shape[2]);
+  const live = size >= LIVE_MIN, id = uid("b");
+  const st = `--oy:${f(g.oy)}px;--tint:${tint(color, .55)};--blink-dur:${f(5.2 + rnd() * 2.8)}s;--blink-delay:${f(-rnd() * 6)}s;--idle-delay:${f(-rnd() * 4)}s`;
+  const label = `${name || `${D.name} ${shape[1]}`}, ${STATUSES.find(([k]) => k === s)[1]}`;
+  const defs = `<defs><radialGradient id="${id}g" cx=".36" cy=".26" r=".9"><stop offset="0" stop-color="${tint(color, .34)}"/><stop offset=".55" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, .72)}"/></radialGradient>` +
+    (pic ? `<clipPath id="${id}c"><path d="${g.d}"/></clipPath>` : "") + `</defs>`;
+  const shadow = `<ellipse class="shadow" cx="24" cy="45" rx="${f(Math.min(g.box.w, g.base ? g.base.w + 6 : 99) * (g.float ? .26 : .36))}" ry="${g.float ? 1.3 : 1.6}" fill="#000" opacity=".38"/>`;
+  const glow = g.float ? `<ellipse class="hover-glow" cx="24" cy="${f(g.box.y + g.box.h + 2.4)}" rx="${f(g.box.w * .22)}" ry="1.1" fill="${tint(color, .5)}" opacity=".35"/>` : "";
+  const pulse = `<ellipse class="pulse" cx="24" cy="${f(g.cy)}" rx="${f(g.box.w / 2 + 1)}" ry="${f(g.box.h / 2 + 1)}" fill="none" stroke="${tint(color, .5)}" stroke-width="1.2"/>`;
+  let inner;
+  if (g.perch) {
+    const bs = g.base;
+    const base = `<rect x="${f(bs.x)}" y="${f(bs.y)}" width="${f(bs.w)}" height="${f(bs.h)}" rx="${f(bs.h / 2)}" fill="url(#${id}g)"/>` +
+      `<ellipse cx="24" cy="34.4" rx="${f(Math.min(bs.w * .32, 6))}" ry="1.3" fill="${tint(color, .6)}" opacity=".85"/>${ledSvg(g.face.led)}`;
+    inner = `${base}<g class="head tilter"><g class="bob">${bodySvg(g, color, id, pic, picEyes)}</g></g>`;
+  } else {
+    inner = bodySvg(g, color, id, pic, picEyes);
+  }
+  const cls = `bot${live ? " live" : ""}${extra ? ` ${extra}` : ""}`;
+  return `<svg class="${cls}" data-dir="${dir}" data-s="${s}" data-base="${s}" data-face="${STATUS_FACE[s]}" data-ey="${f(g.face.ey)}" style="${st}" width="${size}" height="${size}" viewBox="0 0 48 48" role="img" aria-label="${label}"${live && extra.includes("tab") ? ' tabindex="0"' : ""}>` +
+    `${defs}${shadow}<g class="pose"><g class="float">${glow}<g class="evt">${pulse}<g class="lean"><g class="body">${inner}</g></g></g></g></g>${star ? starSvg(ring) : ""}</svg>`;
+}
+
+/* ---- Sections --------------------------------------------------------- */
+const cell = (inner, label, sub = "") => `<div class="cell">${inner}<b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</div>`;
+function shapesBlock(dir) {
+  const cells = DIRS[dir].shapes.map((sh, v) => cell(avatar({ dir, v, color: colorOf(1), size: 56 }), sh[1])).join("");
+  return `<section class="blk full"><h4>Ten silhouettes · 56 px · picker size</h4><div class="grid10">${cells}</div></section>`;
+}
+function colourBlock(dir) {
+  const cols = SIX.map((ci, i) => cell(`<div class="sizes">${[96, 40, 24].map((size) => avatar({ dir, v: (i * 3) % 10, color: colorOf(ci), size })).join("")}</div>`, PALETTE[ci][1])).join("");
+  return `<section class="blk full"><h4>Six colours · 96 · 40 · 24 px (24 px only blinks)</h4><div class="row">${cols}</div></section>`;
+}
+function statusBlock(dir) {
+  const cells = STATUSES.map(([s, name], i) => cell(`<div class="sizes">${[72, 40, 24].map((size) => avatar({ dir, v: i * 2, color: colorOf(SIX[i]), s, size })).join("")}</div>`, name)).join("");
+  return `<section class="blk full"><h4>The five statuses · 72 · 40 · 24 px</h4><div class="row">${cells}</div>` +
+    `<p class="why">Resting breathes and glances. On it narrows to focus, the focus ring whirrs in ticks and the LED pulses. Asking you tilts with one lens wide and one squinting. Stuck slopes its shutters, looks down and sighs, LED amber. Off duty has its shutters shut, irises dimmed, body settled.</p></section>`;
+}
+function starPicBlock(dir) {
+  const c = colorOf(3);
+  const main = avatar({ dir, v: 0, color: colorOf(0), s: "onit", star: true, size: 96, name: "Chief" });
+  const mainS = avatar({ dir, v: 0, color: colorOf(0), star: true, size: 40, name: "Chief" });
+  const picOnly = avatar({ dir, v: 3, color: c, pic: true, picEyes: false, size: 96 });
+  const picEyes = avatar({ dir, v: 3, color: c, pic: true, size: 96 });
+  const picSmall = avatar({ dir, v: 3, color: c, pic: true, size: 40 }) + avatar({ dir, v: 3, color: c, pic: true, size: 24 });
+  return `<section class="blk full"><h4>Main bot star · an uploaded picture inside the shape</h4><div class="row">` +
+    `${cell(`<div class="sizes">${main}${mainS}</div>`, "Main bot", "star at 96 and 40")}${cell(picOnly, "Picture only")}${cell(picEyes, "Picture with lenses")}${cell(`<div class="sizes">${picSmall}</div>`, "40 · 24 px")}</div>` +
+    `<p class="why">The picture fills the silhouette inside a rim of the bot's colour. With lenses on (the default), the lenses keep tracking and emoting on top of the photo; without, the status shows through posture, LED and the status pill.</p></section>`;
+}
+function dirArticle(dir) {
+  const D = DIRS[dir];
+  return `<article class="dir" id="dir-${dir}"><div class="dir-head"><span class="tag">${D.tag}</span><h3>${D.name}${dir === RECOMMENDED ? " · recommended" : ""}</h3><p>${D.blurb}</p></div>` +
+    `<div class="blocks">${shapesBlock(dir)}${colourBlock(dir)}${statusBlock(dir)}${starPicBlock(dir)}</div></article>`;
+}
+
+/* In context: the cozy-kit pieces. */
+const TEAM = [
+  { name: "Chief", job: "Leads the team", c: 0, v: 0, s: "onit", star: true, line: "I've added the three tasks for Monday." },
+  { name: "Scout", job: "Finds flats", c: 1, v: 1, s: "ask", line: "Which flat should I book a viewing for?" },
+  { name: "Ledger", job: "Money", c: 3, v: 3, s: "rest", line: "The October total is ready." },
+  { name: "Quill", job: "Writes", c: 7, v: 5, s: "stuck", line: "Stuck on a sign-in page." },
+  { name: "Pixel", job: "Designs", c: 2, v: 8, s: "rest", line: "Resting" },
+  { name: "Archivist", job: "Files", c: 8, v: 9, s: "off", line: "Off duty" },
+];
+function sidebarPiece(dir) {
+  const pin = (b) => `<div class="cz-pin">${avatar({ dir, v: b.v, color: colorOf(b.c), s: b.s, star: b.star, size: 64, ring: "#0e0e12", name: b.name })}<b>${b.name}</b><small>${b.job}</small>${b.s === "ask" ? '<i class="unread"></i>' : ""}</div>`;
+  const row = (b, i) => `<div class="cz-row${i === 0 ? " on" : ""}">${avatar({ dir, v: b.v, color: colorOf(b.c), s: b.s, size: 32, name: b.name })}<div><b>${b.name}</b><small>${b.line}</small></div>${b.s === "ask" || b.s === "stuck" ? '<i class="unread"></i>' : ""}</div>`;
+  return `<div class="cz-side cz"><div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>` +
+    `<div class="cz-grid">${TEAM.map(pin).join("")}</div><div class="cz-sep"></div>${TEAM.slice(1, 4).map(row).join("")}</div>`;
+}
+function heroPiece(dir) {
+  const c = colorOf(1);
+  return `<div class="cz-hero"><div class="cz-hero-band" style="background:linear-gradient(180deg, ${c}40, ${c}00)"></div><div class="cz-hero-body">` +
+    `<div class="cz-hero-top">${avatar({ dir, v: 1, color: c, s: "onit", size: 72, name: "Scout" })}<div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>` +
+    `<div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div><span class="cz-status"><i class="dot"></i>On it · comparing three listings</span>` +
+    `<div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div></div></div>`;
+}
+function chatBarPiece(dir) {
+  return `<div class="cz-bar cz"><span class="cz-btn icon" aria-label="Back"><svg class="ico"><use href="#i-back"/></svg></span>` +
+    `<span class="cz-pill">${avatar({ dir, v: 1, color: colorOf(1), s: "ask", size: 24, name: "Scout" })}Scout<small><i class="dot"></i>Asking you</small></span>` +
+    `<div class="acts"><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>`;
+}
+function cardPiece(dir) {
+  const c = colorOf(1), D = DIRS[dir];
+  const tiles = D.shapes.map((sh, v) => `<span class="cz-tile${v === 1 ? " on" : ""}" title="${sh[1]}">${avatar({ dir, v, color: c, size: 34 })}</span>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<i class="cz-sw${i === 1 ? " on" : ""}" style="background:${hex}" title="${name}"></i>`).join("");
+  return `<div class="cz-surface cz-pop cz"><div class="cz-pop-head">${avatar({ dir, v: 1, color: c, size: 48, name: "Scout" })}<div><b>Scout</b><small>${D.name} · ${D.shapes[1][1]} · Blue</small></div></div>` +
+    `<div class="cz-tabs" role="presentation"><span class="cz-tab on"><svg class="ico"><use href="#i-bot"/></svg>Robot</span><span class="cz-tab"><svg class="ico"><use href="#i-upload"/></svg>Upload</span><span class="cz-tab"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>` +
+    `<div class="cz-tiles">${tiles}</div><div class="cz-swatches">${dots}</div></div>`;
+}
+function kitSlots(dir) {
+  return `<div class="kit-slot"><h4>Sidebar · pinned 3 per row at 64 px · rows 32 px</h4>${sidebarPiece(dir)}</div>` +
+    `<div class="kit-slot"><h4>Panel hero · and the chat header pill · 24 px</h4>${heroPiece(dir)}${chatBarPiece(dir)}</div>` +
+    `<div class="kit-slot" style="grid-column:1/-1"><h4>Avatar card · Robot tab</h4>${cardPiece(dir)}</div>`;
+}
+const ctxChips = (dir) => DIR_KEYS.map((k) => `<button type="button" class="chip" data-ctx-dir="${k}" aria-pressed="${k === dir}">${DIRS[k].name}</button>`).join("");
+
+const VERDICTS = {
+  peep: "The softest and simplest; two shutters do every emotion; reads at 24 px; the picture-with-lenses case works best because each lens has its own bezel.",
+  lens: "The most \"camera\": the visor tilt is very readable. But a dark band across every bot makes a team look alike, and it hides more of an uploaded picture.",
+  bean: "The most alive in motion: the swivel strip panning toward you is a great moment. But the lenses are small, so emotion fades below 40 px.",
+  perch: "The most character, and on-brand (bots that perch in a Roost). The head bob and nod are lovely. Two parts make the silhouette busier at 24 px; a strong runner-up.",
+};
+function verdicts() {
+  return DIR_KEYS.map((k) => `<div class="verdict${k === RECOMMENDED ? " pick" : ""}"><div class="row" style="gap:8px">${avatar({ dir: k, v: 0, color: colorOf(SIX[DIR_KEYS.indexOf(k)]), size: 40 })}<b>${DIRS[k].name}${k === RECOMMENDED ? " · pick" : ""}</b></div>${VERDICTS[k]}</div>`).join("");
+}
+function legacyRows() {
+  const peepIdx = (id) => DIRS.peep.shapes.findIndex((sh) => sh[0] === id);
+  const ghostRows = Object.entries(GHOST_TO_PEEP).map(([ghost, peep]) => [ghost, "Ghost (v5)", peep]);
+  const oldRows = Object.entries(LEGACY_TO_GHOST).map(([old, ghost]) => [old, `Older (via ghost-${ghost})`, GHOST_TO_PEEP[ghost]]);
+  return [...ghostRows, ...oldRows].map(([stored, from, peep], i) =>
+    `<tr><td><code>${stored}</code></td><td>${from}</td><td>${avatar({ dir: "peep", v: peepIdx(peep), color: colorOf(i), size: 24 })}<code>peeper-${peep}</code></td></tr>`).join("");
+}
+
+/* The playground. */
+const PG = { dir: RECOMMENDED, v: 0, c: 1, s: "rest", life: true };
+function pgControls(state) {
+  const c = colorOf(state.c), D = DIRS[state.dir];
+  const chips = (items, key, on) => items.map(([id, name]) => `<button type="button" class="chip" data-${key}="${id}" aria-pressed="${on === id}">${name}</button>`).join("");
+  const tiles = D.shapes.map((sh, v) => `<button type="button" class="tile" data-pg-v="${v}" aria-pressed="${v === state.v}" title="${sh[1]}" aria-label="${sh[1]}">${avatar({ dir: state.dir, v, color: c, size: 34 })}</button>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<button type="button" class="sw-dot" data-pg-c="${i}" aria-pressed="${i === state.c}" style="background:${hex}" aria-label="${name}" title="${name}"></button>`).join("");
+  const groups = EVENT_GROUPS.map((gr) => `<div class="evgroup"><h4>${gr}</h4><div class="pg-row">${EVENTS.filter((e) => e[2] === gr).map(([id, name]) => `<button type="button" class="chip ev" data-pg-ev="${id}">${name}</button>`).join("")}</div></div>`).join("");
+  return `<div class="ctl"><h4>Direction</h4><div class="pg-row">${chips(DIR_KEYS.map((k) => [k, DIRS[k].name]), "pg-dir", state.dir)}</div></div>` +
+    `<div class="ctl"><h4>Shape · ${D.shapes[state.v][1]}</h4><div class="tiles">${tiles}</div></div>` +
+    `<div class="ctl"><h4>Colour · ${PALETTE[state.c][1]}</h4><div class="dots">${dots}</div></div>` +
+    `<div class="ctl"><h4>Status</h4><div class="pg-row">${chips(STATUSES, "pg-s", state.s)}</div></div>` +
+    `<div class="ctl"><h4>Animations</h4><div class="evgroups">${groups}</div></div>` +
+    `<div class="ctl"><div class="pg-row" style="gap:16px"><button type="button" class="sw" role="switch" aria-checked="${state.life}" data-life><i></i>Random life</button>` +
+    `<button type="button" class="sw" role="switch" aria-checked="false" data-calm><i></i>Calm robots</button><span class="hint">Hover to lean in · click to poke</span></div></div>`;
+}
+function pgStage(state) {
+  const n = DIRS[state.dir].shapes.length;
+  const big = avatar({ dir: state.dir, v: state.v, color: colorOf(state.c), s: state.s, size: 176, star: true, extra: "big tab", name: "Chief" });
+  const others = [2, 5, 7, 8].map((k, i) => avatar({ dir: state.dir, v: (state.v + k) % n, color: colorOf((state.c + 2 * (i + 1)) % PALETTE.length), s: state.s, size: 88, extra: "tab" })).join("");
+  return `<div>${big}</div><div class="neighbours">${others}</div><small>Each one follows your pointer on its own. Animations play on all five.</small>`;
+}
+
+function buildAll() {
+  const heroDirs = DIR_KEYS.flatMap((k, i) => [[k, i * 2], [k, i * 2 + 5]]);
+  return {
+    hero: heroDirs.map(([dir, v], i) => avatar({ dir, v, color: colorOf([0, 1, 3, 5, 7, 8, 2, 6][i]), s: ["rest", "onit", "ask", "rest", "rest", "stuck", "rest", "off"][i], star: i === 0, size: 84 })).join(""),
+    dirs: DIR_KEYS.map(dirArticle).join(""),
+    kit: kitSlots(RECOMMENDED),
+    ctx: ctxChips(RECOMMENDED),
+    reco: PALETTE.slice(0, 8).map(([c], i) => avatar({ dir: RECOMMENDED, v: [9, 0, 2, 1, 3, 6, 4, 8][i], color: c, s: STATUSES[i % 5][0], star: i === 0, size: 56 })).join(""),
+    verdicts: verdicts(),
+    legacy: legacyRows(),
+    pgControls: pgControls(PG),
+    pgStage: pgStage(PG),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, avatar, geom, blobPts, smooth, widthAt, DIRS, DIR_KEYS, PALETTE, STATUSES, EVENTS, GHOST_TO_PEEP, LEGACY_TO_GHOST, pgControls, pgStage, kitSlots };
+}
+
+/* ---- The page: one pointer loop, events, random life, the playground ---- */
+if (typeof document !== "undefined") (function page() {
+  const html = document.documentElement, reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let calmPref = false;
+  const isCalm = () => html.classList.contains("calm");
+  const EYE_MAX = 1.5, NOTICE_IN = 1.6, NOTICE_OUT = 2.6, NOTICE_GAP_MS = 4000;
+
+  /* The shared pointer loop. One entry per live bot; only visible ones are touched. */
+  const live = new Map();
+  const pointer = { x: NaN, y: NaN, t: 0, movedAt: -1e9, speed: 0 };
+  let rectsDirty = true, running = false, idleTimer = 0, lastDbl = -1e9;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const st = live.get(e.target);
+      if (st) st.visible = e.isIntersecting;
+      e.target.classList.toggle("offscreen", !e.isIntersecting);
+    }
+    schedule();
+  }, { rootMargin: "48px" });
+
+  function register(root) {
+    for (const [svg] of live) if (!svg.isConnected) { io.unobserve(svg); live.delete(svg); }
+    root.querySelectorAll("svg.bot.live").forEach((svg) => {
+      if (live.has(svg)) return;
+      live.set(svg, { ex: 0, ey: 0, lx: 0, lr: 0, rect: null, visible: false, wrote: false, near: false, noticeAt: -1e9,
+        glanceAt: performance.now() + 1500 + Math.random() * 4000, glancing: false, gx: 0, gy: 0, dblAt: 0, cameraUntil: 0 });
+      io.observe(svg);
+    });
+    rectsDirty = true;
+    schedule();
+  }
+  function schedule() {
+    if (running || document.hidden || isCalm()) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+  const faceTracks = (svg) => !svg.dataset.hold && TRACK_FACES.includes(svg.dataset.face);
+
+  function glance(st, now) {
+    if (now > st.glanceAt) {
+      st.glancing = !st.glancing;
+      st.gx = st.glancing ? (Math.random() - 0.5) * 2 * EYE_MAX * 0.8 : 0;
+      st.gy = st.glancing ? (Math.random() - 0.5) * EYE_MAX * 0.6 : 0;
+      st.glanceAt = now + (st.glancing ? 500 + Math.random() * 900 : 2500 + Math.random() * 6000);
+    }
+    return [st.gx, st.gy];
+  }
+  function notice(svg, st, now, dist, width) {
+    if (!st.near && dist < width * NOTICE_IN && now - st.noticeAt > NOTICE_GAP_MS) { st.near = true; st.noticeAt = now; flash(svg, "notice"); }
+    else if (st.near && dist > width * NOTICE_OUT) st.near = false;
+  }
+  function frame(now) {
+    running = false;
+    if (document.hidden || isCalm()) return;
+    const fresh = now - pointer.movedAt < 4000, fast = pointer.speed > 2.4 && now - lastDbl > 1500;
+    let busy = false, nearest = null, nearestDist = Infinity;
+    for (const [svg, st] of live) {
+      if (!st.visible) continue;
+      if (rectsDirty || !st.rect) st.rect = svg.getBoundingClientRect();
+      const r = st.rect, cx = r.left + r.width / 2, cy = r.top + r.height * ((Number(svg.dataset.ey) || 22) / 48);
+      const dx = pointer.x - cx, dy = pointer.y - cy, dist = Math.hypot(dx, dy) || 1;
+      let tx = 0, ty = 0;
+      if (now >= st.cameraUntil && faceTracks(svg)) {
+        if (fresh) {
+          const m = EYE_MAX * (dist / (dist + r.width * 0.5));
+          tx = (dx / dist) * m; ty = (dy / dist) * m;
+          if (fast && now - st.dblAt > 2600 && dist < r.width * 4 && dist < nearestDist) { nearest = svg; nearestDist = dist; }
+          notice(svg, st, now, dist, r.width);
+        } else [tx, ty] = glance(st, now);
+      }
+      const over = fresh && pointer.x > r.left - 4 && pointer.x < r.right + 4 && pointer.y > r.top - 4 && pointer.y < r.bottom + 4;
+      const lx = over ? clamp((dx / r.width) * 3, -1.5, 1.5) : 0;
+      const lr = over ? clamp((dx / r.width) * 12, -6, 6) : (fresh ? clamp(dx / (r.width * 4), -1, 1) * 2.5 : 0);
+      st.ex += (tx - st.ex) * 0.16; st.ey += (ty - st.ey) * 0.16;
+      const moving = Math.abs(tx - st.ex) > 0.01 || Math.abs(ty - st.ey) > 0.01;
+      if (moving || st.wrote) { svg.style.setProperty("--ex", st.ex.toFixed(2)); svg.style.setProperty("--ey", st.ey.toFixed(2)); st.wrote = moving; }
+      if (Math.abs(lx - st.lx) > 0.05 || Math.abs(lr - st.lr) > 0.1) { st.lx = lx; st.lr = lr; svg.style.setProperty("--lx", lx.toFixed(2)); svg.style.setProperty("--lr", lr.toFixed(1)); }
+      busy = busy || moving || over;
+    }
+    if (nearest) { /* a fast pass: only the nearest bot does a double-take */
+      const st = live.get(nearest), r = st.rect;
+      st.dblAt = now; lastDbl = now;
+      nearest.style.setProperty("--dtx", pointer.x > r.left + r.width / 2 ? "1" : "-1");
+      flash(nearest, "dbl");
+    }
+    rectsDirty = false;
+    pointer.speed *= 0.85;
+    if (busy || fresh) schedule();
+    else { clearTimeout(idleTimer); idleTimer = setTimeout(schedule, 250); } // idle: only the glances are due
+  }
+  function stillAll() {
+    for (const [svg, st] of live) { st.ex = st.ey = st.lx = st.lr = 0; ["--ex", "--ey", "--lx", "--lr"].forEach((k) => svg.style.removeProperty(k)); }
+  }
+  window.addEventListener("pointermove", (e) => {
+    const now = performance.now(), dt = Math.max(1, now - pointer.t);
+    if (Number.isFinite(pointer.x)) pointer.speed = pointer.speed * 0.5 + (Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) / dt) * 0.5;
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = now; pointer.movedAt = now;
+    schedule();
+  }, { passive: true });
+  /* The pointer leaves the window: a short look-around, then back to idle. */
+  function pointerLeft() {
+    if (pointer.movedAt < 0) return;
+    pointer.movedAt = -1e9; pointer.speed = 0;
+    let i = 0;
+    for (const [svg, st] of live) if (st.visible && faceTracks(svg)) setTimeout(() => flash(svg, "around"), (i++ % 12) * 60);
+    schedule();
+  }
+  html.addEventListener("mouseleave", pointerLeft);
+  window.addEventListener("pointerout", (e) => { if (!e.relatedTarget) pointerLeft(); });
+  window.addEventListener("scroll", () => { rectsDirty = true; schedule(); }, { passive: true });
+  window.addEventListener("resize", () => { rectsDirty = true; schedule(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { rectsDirty = true; schedule(); } });
+
+  /* Calm: the system preference or the setting. */
+  function applyCalm() {
+    const on = calmPref || reduce.matches;
+    html.classList.toggle("calm", on);
+    document.querySelectorAll("[data-calm]").forEach((b) => b.setAttribute("aria-checked", String(calmPref)));
+    if (on) stillAll(); else schedule();
+  }
+  reduce.addEventListener("change", applyCalm);
+
+  /* Status, events and pokes: attribute flips on one SVG. */
+  const timers = new WeakMap(), flashes = new WeakMap();
+  const EVENT = Object.fromEntries(EVENTS.map(([id, , , spec]) => [id, spec]));
+  function setStatus(svg, s, asBase = true) {
+    svg.dataset.s = s; svg.dataset.face = STATUS_FACE[s];
+    if (asBase) svg.dataset.base = s;
+  }
+  /** A micro-event: a class for a moment, beside whatever else is running. */
+  function flash(svg, name) {
+    const key = `ev-${name}`, ms = EVENT[name] ? EVENT[name].ms : EXTRA_MS[name] || 800;
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get(key));
+    svg.classList.remove(key); void svg.getBoundingClientRect(); svg.classList.add(key);
+    box.set(key, setTimeout(() => svg.classList.remove(key), ms));
+    flashes.set(svg, box);
+  }
+  function endEvent(svg) {
+    clearTimeout(timers.get(svg));
+    const name = svg.dataset.ev;
+    if (!name) return;
+    delete svg.dataset.ev; delete svg.dataset.hold;
+    svg.classList.remove(`ev-${name}`);
+    setStatus(svg, svg.dataset.base, false);
+    if (name === "power" && svg.dataset.base !== "off") flash(svg, "boot");
+  }
+  const MICRO = {
+    saccade: (svg) => { const st = live.get(svg); if (st) { st.glancing = false; st.glanceAt = 0; } },
+    camera: (svg) => { const st = live.get(svg); if (st) st.cameraUntil = performance.now() + 1700; },
+    dbl: (svg) => { if (!svg.style.getPropertyValue("--dtx")) svg.style.setProperty("--dtx", Math.random() < .5 ? "1" : "-1"); },
+  };
+  const LIFE_ACTIONS = { poke: (svg) => poke(svg), hello: (svg) => flash(svg, "hello"), bye: (svg) => bye(svg) };
+  function fire(svg, name) {
+    if (LIFE_ACTIONS[name]) { LIFE_ACTIONS[name](svg); return; }
+    const ev = EVENT[name];
+    if (!ev) return;
+    if (MICRO[name]) MICRO[name](svg);
+    if (!ev.face && !ev.status && !ev.hold) { flash(svg, name); schedule(); return; }
+    endEvent(svg);
+    void svg.getBoundingClientRect(); // so a repeated event restarts its animation
+    if (ev.status) setStatus(svg, ev.status, false);
+    else svg.dataset.face = ev.face;
+    if (ev.hold) svg.dataset.hold = "1";
+    svg.classList.add(`ev-${name}`);
+    svg.dataset.ev = name;
+    timers.set(svg, setTimeout(() => endEvent(svg), ev.ms));
+  }
+  function poke(svg) {
+    svg.classList.remove("poked"); void svg.getBoundingClientRect(); svg.classList.add("poked");
+    const startled = svg.dataset.s !== "off" && svg.dataset.s !== "stuck" && !svg.dataset.ev;
+    if (startled) svg.dataset.face = "wide";
+    const box = flashes.get(svg) || new Map();
+    clearTimeout(box.get("poked"));
+    box.set("poked", setTimeout(() => { svg.classList.remove("poked"); if (!svg.dataset.ev) svg.dataset.face = STATUS_FACE[svg.dataset.s]; }, EXTRA_MS.poked));
+    flashes.set(svg, box);
+  }
+  function bye(svg) {
+    if (isCalm()) return;
+    flash(svg, "bye");
+    setTimeout(() => svg.classList.add("gone"), 780);
+    setTimeout(() => { svg.classList.remove("gone"); flash(svg, "hello"); }, 1500);
+  }
+  document.addEventListener("click", (e) => {
+    const svg = e.target.closest("svg.bot.live");
+    if (svg) poke(svg);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches("svg.bot.live")) { e.preventDefault(); poke(e.target); }
+  });
+
+  /* Random life: now and then one visible bot does one small idle thing. */
+  const LIFE = [["dblblink", 2], ["saccade", 4], ["camera", 1], ["tilt", 1.2], ["whirr", 1.4]];
+  function lifeTick() {
+    const wait = 900 + Math.random() * 2200;
+    if (!PG.life || document.hidden || isCalm()) { setTimeout(lifeTick, wait); return; }
+    const cands = [];
+    for (const [svg, st] of live) if (st.visible && !svg.dataset.ev && faceTracks(svg)) cands.push(svg);
+    if (cands.length) {
+      const svg = cands[Math.floor(Math.random() * cands.length)], total = LIFE.reduce((a, [, w]) => a + w, 0);
+      let pick = Math.random() * total, name = LIFE[0][0];
+      for (const [id, w] of LIFE) { pick -= w; if (pick <= 0) { name = id; break; } }
+      fire(svg, name);
+    }
+    setTimeout(lifeTick, wait);
+  }
+
+  /* Build the page. */
+  const built = buildAll();
+  const SLOTS = [["heroStrip", "hero"], ["dirs", "dirs"], ["kit", "kit"], ["ctxDirs", "ctx"], ["recoRow", "reco"], ["verdicts", "verdicts"], ["legacyRows", "legacy"], ["pgControls", "pgControls"], ["pgStage", "pgStage"]];
+  for (const [id, key] of SLOTS) document.getElementById(id).innerHTML = built[key];
+  register(document);
+  applyCalm();
+  setTimeout(lifeTick, 1500);
+
+  /* The playground and the context switcher. */
+  const pg = document.getElementById("pg");
+  const stageBots = () => Array.from(document.querySelectorAll("#pgStage svg.bot"));
+  function rerender(controls) {
+    if (controls) document.getElementById("pgControls").innerHTML = pgControls(PG);
+    document.getElementById("pgStage").innerHTML = pgStage(PG);
+    register(pg);
+    stageBots().forEach((svg) => flash(svg, "hello"));
+  }
+  pg.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const d = b.dataset;
+    if (d.pgDir) { PG.dir = d.pgDir; PG.v = 0; rerender(true); }
+    else if (d.pgV !== undefined) { PG.v = Number(d.pgV); rerender(true); }
+    else if (d.pgC !== undefined) { PG.c = Number(d.pgC); rerender(true); }
+    else if (d.pgS) {
+      PG.s = d.pgS;
+      stageBots().forEach((svg) => { endEvent(svg); setStatus(svg, PG.s); if (PG.s === "off") fire(svg, "power"); });
+      pg.querySelectorAll("[data-pg-s]").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.pgS === PG.s)));
+    }
+    else if (d.pgEv) { stageBots().forEach((svg, i) => setTimeout(() => fire(svg, d.pgEv), i * 90)); }
+    else if (b.hasAttribute("data-life")) { PG.life = !PG.life; b.setAttribute("aria-checked", String(PG.life)); }
+  });
+  document.getElementById("ctxDirs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ctx-dir]");
+    if (!b) return;
+    document.getElementById("kit").innerHTML = kitSlots(b.dataset.ctxDir);
+    document.getElementById("ctxDirs").innerHTML = ctxChips(b.dataset.ctxDir);
+    register(document.getElementById("kit"));
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-calm]")) return;
+    calmPref = !calmPref;
+    applyCalm();
+  });
+})();
+</script>
+</body>
+</html>

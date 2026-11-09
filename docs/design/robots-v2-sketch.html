@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Robots v2</title>
+<meta name="description" content="Five original robot avatar directions and a cozy UI kit sample for Roost's next look.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost robots v2 sketch. Self-contained: no fonts, images or scripts
+   from anywhere else. Dark only (V4). The :root values are copied from
+   web/src/styles/tokens.css; the --new-* values are the proposal.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-overlay: #26262f;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-border-strong: #3a3a45;
+  --color-accent: #7c3aed;
+  --color-accent-hover: #6d28d9;
+  --color-accent-strong: #a78bfa;
+  --color-accent-soft: #c4b5fd;
+  --color-accent-tint: rgb(124 58 237 / 0.18);
+  --color-on-accent: #ffffff;
+  --color-ok: #34d399;
+  --color-warn: #f5a524;
+  --color-danger: #f87171;
+  --color-danger-text: #fecaca;
+  --color-danger-tint: rgb(248 113 113 / 0.1);
+  --color-off: #9ca3af;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  --radius-xs: 6px; --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px; --radius-pill: 999px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem; --fs-lead: 1rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem; --fs-display: 1.75rem;
+  --control-sm: 28px; --control-md: 34px; --control-lg: 40px;
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 18px 48px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.35);
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-fast: 140ms;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-strong);
+
+  /* The proposal (Section B's table) */
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-hover: #6152cf;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-item: 30px;
+  --new-pad-item: 8px;
+  --new-fs-menu: 0.8125rem;
+  --new-icon: 16px;
+  --new-gap: 4px;
+  --robot-ring: var(--color-panel);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; gap: 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+.lede { color: var(--color-text-secondary); max-width: 70ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 72ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+
+/* ---- Section A ------------------------------------------------------- */
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--color-text-secondary); font-size: var(--fs-label); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dirs { display: grid; gap: 24px; }
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 20px; }
+.dir[data-picked="true"] { border-color: var(--new-accent-strong); box-shadow: 0 0 0 1px var(--new-accent-strong); }
+.dir-head { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.dir-num { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--color-raised); font-family: var(--font-round); font-weight: 800; color: var(--color-text-secondary); flex: none; }
+.dir-title { flex: 1 1 260px; min-width: 0; }
+.dir-title p { color: var(--color-text-secondary); }
+.pick { font: inherit; font-size: var(--fs-label); font-weight: 600; height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; }
+.pick:hover { background: #26262f; }
+.pick:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pick[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.blocks { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.blk { grid-column: span 6; background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.blk.full { grid-column: 1 / -1; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.cell { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.sizes { display: flex; gap: 8px; align-items: center; }
+.bot { display: block; overflow: visible; flex: none; }
+.note { font-size: var(--fs-caption); color: var(--color-text-faint); }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+@media (max-width: 860px) { .blk { grid-column: 1 / -1; } }
+
+/* Robot motion: only for people who have not asked for less */
+@media (prefers-reduced-motion: no-preference) {
+  .a-breathe { animation: breathe 3.6s ease-in-out infinite; transform-box: view-box; transform-origin: 24px 46px; }
+  .a-look { animation: look 2.4s ease-in-out infinite; }
+  .a-pulse { animation: pulse 1.2s ease-in-out infinite; }
+  .a-glow { animation: glow 3.2s ease-in-out infinite; }
+  .a-sweep { animation: sweep 1.4s ease-in-out infinite alternate; }
+  .a-shake { animation: shake 0.5s steps(2) infinite; }
+  .a-hop { animation: hop 1.1s ease-in-out infinite; }
+  .a-sway { animation: sway 4s ease-in-out infinite; transform-box: view-box; transform-origin: var(--ox, 24px) var(--oy, 14px); }
+  .a-wiggle { animation: wiggle 0.9s ease-in-out infinite; transform-box: view-box; transform-origin: var(--ox, 24px) var(--oy, 14px); }
+  .a-spin { animation: spin 1s linear infinite; transform-box: fill-box; transform-origin: center; }
+  .a-seq { animation: seq 1.2s steps(1) infinite; }
+  .a-seq.d2 { animation-delay: 0.3s; }
+  .a-seq.d3 { animation-delay: 0.6s; }
+  .a-flat { animation: flat 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .a-glitch { animation: glitch 0.45s steps(2) infinite; }
+}
+@keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03); } }
+@keyframes look { 0%, 35% { transform: translateX(-1.8px); } 50%, 85% { transform: translateX(1.8px); } 100% { transform: translateX(-1.8px); } }
+@keyframes pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+@keyframes sweep { from { transform: translateX(calc(var(--d, 8px) * -1)); } to { transform: translateX(var(--d, 8px)); } }
+@keyframes shake { 0% { transform: translateX(-0.6px); } 50% { transform: translateX(0.6px); } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-1.6px); } }
+@keyframes sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes seq { 0% { opacity: 0.25; } 33% { opacity: 1; } 66% { opacity: 0.25; } }
+@keyframes flat { 0%, 100% { transform: scaleX(0.7); opacity: 0.6; } 50% { transform: scaleX(1); opacity: 1; } }
+@keyframes glitch { 0% { transform: translate(-0.7px, 0.3px); } 50% { transform: translate(0.7px, -0.3px); } }
+.s-off .pose { filter: saturate(0.35); }
+
+/* ---- Section B: side by side ------------------------------------------ */
+.pairs { display: grid; gap: 20px; }
+.pair { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+.pair-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.pair-head p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.side { background: var(--color-bg); border-radius: 14px; padding: 18px; display: grid; gap: 12px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; }
+.side > h4 { justify-self: stretch; display: flex; justify-content: space-between; }
+.side > h4 i { font-style: normal; color: var(--new-accent-strong); }
+@media (max-width: 760px) { .sides { grid-template-columns: minmax(0, 1fr); } }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.now .ico { width: 18px; height: 18px; stroke-width: 1.8; }
+.rule-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.rule-list span { font-size: var(--fs-caption); padding: 3px 9px; border-radius: 8px; background: var(--color-raised); color: var(--color-text-secondary); box-shadow: var(--new-edge-inner); }
+
+/* Current kit, as it ships today (ui-overlays.css and ui.css) */
+.now { font-size: var(--fs-body); }
+.now-surface { background: var(--color-overlay); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+.now-menu { min-width: 220px; padding: var(--space-1); display: flex; flex-direction: column; max-width: 100%; }
+.now-item { display: flex; align-items: center; gap: var(--space-2); min-height: var(--control-md); padding: 0 var(--space-3); border-radius: var(--radius-sm); font-size: var(--fs-body); color: var(--color-text); }
+.now-item.hl { background: var(--color-accent); color: var(--color-on-accent); box-shadow: inset 0 0 0 1px var(--color-accent-strong); }
+.now-btn { display: inline-flex; align-items: center; gap: 8px; height: var(--control-md); padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-strong); background: var(--color-raised); color: var(--color-text); font: inherit; font-weight: 600; }
+.now-btn.primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.now-tabs { display: flex; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-panel); max-width: 100%; overflow: hidden; }
+.now-tab { flex: 1 0 auto; min-height: var(--control-md); padding: 0 var(--space-4); border-radius: var(--radius-pill); color: var(--color-text-secondary); font-size: var(--fs-label); font-weight: 600; display: grid; place-items: center; }
+.now-tab.on { background: var(--color-raised); color: var(--color-text); }
+.now-select { width: 220px; max-width: 100%; height: var(--control-md); padding: 0 var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); display: flex; align-items: center; justify-content: space-between; }
+.now-pop { width: 320px; max-width: 100%; padding: var(--space-4); display: grid; gap: var(--space-3); }
+.now-pop h5 { margin: 0; font-size: var(--fs-heading); font-weight: 600; }
+.now-tiles { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.now-tile { width: 56px; height: 56px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--color-raised); }
+.now-tile.on { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent); }
+.now-swatches { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.now-sw { width: 28px; height: 28px; border-radius: 50%; }
+.now-sw.on { box-shadow: 0 0 0 2px var(--color-overlay), 0 0 0 4px var(--color-text); }
+.now-toast { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border: 1px solid var(--color-ok); border-radius: var(--radius-md); background: var(--color-overlay); box-shadow: var(--shadow-md); width: 340px; max-width: 100%; }
+.now-toast p { flex: 1; }
+.now-side { width: 300px; max-width: 100%; background: var(--color-panel); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); display: grid; gap: 2px; }
+.now-row { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); min-width: 0; }
+.now-row.on { background: var(--color-raised); border: 1px solid var(--color-border-strong); }
+.now-row b { font-weight: 600; display: block; }
+.now-row small { color: var(--color-text-secondary); font-size: var(--fs-label); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.now-hero { width: 380px; max-width: 100%; background: var(--color-panel); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); display: grid; justify-items: center; gap: var(--space-3); text-align: center; }
+.now-hero h5 { margin: 0; font-size: var(--fs-title); font-weight: 700; }
+.now-hero .acts { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+/* Proposed cozy kit */
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-menu { min-width: 208px; padding: 4px; display: flex; flex-direction: column; gap: 1px; max-width: 100%; }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-item { display: flex; align-items: center; gap: 8px; height: var(--new-item); padding: 0 var(--new-pad-item); border-radius: var(--new-radius-item); color: var(--color-text); cursor: default; }
+.cz-item .ico { color: var(--color-text-secondary); }
+.cz-item kbd { margin-left: auto; font-family: var(--font-sans); font-size: var(--fs-caption); color: var(--color-text-faint); }
+.cz-item:hover, .cz-item.hl { background: var(--new-hover); }
+.cz-item.hl .ico, .cz-item:hover .ico { color: var(--color-text); }
+.cz-item.danger, .cz-item.danger .ico { color: var(--color-danger); }
+.cz-item.danger:hover { background: var(--color-danger-tint); }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn:hover { background: #26262f; }
+.cz-btn.ghost { background: transparent; box-shadow: none; color: var(--color-text-secondary); }
+.cz-btn.ghost:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14); }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: inline-flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { height: 26px; padding: 0 10px; border-radius: 7px; display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-secondary); font-weight: 600; white-space: nowrap; }
+.cz-tab:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-tab.on { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-select { width: 200px; max-width: 100%; height: 30px; padding: 0 8px 0 10px; border-radius: 10px; background: var(--color-raised); box-shadow: var(--new-edge-inner); display: flex; align-items: center; gap: 8px; }
+.cz-select span { flex: 1; }
+.cz-select .ico { color: var(--color-text-secondary); }
+.cz-check { margin-left: auto; color: var(--new-accent-strong); }
+.cz-pop { width: 272px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: flex; flex-wrap: wrap; gap: var(--new-gap); }
+.cz-tile { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; }
+.cz-tile:hover { background: var(--new-hover); }
+.cz-tile.on { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-foot { display: flex; gap: var(--new-gap); justify-content: space-between; padding-top: 8px; border-top: 1px solid rgb(255 255 255 / 0.06); }
+.cz-toast { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 8px; border-radius: var(--new-radius-surface); background: var(--new-overlay); box-shadow: var(--new-edge-inner), var(--new-shadow); width: 300px; max-width: 100%; }
+.cz-toast p { flex: 1; min-width: 0; }
+.cz-toast p b { font-weight: 600; }
+.cz-side { width: 260px; max-width: 100%; background: var(--color-panel); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-pins { display: flex; gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { flex: 1; display: grid; justify-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin .unread { position: absolute; top: 6px; right: 10px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row:hover { background: var(--new-hover); }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; font-size: var(--new-fs-menu); display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 340px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-panel); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; background: linear-gradient(180deg, rgb(110 168 254 / 0.22), rgb(110 168 254 / 0)); }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); }
+.cz-status .dot { width: 7px; height: 7px; background: var(--new-accent-strong); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+
+/* ---- Tables and the close ------------------------------------------- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 560px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-accent-soft); }
+td.was { color: var(--color-text-faint); }
+.chip-c { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; box-shadow: var(--new-edge-inner); }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 74ch; }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-accent-soft); word-break: break-word; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+.pickbar { position: sticky; bottom: 12px; justify-self: center; background: var(--new-overlay); box-shadow: var(--new-edge-inner), var(--new-shadow); border-radius: 12px; padding: 8px 12px; font-size: var(--fs-label); color: var(--color-text-secondary); display: flex; gap: 8px; align-items: center; max-width: 100%; }
+.pickbar b { color: var(--color-text); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<!-- 16px icons, drawn for this sketch -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 16 16"><path d="M12.8 9.6A5.2 5.2 0 0 1 6.4 3.2a5.2 5.2 0 1 0 6.4 6.4z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 16 16"><path d="M8 2.2l1.8 3.6 3.9.6-2.8 2.8.7 3.9L8 11.3l-3.6 1.8.7-3.9-2.8-2.8 3.9-.6z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 16 16"><path d="M8 10V2.5M5 5.2L8 2.3l3 2.9"/><path d="M3.5 8.5v3.8c0 .7.5 1.2 1.2 1.2h6.6c.7 0 1.2-.5 1.2-1.2V8.5"/></symbol>
+  <symbol id="i-retire" viewBox="0 0 16 16"><path d="M2.8 4.5h10.4M6.5 4.5V3h3v1.5M4.3 4.5l.6 8.3c0 .4.4.7.8.7h4.6c.4 0 .8-.3.8-.7l.6-8.3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 16 16"><path d="M4.5 6.5L8 10l3.5-3.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-6.5"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3.2 7.5a5 5 0 1 1 1.4 3.9"/><path d="M3 4v3.6h3.6"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+  <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 7.3V11M8 5h.01"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 16 16"><path d="M4.5 2.5h4.5l2.5 2.5v8c0 .3-.2.5-.5.5h-6.5a.5.5 0 0 1-.5-.5v-10c0-.3.2-.5.5-.5z"/><path d="M9 2.5V5h2.5"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 16 16"><rect x="2.5" y="3" width="11" height="7.5" rx="1.3"/><path d="M6 13.2h4M8 10.5v2.7"/></symbol>
+  <symbol id="i-link" viewBox="0 0 16 16"><path d="M7 9a2.5 2.5 0 0 0 3.6 0l2-2a2.5 2.5 0 0 0-3.6-3.6l-.6.6"/><path d="M9 7a2.5 2.5 0 0 0-3.6 0l-2 2A2.5 2.5 0 0 0 7 12.6l.6-.6"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost robots, round two</h1>
+    <p class="lede">A sketch for the next look: five original robot directions to choose from (A), the kit made smaller and cozier, shown next to today's (B), and one recommendation with the code it touches (C). Nothing in the app changes until a direction is picked.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="One robot from each direction"></div>
+  </header>
+
+  <!-- ================================================================ A -->
+  <section class="section" aria-labelledby="secA">
+    <h2 id="secA">A · Five avatar directions <small>pick one</small></h2>
+    <p>Every direction is drawn on a 48-unit grid so it stays sharp at 24px. Bodies are one flat colour with a gentle darker lower band and a small highlight. The five statuses show in the face and the pose, and three of them add a small corner badge so they still read at chip size. The main bot wears a butter star on the lower corner. A picture you upload sits in the screen or face area, and the status badge stays on.</p>
+    <div class="legend" aria-label="How a status shows">
+      <span><i class="dot" style="background:#a9a9b6"></i>Resting: eyes closed, a slow breath</span>
+      <span><i class="dot" style="background:#b2a6f6"></i>On it: eyes and lights move</span>
+      <span><i class="dot" style="background:#f5a524"></i>Asking you: a head tilt and a ? badge</span>
+      <span><i class="dot" style="background:#f87171"></i>Stuck: a small shake and a ! badge</span>
+      <span><i class="dot" style="background:#9ca3af"></i>Off duty: dimmed, settled down, a moon badge</span>
+    </div>
+    <div>
+      <h4 style="margin-bottom:10px">The palette: ten colours tuned for dark surfaces (shared by all five)</h4>
+      <div class="row" id="paletteRow"></div>
+    </div>
+    <div class="dirs" id="dirs"></div>
+  </section>
+
+  <!-- ================================================================ B -->
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">B · The cozy kit <small>now / proposed</small></h2>
+    <p>The same seven pieces, today's style on the left and the proposed one on the right. The robots on the right are direction 1, Soft bot.</p>
+    <div class="rule-list" aria-label="The cozy rules">
+      <span>13px menu type</span><span>6–8px item padding</span><span>30px items</span><span>10–12px radius</span><span>soft layered shadows</span><span>1px inner border</span><span>hover fill, not an outline</span><span>16px icons</span><span>4px gaps</span><span>a calmer accent</span>
+    </div>
+    <div class="pairs">
+
+      <article class="pair">
+        <div class="pair-head"><h3>Menu</h3><p>The bot's ⋯ menu. The highlighted row is a quiet fill, not a solid violet bar.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-surface now-menu" role="presentation">
+              <div class="now-item">Pin</div>
+              <div class="now-item hl">Off duty</div>
+              <div class="now-item">Make main</div>
+              <div class="now-item">Share as Template</div>
+              <div class="now-item">Retire this bot</div>
+            </div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>13px · 30px rows</i></h4>
+            <div class="cz-surface cz-menu" role="presentation">
+              <div class="cz-label"><span class="av" data-dir="soft" data-c="1" data-v="0" data-s="rest" data-size="16"></span>Scout</div>
+              <div class="cz-item"><svg class="ico"><use href="#i-pin"/></svg>Pin</div>
+              <div class="cz-item hl"><svg class="ico"><use href="#i-moon"/></svg>Off duty</div>
+              <div class="cz-item"><svg class="ico"><use href="#i-star"/></svg>Make main</div>
+              <div class="cz-item"><svg class="ico"><use href="#i-share"/></svg>Share as Template</div>
+              <div class="cz-sep"></div>
+              <div class="cz-item danger"><svg class="ico"><use href="#i-retire"/></svg>Retire this bot</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Popover</h3><p>The avatar picker card: shapes, colours, Upload and Reset.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-surface now-pop">
+              <h5>Look</h5>
+              <div class="now-tiles">
+                <div class="now-tile on"><span class="av" data-dir="now" data-head="classic" data-color="#3b82f6" data-size="40"></span></div>
+                <div class="now-tile"><span class="av" data-dir="now" data-head="wide" data-color="#3b82f6" data-size="40"></span></div>
+                <div class="now-tile"><span class="av" data-dir="now" data-head="soft" data-color="#3b82f6" data-size="40"></span></div>
+                <div class="now-tile"><span class="av" data-dir="now" data-head="classic" data-color="#3b82f6" data-size="40"></span></div>
+              </div>
+              <div class="now-swatches">
+                <i class="now-sw" style="background:#8b5cf6"></i><i class="now-sw on" style="background:#3b82f6"></i><i class="now-sw" style="background:#14b8a6"></i><i class="now-sw" style="background:#22c55e"></i><i class="now-sw" style="background:#f97316"></i><i class="now-sw" style="background:#ec4899"></i><i class="now-sw" style="background:#ef4444"></i><i class="now-sw" style="background:#eab308"></i>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="now-btn">Upload picture</span><span class="now-btn">Reset</span></div>
+            </div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>272px · 40px tiles</i></h4>
+            <div class="cz-surface cz-pop">
+              <div class="cz-pop-head"><span class="av" data-dir="soft" data-c="1" data-v="0" data-s="rest" data-size="44"></span><div><b>Scout</b><small>Shape and colour</small></div></div>
+              <div class="cz-tiles" id="pickerTiles"></div>
+              <div class="cz-swatches" id="pickerSwatches"></div>
+              <div class="cz-foot"><span class="cz-btn"><svg class="ico"><use href="#i-upload"/></svg>Upload picture</span><span class="cz-btn ghost"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Tabs</h3><p>The Profile's tabs: a small segmented bar with a raised, softly shadowed active tab.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-tabs"><span class="now-tab on">Info</span><span class="now-tab">Documents</span><span class="now-tab">Computer</span><span class="now-tab">Links</span></div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>26px · 4px gaps</i></h4>
+            <div class="cz-tabs"><span class="cz-tab on"><svg class="ico"><use href="#i-info"/></svg>Info</span><span class="cz-tab"><svg class="ico"><use href="#i-doc"/></svg>Documents</span><span class="cz-tab"><svg class="ico"><use href="#i-screen"/></svg>Computer</span><span class="cz-tab"><svg class="ico"><use href="#i-link"/></svg>Links</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Select</h3><p>A task's repeat, closed and open.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-select"><span>Every week</span><svg class="ico"><use href="#i-chev"/></svg></div>
+            <div class="now-surface now-menu" style="min-width:220px">
+              <div class="now-item">Never</div><div class="now-item">Every day</div><div class="now-item hl">Every week</div><div class="now-item">Every month</div>
+            </div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>30px · 10px radius</i></h4>
+            <div class="cz-select"><span>Every week</span><svg class="ico"><use href="#i-chev"/></svg></div>
+            <div class="cz-surface cz-menu" style="min-width:200px">
+              <div class="cz-item">Never</div><div class="cz-item hl">Every day</div><div class="cz-item">Every week<svg class="ico cz-check"><use href="#i-check"/></svg></div><div class="cz-item">Every month</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Toast with Undo</h3><p>A small robot says who it is about; Undo is a quiet button.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-toast"><p>Scout is off duty.</p><span class="now-btn">Undo</span></div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>12px radius · layered shadow</i></h4>
+            <div class="cz-toast"><span class="av" data-dir="soft" data-c="1" data-v="0" data-s="off" data-size="24"></span><p><b>Scout</b> is off duty</p><span class="cz-btn">Undo</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Sidebar list</h3><p>Pinned robots sit on a small shelf on top; the rest are 40px rows.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-side">
+              <div class="now-row on"><span class="av" data-dir="now" data-head="classic" data-color="#8b5cf6" data-star="1" data-size="40"></span><div style="min-width:0"><b>Chief</b><small>I've added the three tasks for Monday.</small></div></div>
+              <div class="now-row"><span class="av" data-dir="now" data-head="wide" data-color="#3b82f6" data-size="40"></span><div style="min-width:0"><b>Scout</b><small>Found two flats under budget.</small></div></div>
+              <div class="now-row"><span class="av" data-dir="now" data-head="soft" data-color="#14b8a6" data-size="40"></span><div style="min-width:0"><b>Ledger</b><small>The October total is ready.</small></div></div>
+              <div class="now-row"><span class="av" data-dir="now" data-head="classic" data-color="#f97316" data-size="40"></span><div style="min-width:0"><b>Quill</b><small>Draft saved to Documents.</small></div></div>
+            </div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>pinned shelf · 13px names</i></h4>
+            <div class="cz-side">
+              <div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>
+              <div class="cz-pins">
+                <div class="cz-pin"><span class="av" data-dir="soft" data-c="0" data-v="0" data-s="onit" data-star="1" data-size="40" data-ring="#16161b"></span>Chief</div>
+                <div class="cz-pin"><span class="av" data-dir="soft" data-c="1" data-v="2" data-s="ask" data-size="40" data-ring="#16161b"></span>Scout<i class="unread"></i></div>
+                <div class="cz-pin"><span class="av" data-dir="soft" data-c="3" data-v="3" data-s="rest" data-size="40" data-ring="#16161b"></span>Ledger</div>
+              </div>
+              <div class="cz-sep"></div>
+              <div class="cz-row on"><span class="av" data-dir="soft" data-c="6" data-v="1" data-s="rest" data-size="40" data-ring="#16161b"></span><div><b>Quill</b><small>Draft saved to Documents.</small></div></div>
+              <div class="cz-row"><span class="av" data-dir="soft" data-c="8" data-v="4" data-s="stuck" data-size="40" data-ring="#16161b"></span><div><b>Courier</b><small>Stuck on a sign-in page.</small></div><i class="unread"></i></div>
+              <div class="cz-row"><span class="av" data-dir="soft" data-c="9" data-v="0" data-s="off" data-size="40" data-ring="#16161b"></span><div><b>Archivist</b><small>Off duty</small></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair">
+        <div class="pair-head"><h3>Panel hero</h3><p>The top of a bot's Profile: smaller, left-aligned, with a soft band in the bot's colour.</p></div>
+        <div class="sides">
+          <div class="side now"><h4>Now</h4>
+            <div class="now-hero">
+              <span class="av" data-dir="now" data-head="wide" data-color="#3b82f6" data-size="96"></span>
+              <h5>Scout</h5>
+              <span style="color:var(--color-accent-strong)">On it</span>
+              <div class="acts"><span class="now-btn primary">Chat</span><span class="now-btn">Take control</span><span class="now-btn">⋯</span></div>
+            </div>
+          </div>
+          <div class="side cz"><h4>Proposed <i>64px robot · 18px name</i></h4>
+            <div class="cz-hero">
+              <div class="cz-hero-band"></div>
+              <div class="cz-hero-body">
+                <div class="cz-hero-top">
+                  <span class="av" data-dir="soft" data-c="1" data-v="2" data-s="onit" data-size="64" data-ring="#16161b"></span>
+                  <div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div>
+                </div>
+                <div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div>
+                <span class="cz-status"><i class="dot"></i>On it · comparing three listings</span>
+                <div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <h3 style="margin-top:8px">Token changes</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Token</th><th>Current</th><th>Proposed</th><th>Used by</th></tr></thead>
+        <tbody>
+          <tr><td><code>--fs-menu</code> (new)</td><td class="was">none (menus use <code>--fs-body</code>, 14px)</td><td>13px (0.8125rem)</td><td>menu, select and tab items, toasts</td></tr>
+          <tr><td><code>--control-item</code> (new)</td><td class="was">none (items use <code>--control-md</code>, 34px)</td><td>30px</td><td>menu and select rows</td></tr>
+          <tr><td><code>--control-md</code></td><td class="was">34px</td><td>32px</td><td>buttons, inputs, selects</td></tr>
+          <tr><td><code>--pad-item</code> (new)</td><td class="was">12px (<code>--space-3</code>)</td><td>8px</td><td>item side padding</td></tr>
+          <tr><td><code>--radius-sm</code></td><td class="was">10px</td><td>8px</td><td>items, small buttons</td></tr>
+          <tr><td><code>--radius-md</code></td><td class="was">14px</td><td>12px</td><td>menus, popovers, toasts, selects</td></tr>
+          <tr><td><code>--color-overlay</code></td><td class="was"><i class="chip-c" style="background:#26262f"></i>#26262f</td><td><i class="chip-c" style="background:#1d1d24"></i>#1d1d24</td><td>menus, popovers, toasts</td></tr>
+          <tr><td><code>--edge-inner</code> (new)</td><td class="was">none (a 1px <code>--color-border</code> outline)</td><td>inset 0 0 0 1px rgb(255 255 255 / 0.06)</td><td>every raised surface</td></tr>
+          <tr><td><code>--color-hover</code> (new)</td><td class="was">none (highlight is solid <code>--color-accent</code>)</td><td>rgb(255 255 255 / 0.07)</td><td>hovered and keyboard-highlighted items</td></tr>
+          <tr><td><code>--shadow-lg</code></td><td class="was">0 18px 48px / .55, 0 2px 6px / .35</td><td>0 0 0 1px / .5, 0 2px 4px / .18, 0 8px 16px / .22, 0 20px 40px / .28</td><td>overlays</td></tr>
+          <tr><td><code>--icon-size</code> (new)</td><td class="was">none (14–20px, mixed)</td><td>16px</td><td>every kit icon</td></tr>
+          <tr><td><code>--gap-tight</code> (new, = <code>--space-1</code>)</td><td class="was">none</td><td>4px</td><td>tiles, tabs, button groups</td></tr>
+          <tr><td><code>--color-accent</code></td><td class="was"><i class="chip-c" style="background:#7c3aed"></i>#7c3aed</td><td><i class="chip-c" style="background:#6c5ce0"></i>#6c5ce0 (white on it 4.95:1)</td><td>primary buttons, selection</td></tr>
+          <tr><td><code>--color-accent-hover</code></td><td class="was">#6d28d9</td><td>#6152cf</td><td>primary hover</td></tr>
+          <tr><td><code>--color-accent-strong</code></td><td class="was"><i class="chip-c" style="background:#a78bfa"></i>#a78bfa</td><td><i class="chip-c" style="background:#b2a6f6"></i>#b2a6f6 (7.5:1 or more on every surface)</td><td>links, focus ring, On it</td></tr>
+          <tr><td><code>--color-accent-tint</code></td><td class="was">rgb(124 58 237 / 0.18)</td><td>rgb(108 92 224 / 0.16)</td><td>selected tiles</td></tr>
+          <tr><td><code>--robot-screen</code></td><td class="was">#0b0a11</td><td>#1a1925</td><td>the visor and screens</td></tr>
+          <tr><td><code>--robot-star</code></td><td class="was">#f59e0b</td><td>#f6c453</td><td>the main bot's star</td></tr>
+          <tr><td><code>--robot-ring</code> (new)</td><td class="was">none</td><td>= the surface behind (<code>--color-panel</code>)</td><td>the ring round a badge</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================ C -->
+  <section class="section" aria-labelledby="secC">
+    <h2 id="secC">C · Recommendation</h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Go with direction 1, Soft bot, plus the cozy kit.</b> It is the calmest of the five, and it is still plainly a robot and plainly Roost's. The squircle head and pill visor read cleanly at 24px. The visor is a ready frame for an uploaded picture, and the round eyes carry the five statuses without new glyph art. It also keeps today's idea of a head with a screen, so moving to it feels like an upgrade, not a rebrand. Pebble is the strongest runner-up if you want even less detail. Sprout's leaf could join later as one more Soft bot antenna. Ship the kit tweaks first, because they are small and low-risk and change how every menu feels. Then swap the heads.</p>
+      <div class="map">
+        <div><code>web/src/components/robot/heads.tsx</code><p>Five Soft bot heads on a 48-unit grid (Square, Tall, Wide, Dome, Eared), each drawn by one two-tone body helper (base colour, a lower band at shade 0.74 and a small highlight) and a visor box. Head names reuse <code>classic</code>, <code>tall</code>, <code>wide</code> and <code>soft</code> and add <code>eared</code>.</p></div>
+        <div><code>web/src/components/robot/look.ts</code><p>The old shapes keep drawing through the one table: <code>cube</code> → Square and <code>monitor</code> → Wide join <code>LEGACY_SHAPE_TO_HEAD</code> next to the five bird shapes. Stored avatars keep their values and nothing migrates. <code>roost/constants.py</code> (<code>ROBOT_HEADS</code>, <code>LEGACY_AVATAR_SHAPES</code>) and <code>tests/test_bot_look.py</code> move in step.</p></div>
+        <div><code>signals*.tsx, StatusBadge.tsx, RobotFace.tsx</code><p>The three screen styles give way to eyes in the visor (closed, looking, looking up, crossed, flat). <code>StatusBadge</code> becomes the one corner badge (? · ! · moon) for every robot, with or without a picture. <code>robotScreen()</code> still accepts stored screen values.</p></div>
+        <div><code>web/src/components/robot/palette.ts</code><p>Ten new swatches. <code>BOT_DEFAULT_COLORS</code> and <code>roost/constants.py</code> stay the same list. Any stored hex still draws.</p></div>
+        <div><code>web/src/styles/robot.css</code><p>Breathe, look, shake and the antenna pulse, all inside <code>prefers-reduced-motion: no-preference</code> and off when <code>still</code> is set. Posture (tilt, settling down, dimming) stays put without motion.</p></div>
+        <div><code>web/src/styles/tokens.css</code><p>The token table above. <code>web/tests/tokens.test.ts</code> still holds every text colour at 4.5:1 or more.</p></div>
+        <div><code>web/src/ui/ + ui-overlays.css, ui.css</code><p>Menu, Select, Tabs, Popover, Sheet, Tooltip and Toast take the new tokens. Highlighted items use <code>--color-hover</code> in place of the accent fill. Menu and Select items get a 16px icon slot. Surfaces swap the 1px border for <code>--edge-inner</code> and the layered shadow.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pickbar" id="pickbar" aria-live="polite">Your pick: <b id="pickName">none yet</b></div>
+</main>
+
+<script>
+"use strict";
+/* Builds every robot on the page from small SVG strings. Pure functions up top; the page wiring at
+   the bottom runs only in a browser. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8]; // the six colours each direction shows at three sizes
+const STATUSES = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"]];
+const STATUS_COLOR = { onit: "#b2a6f6", ask: "#f5a524", stuck: "#f87171", off: "#9ca3af" };
+const VISOR = "#1a1925";
+const INK_DARK = "#1a1824";
+const RING = "#0e0e12"; // the surface behind Section A's robots
+const STAR = "#f6c453";
+const SHADE = 0.74;
+const LIFT = 2.6; // how far the base colour sits above the lower band
+const EYE_R = 2.5;
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const toHex = (rgb) => "#" + rgb.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+const tint = (hex, a) => toHex(channels(hex).map((v) => v + (255 - v) * a));
+const shade = (hex, k) => toHex(channels(hex).map((v) => v * k));
+
+/** A squircle-ish closed path; k near 0.55 is an ellipse, near 0.9 a soft square. */
+function sq(cx, cy, w, h, kt = 0.9, kb = kt) {
+  const hw = w / 2, hh = h / 2, x0 = cx - hw, x1 = cx + hw, y0 = cy - hh, y1 = cy + hh;
+  return `M${f(cx)} ${f(y0)}C${f(cx + hw * kt)} ${f(y0)} ${f(x1)} ${f(cy - hh * kt)} ${f(x1)} ${f(cy)}` +
+    `C${f(x1)} ${f(cy + hh * kb)} ${f(cx + hw * kb)} ${f(y1)} ${f(cx)} ${f(y1)}` +
+    `C${f(cx - hw * kb)} ${f(y1)} ${f(x0)} ${f(cy + hh * kb)} ${f(x0)} ${f(cy)}` +
+    `C${f(x0)} ${f(cy - hh * kt)} ${f(cx - hw * kt)} ${f(y0)} ${f(cx)} ${f(y0)}Z`;
+}
+
+function rr(x, y, w, h, r) {
+  const q = Math.min(r, w / 2, h / 2);
+  return `M${f(x + q)} ${f(y)}H${f(x + w - q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + w)} ${f(y + q)}V${f(y + h - q)}` +
+    `A${f(q)} ${f(q)} 0 0 1 ${f(x + w - q)} ${f(y + h)}H${f(x + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x)} ${f(y + h - q)}` +
+    `V${f(y + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + q)} ${f(y)}Z`;
+}
+
+/** The two-tone body: the whole shape in the shade, the base colour lifted inside it, a small gloss. */
+function body(d, color, gloss) {
+  const id = uid("b");
+  const shine = gloss ? `<ellipse cx="${f(gloss[0])}" cy="${f(gloss[1])}" rx="3.4" ry="1.7" fill="#fff" opacity=".22" transform="rotate(-24 ${f(gloss[0])} ${f(gloss[1])})"/>` : "";
+  return `<clipPath id="${id}"><path d="${d}"/></clipPath><path d="${d}" fill="${shade(color, SHADE)}"/>` +
+    `<g clip-path="url(#${id})"><path d="${d}" fill="${color}" transform="translate(0 -${LIFT})"/></g>${shine}`;
+}
+
+/** Two eyes in one of five states. */
+function eyes(kind, lx, rx, y, ink, r = EYE_R) {
+  const sw = f(r * 0.72);
+  const line = (d) => `<path d="${d}" stroke="${ink}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+  const both = (one) => one(lx) + one(rx);
+  if (kind === "closed") return both((x) => line(`M${f(x - r)} ${f(y - 0.6)}q${f(r)} ${f(r * 1.1)} ${f(r * 2)} 0`));
+  if (kind === "flat") return both((x) => line(`M${f(x - r * 0.9)} ${f(y + 0.4)}h${f(r * 1.8)}`));
+  if (kind === "x") {
+    const a = r * 0.85;
+    return both((x) => line(`M${f(x - a)} ${f(y - a)}l${f(a * 2)} ${f(a * 2)}M${f(x + a)} ${f(y - a)}l${f(-a * 2)} ${f(a * 2)}`));
+  }
+  const dy = kind === "up" ? -r * 0.55 : 0;
+  const dots = both((x) => `<circle cx="${f(x)}" cy="${f(y + dy)}" r="${f(r)}" fill="${ink}"/>`);
+  return kind === "look" ? `<g class="a-look">${dots}</g>` : dots;
+}
+
+const GLYPHS = {
+  ask: `<path d="M37.9 7.1a2.2 2.2 0 1 1 3.1 2c-.6.3-1 .8-1 1.4v.2" stroke="${INK_DARK}" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="40" cy="12.9" r=".95" fill="${INK_DARK}"/>`,
+  stuck: `<path d="M40 5.4v4.6" stroke="${INK_DARK}" stroke-width="1.8" stroke-linecap="round"/><circle cx="40" cy="12.7" r="1" fill="${INK_DARK}"/>`,
+  off: `<path d="M41.4 5.2a4 4 0 1 0 2.3 6.4 3.3 3.3 0 0 1-2.3-6.4z" fill="${INK_DARK}"/>`,
+};
+
+/** The corner badge: ? for Asking you, ! for Stuck, a moon for Off duty. */
+function badge(status, ring = RING) {
+  if (!GLYPHS[status]) return "";
+  return `<g class="badge"><circle cx="40" cy="9" r="7" fill="${STATUS_COLOR[status]}" stroke="${ring}" stroke-width="2.6"/>${GLYPHS[status]}</g>`;
+}
+
+function star(ring = RING) {
+  return `<g transform="translate(40 40)"><circle r="7.4" fill="${STAR}" stroke="${ring}" stroke-width="2.6"/>` +
+    `<path d="M0 -4.3l1.3 2.6 2.9.45-2.1 2.05.5 2.9L0 2.6l-2.6 1.4.5-2.9-2.1-2.05 2.9-.45z" fill="#4a3606"/></g>`;
+}
+
+/** A stand-in for an uploaded picture: sky, sun and hills, clipped to the given path. */
+function photo(clipD, x, y, w, h) {
+  const clip = uid("p"), grad = uid("g");
+  return `<defs><linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5f2"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient></defs>` +
+    `<clipPath id="${clip}"><path d="${clipD}"/></clipPath><g clip-path="url(#${clip})">` +
+    `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="url(#${grad})"/>` +
+    `<circle cx="${f(x + w * 0.7)}" cy="${f(y + h * 0.36)}" r="${f(h * 0.16)}" fill="#fff4d6"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.78)}q${f(w * 0.3)} ${f(-h * 0.36)} ${f(w * 0.62)} 0t${f(w * 0.62)} 0V${f(y + h)}H${f(x)}z" fill="#5fae7a"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.9)}q${f(w * 0.4)} ${f(-h * 0.22)} ${f(w)} ${f(-h * 0.06)}V${f(y + h)}H${f(x)}z" fill="#3f8a63"/></g>`;
+}
+
+/** Posture: Asking you tilts, Off duty settles down and dims, Resting breathes, Stuck shakes. */
+function pose(status, inner) {
+  const motion = { rest: "a-breathe", stuck: "a-shake" }[status] || "";
+  const still = { ask: ' transform="rotate(-7 24 44)"', off: ' transform="translate(0 1.6)" opacity=".62"' }[status] || "";
+  return `<g class="pose"${still}><g class="${motion}">${inner}</g></g>`;
+}
+
+function antenna(x, top, color, status, len = 5.5) {
+  const lit = status === "onit";
+  const ball = lit ? STATUS_COLOR.onit : tint(color, 0.35);
+  return `<path d="M${f(x)} ${f(top + 1)}V${f(top - len)}" stroke="${shade(color, 0.62)}" stroke-width="2.2" stroke-linecap="round"/>` +
+    `<circle cx="${f(x)}" cy="${f(top - len - 1)}" r="2.8" fill="${ball}"${lit ? ' class="a-pulse"' : ""}/>`;
+}
+
+const EYE_OF = { rest: "closed", onit: "look", ask: "up", stuck: "x", off: "flat" };
+
+/* ---- 1. Soft bot ------------------------------------------------------- */
+const SOFT = [
+  { label: "Square", w: 36, h: 31, kt: 0.9, kb: 0.9, cy: 28, top: "ball" },
+  { label: "Tall", w: 30, h: 35, kt: 0.9, kb: 0.9, cy: 28.5, top: "ball" },
+  { label: "Wide", w: 41, h: 29, kt: 0.88, kb: 0.9, cy: 29, top: "twin" },
+  { label: "Dome", w: 36, h: 33, kt: 0.6, kb: 0.92, cy: 28, top: "none" },
+  { label: "Eared", w: 31, h: 30, kt: 0.9, kb: 0.9, cy: 28.5, top: "ball", ears: true },
+];
+
+function softBot({ color, v, s, pic }) {
+  const o = SOFT[v % SOFT.length], cx = 24, y0 = o.cy - o.h / 2;
+  const d = sq(cx, o.cy, o.w, o.h, o.kt, o.kb);
+  let top = "";
+  if (o.top === "ball") top = antenna(cx, y0, color, s);
+  if (o.top === "twin") top = antenna(cx - 9, y0 + 1.5, color, s, 3.6) + antenna(cx + 9, y0 + 1.5, color, s, 3.6);
+  const ears = o.ears ? [cx - o.w / 2 - 3.6, cx + o.w / 2 - 1.4].map((x) => `<path d="${rr(x, o.cy - 6, 5, 11, 2.5)}" fill="${shade(color, 0.62)}"/>`).join("") : "";
+  const vw = o.w * 0.72, vh = Math.min(o.h * 0.48, 15), vy = o.cy - vh / 2 - 0.5;
+  let face;
+  if (pic) {
+    const pw = o.w * 0.78, ph = o.h * 0.6, px = cx - pw / 2, py = o.cy - ph / 2 - 0.5;
+    face = photo(rr(px, py, pw, ph, 7), px, py, pw, ph);
+  } else {
+    const ink = s === "stuck" ? "#fca5a5" : tint(color, 0.55);
+    face = `<path d="${rr(cx - vw / 2, vy, vw, vh, vh / 2)}" fill="${VISOR}"/>` +
+      `<path d="M${f(cx - vw / 2 + vh / 2)} ${f(vy + 2)}h${f(vw * 0.32)}" stroke="#fff" stroke-opacity=".08" stroke-width="1.6" stroke-linecap="round"/>` +
+      eyes(EYE_OF[s], cx - vw * 0.2, cx + vw * 0.2, vy + vh / 2, ink);
+  }
+  return pose(s, top + ears + body(d, color, [cx - o.w * 0.28, y0 + 4]) + face);
+}
+
+/* ---- 2. Pebble --------------------------------------------------------- */
+const PEBBLE = [
+  { label: "Round", w: 38, h: 36, kt: 0.64, kb: 0.64 },
+  { label: "Wide", w: 43, h: 32, kt: 0.66, kb: 0.66 },
+  { label: "Tall", w: 33, h: 39, kt: 0.62, kb: 0.62 },
+  { label: "Nub", w: 38, h: 34, kt: 0.64, kb: 0.64, nub: true },
+  { label: "Flat top", w: 39, h: 34, kt: 0.88, kb: 0.62 },
+];
+
+function pebbleStrip(s, cx, sy, sw, color) {
+  const ink = tint(color, 0.6);
+  const glow = (x, w, extra = "") => `<rect x="${f(x - w / 2 - 1.5)}" y="${f(sy - 3.6)}" width="${f(w + 3)}" height="7.2" rx="3.6" fill="${ink}" opacity=".25"${extra}/>` +
+    `<rect x="${f(x - w / 2)}" y="${f(sy - 2.3)}" width="${f(w)}" height="4.6" rx="2.3" fill="${ink}"${extra}/>`;
+  if (s === "rest") return `<g class="a-glow">${glow(cx, 6)}</g>`;
+  if (s === "onit") return `<g class="a-sweep" style="--d:${f(sw / 2 - 6)}px">${glow(cx, 8)}</g>`;
+  if (s === "ask") return `<g class="a-hop"><circle cx="${f(cx - 3.4)}" cy="${f(sy - 0.6)}" r="2.3" fill="${ink}"/><circle cx="${f(cx + 3.4)}" cy="${f(sy - 0.6)}" r="2.3" fill="${ink}"/></g>`;
+  if (s === "stuck") return `<path class="a-glitch" d="M${f(cx - sw / 2 + 4)} ${f(sy)}l3 -2.4 3 4.8 3 -4.8 3 4.8 3 -4.8 3 4.8 3 -2.4" stroke="#fca5a5" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+  return `<path d="M${f(cx - 4)} ${f(sy)}h8" stroke="${ink}" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>`;
+}
+
+function pebble({ color, v, s, pic }) {
+  const o = PEBBLE[v % PEBBLE.length], cx = 24, cy = 27.5, y0 = cy - o.h / 2;
+  const d = sq(cx, cy, o.w, o.h, o.kt, o.kb);
+  const studs = [cx - o.w / 2, cx + o.w / 2].map((x) => `<circle cx="${f(x)}" cy="${f(cy + 1)}" r="2.8" fill="${shade(color, 0.6)}"/>`).join("");
+  const nub = o.nub ? `<path d="${rr(cx - 3, y0 - 3.5, 6, 6, 3)}" fill="${shade(color, 0.62)}"/>` : "";
+  const sw = o.w * 0.76, sy = cy - 1;
+  let face;
+  if (pic) {
+    const pw = o.w * 0.68, ph = 18, px = cx - pw / 2, py = cy - 10;
+    face = photo(rr(px, py, pw, ph, 7), px, py, pw, ph);
+  } else {
+    const clip = uid("s"); // the light stays inside the strip
+    face = `<clipPath id="${clip}"><path d="${rr(cx - sw / 2 + 1, sy - 3.8, sw - 2, 7.6, 3.8)}"/></clipPath>` +
+      `<path d="${rr(cx - sw / 2, sy - 4.6, sw, 9.2, 4.6)}" fill="${VISOR}"/>` +
+      `<g clip-path="url(#${clip})">${pebbleStrip(s, cx, sy, sw, color)}</g>`;
+  }
+  return pose(s, nub + studs + body(d, color, [cx - o.w * 0.24, y0 + 5]) + face);
+}
+
+/* ---- 3. Buddy ---------------------------------------------------------- */
+const BUDDY = [
+  { label: "TV", w: 33, h: 28, cy: 28.5, ears: "round" },
+  { label: "Wide", w: 37, h: 26, cy: 29, ears: "round" },
+  { label: "Tall", w: 29, h: 32, cy: 28, ears: "round" },
+  { label: "Bunny", w: 33, h: 27, cy: 31, ears: "up" },
+  { label: "Bolt", w: 33, h: 28, cy: 28.5, ears: "bolt" },
+];
+
+function buddyEars(o, cx, color) {
+  const x0 = cx - o.w / 2, x1 = cx + o.w / 2, y0 = o.cy - o.h / 2, dark = shade(color, 0.62);
+  if (o.ears === "up") {
+    return [cx - 10, cx + 4].map((x) => `<path d="${rr(x, y0 - 9, 6, 13, 3)}" fill="${dark}"/><path d="${rr(x + 1.6, y0 - 7, 2.8, 6, 1.4)}" fill="${tint(color, 0.3)}"/>`).join("");
+  }
+  const stub = `<path d="M${f(cx + 5)} ${f(y0 + 1)}l3.5 -6" stroke="${dark}" stroke-width="2.2" stroke-linecap="round"/><circle cx="${f(cx + 9)}" cy="${f(y0 - 6.2)}" r="2.4" fill="${tint(color, 0.35)}"/>`;
+  if (o.ears === "bolt") {
+    return stub + [x0 - 1, x1 + 1].map((x) => `<circle cx="${f(x)}" cy="${f(o.cy)}" r="4.4" fill="${dark}"/><circle cx="${f(x)}" cy="${f(o.cy)}" r="1.6" fill="${tint(color, 0.3)}"/>`).join("");
+  }
+  return stub + [x0 - 4.5, x1 - 1.5].map((x) => `<path d="${rr(x, o.cy - 6.5, 6, 13, 3)}" fill="${dark}"/>`).join("");
+}
+
+function buddyMouth(s, cx, my, ink) {
+  const stroke = `stroke="${ink}" stroke-width="1.6" fill="none" stroke-linecap="round"`;
+  if (s === "rest") return `<path d="M${f(cx - 2.6)} ${f(my - 0.6)}q2.6 2.2 5.2 0" ${stroke}/>`;
+  if (s === "onit") return [-3, 0, 3].map((dx, i) => `<circle class="a-seq d${i + 1}" cx="${f(cx + dx)}" cy="${f(my)}" r="1" fill="${ink}"/>`).join("");
+  if (s === "ask") return `<circle cx="${f(cx)}" cy="${f(my)}" r="1.5" ${stroke}/>`;
+  if (s === "stuck") return `<path d="M${f(cx - 3.6)} ${f(my)}q.9 -1.4 1.8 0t1.8 0 1.8 0 1.8 0" ${stroke}/>`;
+  return "";
+}
+
+function buddy({ color, v, s, pic }) {
+  const o = BUDDY[v % BUDDY.length], cx = 24, x0 = cx - o.w / 2, y0 = o.cy - o.h / 2;
+  const d = rr(x0, y0, o.w, o.h, 9);
+  const sx = x0 + 4, sy = y0 + 4, sw = o.w - 8, sh = o.h - 8;
+  let face;
+  if (pic) {
+    face = photo(rr(sx, sy, sw, sh, 6), sx, sy, sw, sh);
+  } else if (s === "off") {
+    face = `<path d="${rr(sx, sy, sw, sh, 6)}" fill="${VISOR}"/><path class="a-flat" d="M${f(cx - 6)} ${f(o.cy)}h12" stroke="${tint(color, 0.55)}" stroke-opacity=".6" stroke-width="1.4" stroke-linecap="round"/>`;
+  } else {
+    const ink = s === "stuck" ? "#fca5a5" : tint(color, 0.6), ey = o.cy - 2;
+    const brow = s === "ask" ? `<path d="M${f(cx + 3.2)} ${f(ey - 5.2)}l4 -1.2" stroke="${ink}" stroke-width="1.4" stroke-linecap="round"/>` : "";
+    face = `<path d="${rr(sx, sy, sw, sh, 6)}" fill="${VISOR}"/>` + eyes(EYE_OF[s], cx - 5.2, cx + 5.2, ey, ink, 2.3) + brow + buddyMouth(s, cx, o.cy + 4.4, ink);
+  }
+  return pose(s, buddyEars(o, cx, color) + body(d, color, [x0 + 5, y0 + 2.6]) + face);
+}
+
+/* ---- 4. Sprout --------------------------------------------------------- */
+const SPROUT = [
+  { label: "Leaf", top: "leaf", w: 34, h: 31 },
+  { label: "Two leaves", top: "pair", w: 34, h: 31 },
+  { label: "Bud", top: "bud", w: 34, h: 31 },
+  { label: "Curl", top: "curl", w: 34, h: 31 },
+  { label: "Wide", top: "leaf", w: 39, h: 29 },
+];
+const SPROUT_ANGLE = { rest: -16, onit: 0, ask: 0, stuck: 62, off: -78 };
+const SPROUT_MOTION = { rest: "a-sway", onit: "a-wiggle", ask: "a-hop" };
+
+function leaf(t, color, flip = 1) {
+  const p = (x) => f(24 + x * flip);
+  return `<path d="M24 ${f(t)}C${p(3)} ${f(t - 6.5)} ${p(10)} ${f(t - 8)} ${p(13.5)} ${f(t - 7)}C${p(12)} ${f(t - 2)} ${p(6)} ${f(t + 1.4)} 24 ${f(t)}Z" fill="${tint(color, 0.28)}"/>` +
+    `<path d="M24 ${f(t)}Q${p(6)} ${f(t - 4.2)} ${p(11)} ${f(t - 6)}" stroke="${shade(color, 0.7)}" stroke-width="1" fill="none" stroke-linecap="round"/>`;
+}
+
+function sproutTop(kind, y0, color) {
+  const t = y0 - 6, stem = `<path d="M24 ${f(y0 + 1)}V${f(t)}" stroke="${shade(color, 0.62)}" stroke-width="2.2" stroke-linecap="round"/>`;
+  if (kind === "pair") return stem + leaf(t, color) + leaf(t + 1.5, color, -1);
+  if (kind === "bud") return stem + `<circle cx="24" cy="${f(t - 2.6)}" r="3.8" fill="${tint(color, 0.28)}"/><circle cx="25.2" cy="${f(t - 3.6)}" r="1.1" fill="#fff" opacity=".45"/>`;
+  if (kind === "curl") return `<path d="M24 ${f(y0 + 1)}V${f(y0 - 4)}c0 -4 2 -6.5 5 -6.5c3 0 4 3.4 1.6 4.6c-1.6 .8 -3 -.4 -2.4 -1.8" stroke="${shade(color, 0.62)}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  return stem + leaf(t, color);
+}
+
+function sprout({ color, v, s, pic }) {
+  const o = SPROUT[v % SPROUT.length], cx = 24, cy = 30, y0 = cy - o.h / 2;
+  const d = sq(cx, cy, o.w, o.h, 0.6, 0.66);
+  const motion = SPROUT_MOTION[s] || "";
+  const top = `<g transform="rotate(${SPROUT_ANGLE[s]} 24 ${f(y0 + 1)})"><g class="${motion}" style="--oy:${f(y0 + 1)}px">${sproutTop(o.top, y0, color)}</g></g>`;
+  const bolts = [cx - o.w / 2 + 0.5, cx + o.w / 2 - 0.5].map((x) => `<circle cx="${f(x)}" cy="${f(cy + 2)}" r="2.4" fill="${shade(color, 0.6)}"/>`).join("");
+  const fw = o.w * 0.64, fh = o.h * 0.48, fy = cy + 1.5;
+  let face;
+  if (pic) {
+    const pw = o.w * 0.72, ph = o.h * 0.6;
+    face = photo(sq(cx, fy, pw, ph, 0.78), cx - pw / 2, fy - ph / 2, pw, ph);
+  } else {
+    face = `<path d="${sq(cx, fy, fw, fh, 0.8)}" fill="${tint(color, 0.66)}"/>` +
+      eyes(EYE_OF[s], cx - 5, cx + 5, fy - 0.6, s === "stuck" ? "#b42318" : INK_DARK, 2.3) +
+      (s === "rest" || s === "onit" ? `<circle cx="${f(cx - 8.6)}" cy="${f(fy + 2.6)}" r="1.5" fill="${shade(color, 0.92)}" opacity=".7"/><circle cx="${f(cx + 8.6)}" cy="${f(fy + 2.6)}" r="1.5" fill="${shade(color, 0.92)}" opacity=".7"/>` : "");
+  }
+  // The leaf is drawn over the head, so a wilted or folded leaf lies on it.
+  return pose(s, bolts + body(d, color, [cx - o.w * 0.26, y0 + 5.5]) + top + face);
+}
+
+/* ---- 5. Boxbot, refined (the baseline) ---------------------------------- */
+const BOX = [
+  { label: "Classic", head: [8, 13, 32, 30, 8], screen: [12.5, 18.5, 23, 18], top: "ball" },
+  { label: "Tall", head: [11, 9, 26, 36, 8], screen: [15, 15, 18, 22], top: "ball" },
+  { label: "Wide", head: [5, 15, 38, 27, 8], screen: [10, 20, 28, 17], top: "twin", ears: true },
+  { label: "Soft", head: [8, 13, 32, 30, 13], screen: [12.5, 19, 23, 17], top: "ball", round: true },
+  { label: "Cube", head: [9, 12, 30, 31, 7], screen: [13, 20, 22, 17], top: "ball", lid: true },
+  { label: "Monitor", head: [6, 8, 36, 28, 7], screen: [10, 12, 28, 20], top: "none", stand: true },
+];
+
+function boxGlyph(s, cx, cy, color) {
+  const ink = tint(color, 0.6), st = `stroke-width="2" fill="none" stroke-linecap="round"`;
+  if (s === "rest") return `<path class="a-flat" d="M${f(cx - 4.5)} ${f(cy)}h9" stroke="${ink}" ${st}/>`;
+  if (s === "onit") return `<circle class="a-spin" cx="${f(cx)}" cy="${f(cy)}" r="4.2" stroke="${STATUS_COLOR.onit}" stroke-dasharray="17 9" ${st}/>`;
+  if (s === "ask") return `<path d="M${f(cx - 2.6)} ${f(cy - 2.2)}a2.7 2.7 0 1 1 3.7 2.5c-.8.3-1.1.9-1.1 1.6" stroke="${STATUS_COLOR.ask}" ${st}/><circle cx="${f(cx)}" cy="${f(cy + 4.3)}" r="1.1" fill="${STATUS_COLOR.ask}"/>`;
+  if (s === "stuck") return `<g class="a-glitch"><path d="M${f(cx)} ${f(cy - 5)}v5.6" stroke="${STATUS_COLOR.stuck}" ${st}/><circle cx="${f(cx)}" cy="${f(cy + 4.3)}" r="1.2" fill="${STATUS_COLOR.stuck}"/></g>`;
+  return `<path d="M${f(cx - 3)} ${f(cy - 3)}h6l-6 6h6" stroke="${ink}" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+function boxbot({ color, v, s, pic }) {
+  const o = BOX[v % BOX.length], [x, y, w, h, r] = o.head, [sx, sy, sw, sh] = o.screen, cx = x + w / 2;
+  const dark = shade(color, 0.62);
+  let extra = "";
+  if (o.top === "ball") extra += antenna(cx, y, color, "rest", 4.5);
+  if (o.top === "twin") extra += antenna(cx - 9, y + 1, color, "rest", 3.4) + antenna(cx + 9, y + 1, color, "rest", 3.4);
+  if (o.ears) extra += [x - 3, x + w - 1].map((ex) => `<path d="${rr(ex, y + 8, 4, 11, 2)}" fill="${dark}"/>`).join("");
+  if (o.stand) extra += `<rect x="21" y="${y + h - 1}" width="6" height="6" fill="${dark}"/><path d="${rr(15, y + h + 4, 18, 4, 2)}" fill="${dark}"/>`;
+  const lid = o.lid ? `<path d="${rr(x + 3, y + 2.5, w - 6, 3, 1.5)}" fill="#fff" opacity=".16"/>` : "";
+  const screenD = rr(sx, sy, sw, sh, o.round ? 7 : 5);
+  const face = pic ? photo(screenD, sx, sy, sw, sh) : `<path d="${screenD}" fill="${VISOR}"/>` + boxGlyph(s, sx + sw / 2, sy + sh / 2, color);
+  return pose(s, extra + body(rr(x, y, w, h, r), color, null) + lid + face);
+}
+
+/* ---- Today's Boxbot (for Section B's left side), from heads.tsx on its 120 grid ---- */
+function nowBot(head, color, hasStar) {
+  const dark = shade(color, 0.7), ink = tint(color, 0.55);
+  const rivets = (pts) => pts.map(([a, b]) => `<circle cx="${a}" cy="${b}" r="2.6" fill="${shade(color, 0.65)}"/>`).join("");
+  const parts = {
+    classic: [`<path d="M60 24 l-6 -9 h12 l-6 -9" stroke="${dark}" stroke-width="3.5" fill="none" stroke-linejoin="round"/><rect x="20" y="24" width="80" height="72" rx="10" fill="${color}"/>` + rivets([[28, 32], [92, 32], [28, 88], [92, 88]]), [30, 38, 60, 48]],
+    wide: [`<path d="M44 30 l-12 -18 M76 30 l12 -18" stroke="${dark}" stroke-width="3.5" stroke-linecap="round"/><circle cx="32" cy="11" r="4" fill="${tint(color, 0.3)}"/><circle cx="88" cy="11" r="4" fill="${tint(color, 0.3)}"/><rect x="10" y="30" width="100" height="66" rx="12" fill="${color}"/><rect x="4" y="52" width="8" height="22" rx="3" fill="${dark}"/><rect x="108" y="52" width="8" height="22" rx="3" fill="${dark}"/>`, [20, 40, 80, 46]],
+    soft: [`<line x1="60" y1="8" x2="60" y2="22" stroke="${dark}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="8" r="5" fill="${tint(color, 0.3)}"/><rect x="18" y="22" width="84" height="78" rx="26" fill="${color}"/>`, [30, 36, 60, 50]],
+  };
+  const [shape, [bx, by, bw, bh]] = parts[head] || parts.classic;
+  const mx = bx + bw / 2, my = by + bh / 2;
+  const starMark = hasStar ? `<g transform="translate(98 99)"><circle r="12" fill="#f59e0b"/><path d="M0 -6.5 l2 4 4.4 .7 -3.2 3.1 .8 4.4 -4 -2.1 -4 2.1 .8 -4.4 -3.2 -3.1 4.4 -.7z" fill="#fff"/></g>` : "";
+  return shape + `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="8" fill="#0b0a11"/>` +
+    `<rect x="${bx + 3}" y="${by + 3}" width="${bw - 6}" height="${bh / 3}" rx="5" fill="#fff" opacity=".05"/>` +
+    `<path d="M${mx - 10} ${my}h20" stroke="${ink}" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 3px ${ink})"/>` + starMark;
+}
+
+/* ---- The five directions --------------------------------------------- */
+const DIRECTIONS = [
+  { id: "soft", name: "Soft bot", idea: "A squircle head with a soft pill visor and a small ball antenna; round eyes in the visor carry the mood.", draw: softBot, shapes: SOFT,
+    why: "Strongest at 24px: the visor is one dark shape on one bright one. The visor is the natural frame for a picture." },
+  { id: "pebble", name: "Pebble", idea: "A smooth, symmetrical pebble robot with ear studs and one wide visor strip; a single light does all the talking.", draw: pebble, shapes: PEBBLE,
+    why: "The fewest parts of the five, and very calm. The light strip gives a clear On it sweep, but the face has less expression." },
+  { id: "buddy", name: "Buddy", idea: "A rounded TV head with chunky short ears, like a desk toy; a small face lives on its screen.", draw: buddy, shapes: BUDDY,
+    why: "The most playful and expressive (mouth and brow). At 24px the face gets busy, so the badge does the work." },
+  { id: "sprout", name: "Sprout", idea: "A round robot with a light face plate and a leaf antenna that rests, perks up, wilts or folds, a nod to a roost.", draw: sprout, shapes: SPROUT,
+    why: "The most Roost-only idea: posture shows status even in a still frame. The light face plate breaks from the dark-screen family." },
+  { id: "box", name: "Boxbot, refined", idea: "Today's six heads, softened: rounder corners, no rivets or zigzags, a two-tone body and one glyph on the screen.", draw: boxbot, shapes: BOX,
+    why: "The baseline: the least change, and every stored head maps 1:1. The screen glyph alone is hard to read at chip size, so it leans on the badge." },
+];
+
+/** One robot as an SVG string. Badges and the star sit outside the pose, so they never tilt or dim. */
+function robot(dir, { color, v = 0, s = "rest", star: hasStar = false, pic = false, size = 96, ring = RING }) {
+  const inner = dir.draw({ color, v, s, pic, star: hasStar });
+  const label = `${dir.name}, ${(STATUSES.find(([k]) => k === s) || ["", ""])[1]}${hasStar ? ", main bot" : ""}${pic ? ", with a picture" : ""}`;
+  return `<svg class="bot s-${s}" viewBox="0 0 48 48" width="${size}" height="${size}" role="img" aria-label="${label}">` +
+    inner + badge(s, ring) + (hasStar ? star(ring) : "") + `</svg>`;
+}
+
+function cell(svgs, caption) {
+  return `<div class="cell"><div class="sizes">${svgs}</div>${caption ? `<b>${caption}</b>` : ""}</div>`;
+}
+
+function colourBlock(dir) {
+  const cols = SIX.map((i) => {
+    const [c, name] = PALETTE[i];
+    return `<div class="cell">${robot(dir, { color: c, size: 96 })}<div class="sizes">${robot(dir, { color: c, size: 40 })}${robot(dir, { color: c, size: 24 })}</div><b>${name}</b></div>`;
+  }).join("");
+  return `<section class="blk full"><h4>Six colours · 96 · 40 · 24 px</h4><div class="row">${cols}</div></section>`;
+}
+
+function statusBlock(dir) {
+  const color = PALETTE[1][0];
+  const cells = STATUSES.map(([s, name]) => `<div class="cell">${robot(dir, { color, s, size: 72 })}<div class="sizes">${robot(dir, { color, s, size: 40 })}${robot(dir, { color, s, size: 24 })}</div><b>${name}</b></div>`).join("");
+  return `<section class="blk full"><h4>The five statuses · 72 · 40 · 24 px</h4><div class="row">${cells}</div></section>`;
+}
+
+function shapeBlock(dir) {
+  const cells = dir.shapes.map((o, v) => cell(robot(dir, { color: PALETTE[(v * 2 + 1) % PALETTE.length][0], v, size: 56 }), o.label)).join("");
+  return `<section class="blk"><h4>${dir.shapes.length} shapes, so bots can differ</h4><div class="row">${cells}</div></section>`;
+}
+
+function starPicBlock(dir) {
+  const c = PALETTE[0][0];
+  const starRow = [96, 40, 24].map((size) => robot(dir, { color: c, star: true, s: "onit", size })).join("");
+  const picRow = [96, 40, 24].map((size) => robot(dir, { color: PALETTE[3][0], pic: true, s: "ask", size })).join("");
+  return `<section class="blk"><h4>Main bot star · an uploaded picture</h4><div class="row">${cell(starRow, "Main bot, On it")}${cell(picRow, "Picture, Asking you")}</div></section>`;
+}
+
+function paletteBlock(dir) {
+  const cells = PALETTE.map(([c], i) => robot(dir, { color: c, v: i % dir.shapes.length, s: STATUSES[i % 5][0], size: 32 })).join("");
+  return `<section class="blk full"><h4>All ten colours, mixed shapes and statuses, 32 px</h4><div class="row" style="gap:10px">${cells}</div><p class="why">${dir.why}</p></section>`;
+}
+
+function directionCard(dir, n) {
+  return `<article class="dir" id="d-${dir.id}" data-picked="false"><div class="dir-head"><span class="dir-num">${n}</span>` +
+    `<div class="dir-title"><h3>${dir.name}</h3><p>${dir.idea}</p></div>` +
+    `<button type="button" class="pick" data-pick="${dir.id}" aria-pressed="false">Pick this</button></div>` +
+    `<div class="blocks">${colourBlock(dir)}${statusBlock(dir)}${shapeBlock(dir)}${starPicBlock(dir)}${paletteBlock(dir)}</div></article>`;
+}
+
+/** A Section B slot: data attributes say which robot to draw. */
+function slot(data) {
+  const size = Number(data.size || 40);
+  if (data.dir === "now") {
+    const label = "Today's robot";
+    return `<svg class="bot" viewBox="0 0 120 120" width="${size}" height="${size}" role="img" aria-label="${label}">${nowBot(data.head, data.color, data.star === "1")}</svg>`;
+  }
+  const dir = DIRECTIONS.find((d) => d.id === data.dir) || DIRECTIONS[0];
+  const ring = data.ring || "#1d1d24";
+  return robot(dir, { color: PALETTE[Number(data.c || 0)][0], v: Number(data.v || 0), s: data.s || "rest", star: data.star === "1", size, ring });
+}
+
+function buildAll() {
+  return {
+    dirs: DIRECTIONS.map((d, i) => directionCard(d, i + 1)).join(""),
+    palette: PALETTE.map(([c, name]) => `<div class="cell"><span style="width:36px;height:36px;border-radius:12px;background:linear-gradient(180deg, ${c} 70%, ${shade(c, SHADE)} 70%);box-shadow:inset 0 0 0 1px rgb(255 255 255 / .06)"></span><b>${name}</b><b style="font-family:var(--font-mono);color:var(--color-text-faint)">${c}</b></div>`).join(""),
+    hero: DIRECTIONS.map((d, i) => robot(d, { color: PALETTE[[0, 1, 3, 4, 7][i]][0], s: ["rest", "onit", "ask", "rest", "rest"][i], star: i === 0, size: 64, ring: "#0e0e12" })).join(""),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, slot, robot, DIRECTIONS, PALETTE, STATUSES, sq, rr, tint, shade };
+}
+
+if (typeof document !== "undefined") {
+  const built = buildAll();
+  document.getElementById("dirs").innerHTML = built.dirs;
+  document.getElementById("paletteRow").innerHTML = built.palette;
+  document.getElementById("heroStrip").innerHTML = built.hero;
+  document.getElementById("recoRow").innerHTML = PALETTE.slice(0, 6).map(([c], i) => robot(DIRECTIONS[0], { color: c, v: i % 5, s: STATUSES[i % 5][0], star: i === 0, size: 48, ring: "#16161b" })).join("");
+
+  document.querySelectorAll(".av").forEach((el) => { el.outerHTML = slot(el.dataset); });
+
+  const soft = DIRECTIONS[0];
+  document.getElementById("pickerTiles").innerHTML = soft.shapes.map((o, v) =>
+    `<span class="cz-tile${v === 0 ? " on" : ""}" title="${o.label}">${robot(soft, { color: PALETTE[1][0], v, size: 32, ring: "#1d1d24" })}</span>`).join("");
+  document.getElementById("pickerSwatches").innerHTML = PALETTE.map(([c, name], i) =>
+    `<i class="cz-sw${i === 1 ? " on" : ""}" style="background:${c}" title="${name}"></i>`).join("");
+
+  const pickName = document.getElementById("pickName");
+  document.getElementById("dirs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-pick]");
+    if (!button) return;
+    const id = button.dataset.pick;
+    document.querySelectorAll(".dir").forEach((card) => {
+      const on = card.id === `d-${id}`;
+      card.dataset.picked = String(on);
+      const b = card.querySelector("[data-pick]");
+      b.setAttribute("aria-pressed", String(on));
+      b.textContent = on ? "Picked" : "Pick this";
+    });
+    pickName.textContent = (DIRECTIONS.find((d) => d.id === id) || { name: "none yet" }).name;
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roost Avatars v3</title>
+<meta name="description" content="Round three of Roost's bot avatars: five soft, original families with face-only statuses, placed in the cozy kit.">
+<style>
+/* ---------------------------------------------------------------------
+   Roost avatars, round three. Self-contained: no fonts, images or
+   scripts from anywhere else. Dark only (V4). The :root values are copied
+   from web/src/styles/tokens.css; the --new-* values are round two's
+   cozy-kit proposal, reused as they were.
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --color-bg: #0e0e12;
+  --color-panel: #16161b;
+  --color-raised: #1f1f26;
+  --color-text: #ededf2;
+  --color-text-secondary: #a9a9b6;
+  --color-text-faint: #9292a0;
+  --color-border: #2a2a33;
+  --color-accent-soft: #c4b5fd;
+  --color-danger: #f87171;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-caption: 0.75rem; --fs-label: 0.8125rem; --fs-body: 0.875rem;
+  --fs-heading: 1.125rem; --fs-title: 1.375rem;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px #b2a6f6;
+
+  /* Round two's cozy kit */
+  --new-overlay: #1d1d24;
+  --new-accent: #6c5ce0;
+  --new-accent-strong: #b2a6f6;
+  --new-accent-tint: rgb(108 92 224 / 0.16);
+  --new-hover: rgb(255 255 255 / 0.07);
+  --new-edge-inner: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --new-shadow: 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.18), 0 8px 16px rgb(0 0 0 / 0.22), 0 20px 40px rgb(0 0 0 / 0.28);
+  --new-radius-item: 8px;
+  --new-radius-surface: 12px;
+  --new-fs-menu: 0.8125rem;
+  --new-gap: 4px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans);
+  font-size: var(--fs-body); line-height: 1.5;
+  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3, h4 { font-family: var(--font-round); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.015em; }
+h2 { font-size: var(--fs-title); font-weight: 750; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+h2 small { font-family: var(--font-mono); font-size: var(--fs-caption); color: var(--color-text-faint); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+h3 { font-size: var(--fs-heading); font-weight: 750; }
+h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-text-faint); }
+p { margin: 0; }
+.lede { color: var(--color-text-secondary); max-width: 72ch; margin-top: 8px; }
+.section { display: grid; gap: 20px; }
+.section > p { color: var(--color-text-secondary); max-width: 74ch; }
+.hero-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; align-items: flex-end; }
+
+/* ---- Guardrails and legend ------------------------------------------- */
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--color-panel); border-radius: 14px; padding: 14px; box-shadow: var(--new-edge-inner); display: grid; gap: 6px; align-content: start; }
+.rule b { font-family: var(--font-round); font-size: var(--fs-body); }
+.rule p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.rule .no { color: var(--color-danger); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--color-text-secondary); font-size: var(--fs-label); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* ---- Section A: the directions -------------------------------------- */
+.dirs { display: grid; gap: 24px; }
+.dir { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 20px; display: grid; gap: 20px; }
+.dir[data-picked="true"] { border-color: var(--new-accent-strong); box-shadow: 0 0 0 1px var(--new-accent-strong); }
+.dir-head { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.dir-num { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--color-raised); font-family: var(--font-round); font-weight: 800; color: var(--color-text-secondary); flex: none; }
+.dir-title { flex: 1 1 260px; min-width: 0; display: grid; gap: 2px; }
+.dir-title p { color: var(--color-text-secondary); }
+.dir-title .hook { color: var(--color-accent-soft); font-size: var(--fs-label); }
+.pick { font: inherit; font-size: var(--fs-label); font-weight: 600; height: 30px; padding: 0 12px; border-radius: 10px; border: 0;
+  background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner); cursor: pointer; }
+.pick:hover { background: #26262f; }
+.pick:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pick[aria-pressed="true"] { background: var(--new-accent); color: #fff; }
+.blocks { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.blk { grid-column: span 6; background: var(--color-bg); border-radius: 14px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.blk.full { grid-column: 1 / -1; }
+.row { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.grid12 { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 12px 8px; }
+.cell { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.cell > b { font-weight: 500; font-size: var(--fs-caption); color: var(--color-text-secondary); text-align: center; white-space: nowrap; }
+.sizes { display: flex; gap: 8px; align-items: flex-end; }
+.bot { display: block; overflow: visible; flex: none; }
+.why { font-size: var(--fs-label); color: var(--color-text-secondary); }
+@media (max-width: 860px) { .blk { grid-column: 1 / -1; } }
+
+/* Face motion: only for people who have not asked for less. Posture (tilt, settle, dim) stays without it. */
+@media (prefers-reduced-motion: no-preference) {
+  .a-blink { animation: blink 5.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .a-look { animation: look 3.4s ease-in-out infinite; }
+  .a-bounce { animation: bounce 1.1s ease-in-out infinite; }
+  .a-hop { animation: hop 0.9s ease-in-out infinite; }
+  .a-squash { animation: squash 1.1s ease-in-out infinite; transform-box: view-box; transform-origin: 24px 44px; }
+  .a-breathe { animation: breathe 3.8s ease-in-out infinite; transform-box: view-box; transform-origin: 24px 44px; }
+  .a-wobble { animation: wobble 0.7s ease-in-out infinite; transform-box: view-box; transform-origin: 24px 44px; }
+  .a-dizzy { animation: spin 1.3s linear infinite; transform-box: fill-box; transform-origin: center; }
+  .a-glint { animation: glint 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .a-zed { animation: zed 3s ease-in-out infinite; }
+}
+@keyframes blink { 0%, 62%, 100% { transform: scaleY(1); } 72%, 82% { transform: scaleY(0.12); } }
+@keyframes look { 0%, 18%, 84%, 100% { transform: translate(0, 0); } 28%, 44% { transform: translate(-1.5px, -0.4px); } 56%, 72% { transform: translate(1.5px, -0.4px); } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-1.6px); } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.9px); } }
+@keyframes squash { 0%, 100% { transform: scale(1, 1); } 30% { transform: scale(1.05, 0.94); } 62% { transform: scale(0.97, 1.04); } }
+@keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.018, 0.982); } }
+@keyframes wobble { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes glint { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.16); opacity: 0.78; } }
+@keyframes zed { 0% { transform: translate(0, 1px); opacity: 0; } 30% { opacity: 1; } 80% { transform: translate(1px, -2.6px); opacity: 0.9; } 100% { transform: translate(1px, -3px); opacity: 0; } }
+.s-off .pose { filter: saturate(0.4); }
+
+/* ---- Section B: the cozy kit pieces (from round two) ------------------ */
+.kit { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+.kit-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.kit-head p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+.kit-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.kit-slot { background: var(--color-bg); border-radius: 14px; padding: 16px; display: grid; gap: 10px; align-content: start; justify-items: start; min-width: 0; overflow: hidden; }
+@media (max-width: 980px) { .kit-row { grid-template-columns: minmax(0, 1fr); } }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cz { font-size: var(--new-fs-menu); }
+.cz-surface { background: var(--new-overlay); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner), var(--new-shadow); }
+.cz-label { padding: 6px 8px 4px; font-size: var(--fs-caption); color: var(--color-text-faint); display: flex; align-items: center; gap: 6px; }
+.cz-sep { height: 1px; background: rgb(255 255 255 / 0.06); margin: 4px 6px; }
+.cz-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--new-radius-item); border: 0; background: var(--color-raised); color: var(--color-text); font: inherit; font-size: var(--new-fs-menu); font-weight: 600; box-shadow: var(--new-edge-inner); }
+.cz-btn.primary { background: var(--new-accent); color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14); }
+.cz-btn.icon { width: 28px; padding: 0; justify-content: center; }
+.cz-tabs { display: flex; gap: var(--new-gap); padding: 3px; border-radius: 10px; background: var(--color-panel); box-shadow: var(--new-edge-inner); max-width: 100%; overflow: hidden; }
+.cz-tab { flex: 1; height: 26px; padding: 0 8px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-secondary); font-weight: 600; white-space: nowrap; }
+.cz-tab:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-tab.on { background: var(--color-raised); color: var(--color-text); box-shadow: var(--new-edge-inner), 0 1px 2px rgb(0 0 0 / 0.35); }
+.cz-pop { width: 284px; max-width: 100%; padding: 12px; display: grid; gap: 10px; }
+.cz-pop-head { display: flex; gap: 10px; align-items: center; }
+.cz-pop-head b { display: block; font-size: var(--fs-body); }
+.cz-pop-head small { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-tiles { display: grid; grid-template-columns: repeat(6, 36px); gap: var(--new-gap); }
+.cz-tile { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+.cz-tile:hover { background: var(--new-hover); }
+.cz-tile.on { background: var(--new-accent-tint); box-shadow: inset 0 0 0 1px var(--new-accent-strong); }
+.cz-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.cz-sw { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18); }
+.cz-sw.on { box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18), 0 0 0 2px var(--new-overlay), 0 0 0 3.5px var(--color-text); }
+.cz-side { width: 260px; max-width: 100%; background: var(--color-panel); border-radius: var(--new-radius-surface); box-shadow: var(--new-edge-inner); padding: 6px; display: grid; gap: 1px; }
+.cz-pins { display: flex; gap: var(--new-gap); padding: 2px 2px 6px; }
+.cz-pin { flex: 1; display: grid; justify-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; font-size: var(--fs-caption); color: var(--color-text-secondary); position: relative; min-width: 0; }
+.cz-pin:hover { background: var(--new-hover); color: var(--color-text); }
+.cz-pin .unread { position: absolute; top: 6px; right: 10px; }
+.cz-row { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: var(--new-radius-item); min-width: 0; }
+.cz-row:hover { background: var(--new-hover); }
+.cz-row.on { background: var(--color-raised); box-shadow: var(--new-edge-inner); }
+.cz-row div { min-width: 0; flex: 1; }
+.cz-row b { font-weight: 600; font-size: var(--new-fs-menu); display: block; }
+.cz-row small { color: var(--color-text-faint); font-size: var(--fs-caption); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread { width: 7px; height: 7px; border-radius: 50%; background: var(--new-accent-strong); flex: none; }
+.cz-hero { width: 320px; max-width: 100%; border-radius: var(--new-radius-surface); background: var(--color-panel); box-shadow: var(--new-edge-inner); overflow: hidden; }
+.cz-hero-band { height: 44px; }
+.cz-hero-body { padding: 0 14px 14px; margin-top: -30px; display: grid; gap: 8px; }
+.cz-hero-top { display: flex; align-items: flex-end; gap: 10px; }
+.cz-hero-top .acts { margin-left: auto; display: flex; gap: var(--new-gap); }
+.cz-hero h5 { margin: 0; font-size: var(--fs-heading); font-weight: 700; font-family: var(--font-round); }
+.cz-status { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--color-raised); box-shadow: var(--new-edge-inner); font-size: var(--fs-caption); color: var(--color-text-secondary); }
+.cz-status .dot { width: 7px; height: 7px; background: var(--new-accent-strong); }
+.cz-hero p.sub { color: var(--color-text-faint); font-size: var(--fs-caption); }
+.cz-hero-acts { display: flex; gap: var(--new-gap); flex-wrap: wrap; }
+
+/* ---- Section C ------------------------------------------------------- */
+.tbl-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--color-border); }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-label); min-width: 520px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); background: var(--color-panel); }
+tr:last-child td { border-bottom: 0; }
+td code, .map code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-accent-soft); word-break: break-word; }
+td .bot { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.reco { background: var(--color-panel); border: 1px solid var(--new-accent-strong); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.reco p { max-width: 76ch; }
+.map { display: grid; gap: 10px; }
+.map div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px; background: var(--color-bg); border-radius: 12px; }
+.map p { color: var(--color-text-secondary); font-size: var(--fs-label); }
+@media (max-width: 640px) { .map div { grid-template-columns: minmax(0, 1fr); } }
+.pickbar { position: sticky; bottom: 12px; justify-self: center; background: var(--new-overlay); box-shadow: var(--new-edge-inner), var(--new-shadow); border-radius: 12px; padding: 8px 12px; font-size: var(--fs-label); color: var(--color-text-secondary); display: flex; gap: 8px; align-items: center; max-width: 100%; }
+.pickbar b { color: var(--color-text); }
+</style>
+</head>
+<body>
+<!-- 16px icons, drawn for this sketch -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2H4.5l2.1-2z"/><path d="M8 8.5V14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16"><path d="M8 10.5V3M5 5.8L8 3l3 2.8M3 11.5v1c0 .6.4 1 1 1h8c.6 0 1-.4 1-1v-1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 16 16"><path d="M3.2 7.5a5 5 0 1 1 1.4 3.9"/><path d="M3 4v3.6h3.6"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 16 16"><path d="M8 2.6c3 0 5 2.3 5 5.4 0 3-2.1 5.4-5 5.4S3 11 3 8c0-3.1 2-5.4 5-5.4z"/><path d="M6.2 7.4h.01M9.8 7.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".6"/><circle cx="8" cy="8" r=".6"/><circle cx="12.5" cy="8" r=".6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M3 4.2c0-.7.5-1.2 1.2-1.2h7.6c.7 0 1.2.5 1.2 1.2v5.6c0 .7-.5 1.2-1.2 1.2H7l-3 2.5V11h.2C3.5 11 3 10.5 3 9.8z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 16 16"><path d="M5.5 8V3.8a1 1 0 0 1 2 0V7.5M7.5 7V3a1 1 0 0 1 2 0v4M9.5 7.2V4a1 1 0 0 1 2 0v5.2c0 2.6-1.7 4.3-4 4.3-1.6 0-2.6-.8-3.5-2.2L2.8 9.2a1 1 0 0 1 1.7-1l1 1.1"/></symbol>
+</svg>
+
+<main>
+  <header>
+    <h1>Roost avatars, round three</h1>
+    <p class="lede">Softer, rounder, no antennas. Five families of 12 shapes each (A), the best two placed in the cozy kit from round two (B), and one recommendation that maps onto <code style="font-family:var(--font-mono);font-size:.8em">web/src/components/robot/</code> (C). The app does not change until a direction is picked.</p>
+    <div class="hero-strip" id="heroStrip" aria-label="One avatar from each direction"></div>
+  </header>
+
+  <!-- ============================================================ Guardrails -->
+  <section class="section" aria-labelledby="secG">
+    <h2 id="secG">What changed, and what we stay away from</h2>
+    <p>The feedback asked for the same soft, squishy charm as a well-known competitor's avatars, but in a look that is clearly Roost's own. Every family below follows these rules.</p>
+    <div class="rules">
+      <div class="rule"><b>Symmetric, named shapes</b><p><span class="no">Not</span> free-form, irregular blobs. Every outline is built from an egg, a stone, a cut gem or a pillow on one 48-unit grid, mirrored left and right and sitting on one shared baseline.</p></div>
+      <div class="rule"><b>Our own face language</b><p><span class="no">Not</span> paired vertical pill eyes, and never a tilted eye pair. We use round dots with a white highlight, a beak notch, <i>^ ^</i> arcs, one visor slit, or a small screen inset. The eyes stay level, and only the whole head tilts.</p></div>
+      <div class="rule"><b>The roost is the hook</b><p>Roost's first avatars were birds. The Chick and Hatchling families bring them back: an egg, a tuft, a crest, a wing, a shell. They are perched on a soft shadow and act like birds: a curious head tilt, a tuck to sleep.</p></div>
+      <div class="rule"><b>No antenna, no extra parts</b><p>The statuses use only the eyes and the posture. The two exceptions you asked for are the "?" glint (Asking you) and the "z" (Off duty), and both sit beside the head.</p></div>
+    </div>
+    <div class="legend" aria-label="How a status shows">
+      <span><i class="dot" style="background:#a9a9b6"></i>Resting: a slow blink</span>
+      <span><i class="dot" style="background:#b2a6f6"></i>On it: eyes look around, a gentle bounce</span>
+      <span><i class="dot" style="background:#f5a524"></i>Asking you: head tilt and a ? glint</span>
+      <span><i class="dot" style="background:#f87171"></i>Stuck: X or dizzy eyes and a small wobble</span>
+      <span><i class="dot" style="background:#9ca3af"></i>Off duty: closed eyes, settled and dimmed, a z</span>
+    </div>
+    <p style="font-size:var(--fs-caption);color:var(--color-text-faint)">Motion runs only when your system allows it (<code style="font-family:var(--font-mono)">prefers-reduced-motion</code>). Without motion, each status still reads from the eye shape, the tilt, the dimming and the glint.</p>
+  </section>
+
+  <!-- ================================================================ A -->
+  <section class="section" aria-labelledby="secA">
+    <h2 id="secA">A · Five families <small>pick one</small></h2>
+    <p>Each family has 12 shapes, so a team of bots can all look different, and every shape takes any of the ten colours from round two. Bodies have a soft light from the upper left, a small gloss and a ground shadow. That gives the squishy, touchable feel without outlines.</p>
+    <div class="dirs" id="dirs"></div>
+  </section>
+
+  <!-- ================================================================ B -->
+  <section class="section" aria-labelledby="secB">
+    <h2 id="secB">B · The best two in the cozy kit <small>hero · sidebar · picker</small></h2>
+    <p>The same three pieces for each: the Profile's panel hero, the sidebar with its pinned row, and the avatar picker card with its Robot / Upload / Reset tabs, the shape grid and the colour dots.</p>
+    <div class="dirs" id="kit"></div>
+  </section>
+
+  <!-- ================================================================ C -->
+  <section class="section" aria-labelledby="secC">
+    <h2 id="secC">C · Recommendation</h2>
+    <div class="reco">
+      <div class="row" id="recoRow" style="gap:10px"></div>
+      <p><b>Go with Chick.</b> It has the same soft, squeezable warmth you liked, but it comes from Roost's own story: a roost is where birds rest, and Roost's first avatars were birds. It is distinct from the competitor in all three places their look lives. The <b>silhouettes</b> are named, mirrored bird forms (egg, plump, tufted, crest, wing, puff) that sit on one perch line, not free-form, lopsided blobs. The <b>face</b> is two small, close-set round eyes, each with a white highlight, often over a tiny beak notch. There are no vertical pills, and the eye pair never tilts. The <b>behaviour</b> is a bird's: a curious head cock with a "?" glint when it asks you something, and a tuck and a "z" when it goes off duty. At 24px a Chick is a coloured egg with two dots, which is the most readable of the five. Mochi is the runner-up if you want something rounder and less bird-like. Two or three Hatchling shapes (shell, cap) could later join Chick's family as extra shapes.</p>
+      <div class="map">
+        <div><code>web/src/components/robot/heads.tsx</code><p>The six box heads are replaced by twelve Chick shapes as data: each is a few numbers (width, height, squareness, egg taper, flat base) plus an optional tuft, crest or wing. One pure <code>chickPath()</code> turns them into a mirrored path on the 48-unit grid. The shapes are drawn once and are easy to test.</p></div>
+        <div><code>web/src/components/robot/look.ts</code><p><code>ROBOT_HEADS</code> becomes the twelve Chick names. The bird shapes from S1.6 (<code>round</code>, <code>egg</code>, <code>pear</code>, <code>plump</code>, <code>crest</code>) draw as themselves again. <code>tall</code> and <code>wide</code> keep their names, and <code>LEGACY_SHAPE_TO_HEAD</code> now maps the other four box heads (<code>classic</code>, <code>soft</code>, <code>cube</code>, <code>monitor</code>) instead (table below). Stored avatars keep their value and nothing migrates. <code>roost/constants.py</code> (<code>ROBOT_HEADS</code>, <code>LEGACY_AVATAR_SHAPES</code>), <code>api/types.ts</code> and <code>tests/test_bot_look.py</code> move in step.</p></div>
+        <div><code>RobotFace.tsx · new eyes.tsx</code><p><code>RobotFace</code> draws the body (soft radial light, gloss, ground shadow), the face and the star. A new <code>eyes.tsx</code> holds the five eye states (blink, look, up, X, closed) and the beak. An uploaded picture clips to the body, with a rim in the bot's colour.</p></div>
+        <div><code>signals*.tsx · StatusBadge.tsx · moments.ts</code><p>The three screen styles (glow, pixel, wave) retire. <code>robotScreen()</code> still accepts stored values, and drawing ignores them. <code>StatusBadge</code> becomes the "?" and "z" glints. <code>STATUS_MOMENT</code> keeps feeding the face. The extra moments (think, msg, done) reuse look, up and blink.</p></div>
+        <div><code>palette.ts · robot.css · tokens.css</code><p>Round two's ten colours, plus a beak colour and a ground-shadow token. Blink, look, bounce, wobble, glint and zed run only under <code>prefers-reduced-motion: no-preference</code>, and are off when <code>still</code> is set.</p></div>
+      </div>
+      <h4>Old saved shapes still draw, through look.ts's table</h4>
+      <div class="tbl-wrap"><table><thead><tr><th>Stored shape</th><th>Where it came from</th><th>Draws as</th></tr></thead><tbody id="legacyRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <div class="pickbar" id="pickbar" aria-live="polite">Your pick: <b id="pickName">none yet</b></div>
+</main>
+
+<script>
+"use strict";
+/* Builds every avatar on the page from small SVG strings. Pure functions up top; the page wiring at
+   the bottom runs only in a browser, so node can load and check the rest. */
+
+const PALETTE = [
+  ["#9d8cf6", "Lavender"], ["#6ea8fe", "Blue"], ["#56c6e6", "Sky"], ["#4fcfae", "Mint"], ["#86d27a", "Leaf"],
+  ["#f1cc63", "Butter"], ["#f5a66a", "Apricot"], ["#f2827a", "Coral"], ["#ee8fc2", "Rose"], ["#b9b6c8", "Stone"],
+];
+const SIX = [0, 1, 3, 5, 7, 8];
+const FAMILY_COLOR = 1; // the family grids show every shape in one bot's colour (Blue)
+const STATUSES = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"]];
+const INK = "#1d1b29";
+const SCREEN = "#1a1925";
+const ASK = "#f5a524";
+const STUCK_LIGHT = "#fca5a5";
+const ZED = "#d9d6e6";
+const RING = "#0e0e12";
+const STAR = "#f6c453";
+const BLUSH = "#ff8fa3";
+const BEAK = "#f3a95b";
+const BASE_Y = 44; // every shape sits on this line
+const BEST = ["chick", "mochi"];
+
+let seq = 0;
+const uid = (prefix) => `${prefix}${++seq}`;
+const f = (n) => +n.toFixed(2);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function channels(hex) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const toHex = (rgb) => "#" + rgb.map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("");
+const tint = (hex, a) => toHex(channels(hex).map((v) => v + (255 - v) * a));
+const shade = (hex, k) => toHex(channels(hex).map((v) => v * k));
+const isWarm = (hex) => { const [r, , b] = channels(hex); return r > b + 40; };
+
+/* ---- Geometry ---------------------------------------------------------- */
+
+/** A closed Catmull-Rom spline through the points, as cubic Béziers: always smooth, never a corner. */
+function smooth(pts) {
+  const n = pts.length;
+  let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 0; i < n; i += 1) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+}
+
+/** Points round a mirrored outline: a superellipse (n) with cosine terms measured from the top. */
+function polarPts(o) {
+  const N = 48, e = o.n || 2, pts = [];
+  for (let i = 0; i < N; i += 1) {
+    const t = (i / N) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+    let r = Math.pow(Math.pow(Math.abs(c), e) + Math.pow(Math.abs(s), e), -1 / e);
+    for (const [k, a] of Object.entries(o.h || {})) r += a * Math.cos(Number(k) * t);
+    for (const [k, a] of Object.entries(o.sk || {})) r += a * Math.sin(Number(k) * t);
+    pts.push([o.rx * r * s, -o.ry * r * c]);
+  }
+  return o.flat ? pts.map(([x, y]) => [x, Math.min(y, o.ry * o.flat)]) : pts;
+}
+
+/** A right-hand half outline (top to bottom), mirrored into a whole one. */
+const mirror = (half) => half.concat(half.slice(1, -1).reverse().map(([x, y]) => [-x, y]));
+
+/** Scales the points into the grid if needed, centres them and stands them on the baseline. */
+function place(pts, maxW = 38, maxH = 38) {
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+  const k = Math.min(1, maxW / w, maxH / h), mx = (Math.max(...xs) + Math.min(...xs)) / 2, my = Math.max(...ys);
+  const out = pts.map(([x, y]) => [24 + (x - mx) * k, BASE_Y + (y - my) * k]);
+  return { pts: out, box: { x0: 24 - (w * k) / 2, x1: 24 + (w * k) / 2, y0: BASE_Y - h * k, y1: BASE_Y, w: w * k, h: h * k, cx: 24 } };
+}
+
+function shapeOf(o) {
+  const raw = o.half ? mirror(o.half) : polarPts(o);
+  const p = place(raw, o.maxW, o.maxH);
+  return { d: smooth(p.pts), box: p.box, pts: p.pts };
+}
+
+/** A polygon with its corners rounded by quadratic curves. */
+function roundPoly(pts, r) {
+  const n = pts.length;
+  let d = "";
+  for (let i = 0; i < n; i += 1) {
+    const p = pts[i], a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n];
+    const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+    const ka = Math.min(r, la / 2) / la, kb = Math.min(r, lb / 2) / lb;
+    const s = [p[0] + (a[0] - p[0]) * ka, p[1] + (a[1] - p[1]) * ka], e = [p[0] + (b[0] - p[0]) * kb, p[1] + (b[1] - p[1]) * kb];
+    d += `${i ? "L" : "M"}${f(s[0])} ${f(s[1])}Q${f(p[0])} ${f(p[1])} ${f(e[0])} ${f(e[1])}`;
+  }
+  return d + "Z";
+}
+
+function rr(x, y, w, h, r) {
+  const q = Math.min(r, w / 2, h / 2);
+  return `M${f(x + q)} ${f(y)}H${f(x + w - q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + w)} ${f(y + q)}V${f(y + h - q)}` +
+    `A${f(q)} ${f(q)} 0 0 1 ${f(x + w - q)} ${f(y + h)}H${f(x + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x)} ${f(y + h - q)}` +
+    `V${f(y + q)}A${f(q)} ${f(q)} 0 0 1 ${f(x + q)} ${f(y)}Z`;
+}
+
+/* ---- Shared parts: body, shadow, picture, eyes, glints, star, posture ---- */
+
+/** The soft body: light from the upper left, a gloss. FILL in `behind` takes the same gradient. */
+function softBody(d, box, color, behind = "") {
+  const g = uid("g"), gx = box.x0 + box.w * 0.34, gy = box.y0 + box.h * 0.3, r = Math.max(box.w, box.h) * 0.85;
+  const gloss = `<ellipse cx="${f(box.x0 + box.w * 0.3)}" cy="${f(box.y0 + box.h * 0.2)}" rx="${f(box.w * 0.12)}" ry="${f(Math.max(1.3, box.h * 0.055))}" fill="#fff" opacity=".3" transform="rotate(-30 ${f(box.x0 + box.w * 0.3)} ${f(box.y0 + box.h * 0.2)})"/>`;
+  return `<defs><radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="${f(gx)}" cy="${f(gy)}" r="${f(r)}">` +
+    `<stop offset="0" stop-color="${tint(color, 0.24)}"/><stop offset=".55" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, 0.74)}"/></radialGradient></defs>` +
+    behind.split("FILL").join(`url(#${g})`) + `<path d="${d}" fill="url(#${g})"/>` + gloss;
+}
+
+const groundShadow = (box) => `<ellipse cx="24" cy="${BASE_Y + 1.3}" rx="${f(box.w * 0.34)}" ry="1.5" fill="#000" opacity=".38"/>`;
+
+/** A stand-in for an uploaded picture, clipped to the body path shrunk by k round its middle. */
+function photo(d, box, k = 0.84) {
+  const clip = uid("p"), grad = uid("q"), cx = box.cx, cy = box.y0 + box.h / 2;
+  const tf = `translate(${f(cx)} ${f(cy)}) scale(${k}) translate(${f(-cx)} ${f(-cy)})`;
+  const { x0: x, y0: y, w, h } = box;
+  return `<defs><linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5f2"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient></defs>` +
+    `<clipPath id="${clip}"><path d="${d}" transform="${tf}"/></clipPath><g clip-path="url(#${clip})">` +
+    `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="url(#${grad})"/>` +
+    `<circle cx="${f(x + w * 0.66)}" cy="${f(y + h * 0.34)}" r="${f(h * 0.14)}" fill="#fff4d6"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.74)}q${f(w * 0.3)} ${f(-h * 0.34)} ${f(w * 0.62)} 0t${f(w * 0.62)} 0V${f(y + h)}H${f(x)}z" fill="#5fae7a"/>` +
+    `<path d="M${f(x)} ${f(y + h * 0.88)}q${f(w * 0.4)} ${f(-h * 0.2)} ${f(w)} ${f(-h * 0.06)}V${f(y + h)}H${f(x)}z" fill="#3f8a63"/></g>`;
+}
+
+const dotEye = (x, y, r, ink, shine) => `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${ink}"/>` +
+  (shine ? `<circle cx="${f(x + r * 0.36)}" cy="${f(y - r * 0.38)}" r="${f(r * 0.38)}" fill="#fff"/>` : "");
+
+function spiral(x, y, r) {
+  const pts = [];
+  for (let i = 0; i <= 22; i += 1) {
+    const t = (i / 22) * Math.PI * 4.2, k = r * (0.15 + 0.85 * (i / 22));
+    pts.push(`${f(x + Math.cos(t) * k)} ${f(y + Math.sin(t) * k)}`);
+  }
+  return "M" + pts.join("L");
+}
+
+/** Two eyes for a status. Dots for most; X or dizzy spirals when stuck; soft closed curves off duty. */
+function eyes(s, lx, rx, y, r, opts = {}) {
+  const ink = opts.ink || INK, shine = opts.shine !== false, sw = f(Math.max(1.3, r * 0.74));
+  const line = (d, colour = ink) => `<path d="${d}" stroke="${colour}" stroke-width="${sw}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const both = (one) => one(lx) + one(rx);
+  const dots = (dx, dy, k = 1) => both((x) => dotEye(x + dx, y + dy, r * k, ink, shine));
+  if (s === "rest") return `<g class="a-blink">${dots(0, 0)}</g>`;
+  if (s === "onit") return `<g class="a-look">${dots(0, 0)}</g>`;
+  if (s === "ask") return dots(r * 0.3, -r * 0.36, 1.08);
+  if (s === "stuck" && opts.dizzy) {
+    return both((x) => `<g class="a-dizzy"><path d="${spiral(x, y, r * 1.45)}" stroke="${ink}" stroke-width="1.05" fill="none" stroke-linecap="round"/></g>`);
+  }
+  if (s === "stuck") {
+    const a = r * 0.85;
+    return both((x) => line(`M${f(x - a)} ${f(y - a)}l${f(a * 2)} ${f(a * 2)}M${f(x + a)} ${f(y - a)}l${f(-a * 2)} ${f(a * 2)}`, opts.stuckInk || ink));
+  }
+  return both((x) => line(`M${f(x - r)} ${f(y - r * 0.2)}q${f(r)} ${f(r)} ${f(r * 2)} 0`));
+}
+
+/** The two glints the brief allows: ? beside an asking head, z beside a sleeping one. Never tilted. */
+function glint(s, ring) {
+  if (s === "ask") {
+    const q = "M-2.6 -2.7a2.8 2.8 0 1 1 3.8 2.6c-.8.3-1.2.9-1.2 1.7";
+    return `<g transform="translate(40.6 8.4)"><g class="a-glint">` +
+      `<path d="${q}" stroke="${ring}" stroke-width="5.6" fill="none" stroke-linecap="round"/><circle cy="4.7" r="2.5" fill="${ring}"/>` +
+      `<path d="${q}" stroke="${ASK}" stroke-width="2.3" fill="none" stroke-linecap="round"/><circle cy="4.7" r="1.3" fill="${ASK}"/></g></g>`;
+  }
+  if (s !== "off") return "";
+  const z = (x, y, k) => `M${f(x - 3 * k)} ${f(y - 3 * k)}h${f(6 * k)}l${f(-6 * k)} ${f(6 * k)}h${f(6 * k)}`;
+  const draw = (d, w) => `<path d="${d}" stroke="${ring}" stroke-width="${w + 3}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="${d}" stroke="${ZED}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<g>${draw(z(39.5, 10.5, 1), 2)}<g class="a-zed">${draw(z(45, 3.4, 0.55), 1.5)}</g></g>`;
+}
+
+function starMark(ring) {
+  return `<g transform="translate(40 40)"><circle r="7.4" fill="${STAR}" stroke="${ring}" stroke-width="2.6"/>` +
+    `<path d="M0 -4.3l1.3 2.6 2.9.45-2.1 2.05.5 2.9L0 2.6l-2.6 1.4.5-2.9-2.1-2.05 2.9-.45z" fill="#4a3606"/></g>`;
+}
+
+/** Posture: Asking you cocks the head, Off duty settles and dims; motion is per status and per family. */
+function pose(s, inner, motion = {}) {
+  const still = { ask: ' transform="rotate(-9 24 44)"', off: ' transform="translate(0 1)" opacity=".62"' }[s] || "";
+  const m = motion[s] !== undefined ? motion[s] : ({ onit: "a-bounce", stuck: "a-wobble" }[s] || "");
+  return `<g class="pose"${still}><g class="${m}">${inner}</g></g>`;
+}
+
+/* ---- 1. Chick ----------------------------------------------------------- */
+const CHICK = [
+  { id: "round", label: "Round", rx: 17, ry: 16.5, beak: false },
+  { id: "egg", label: "Egg", rx: 15, ry: 18.5, h: { 1: -0.07 } },
+  { id: "bean", label: "Bean", rx: 15.5, ry: 18, h: { 1: -0.05 }, sk: { 2: 0.05 } },
+  { id: "plump", label: "Plump", rx: 19.5, ry: 16.5, n: 2.3, h: { 1: -0.05 }, flat: 0.86 },
+  { id: "tall", label: "Tall", rx: 13.5, ry: 19, n: 2.2, ey: 0.36 },
+  { id: "tufted", label: "Tufted", rx: 16.5, ry: 16, maxH: 33, feature: "tuft" },
+  { id: "crest", label: "Crest", rx: 15, ry: 17.5, h: { 1: -0.05 }, maxH: 33, feature: "crest" },
+  { id: "pear", label: "Pear", rx: 16.5, ry: 18, h: { 1: -0.15, 2: 0.03 }, ey: 0.36, gap: 4.4 },
+  { id: "wide", label: "Wide", rx: 20, ry: 14.5, n: 2.6, flat: 0.9, ey: 0.42 },
+  { id: "drop", label: "Drop", half: [[0, -20], [1.6, -18.3], [5.2, -13.4], [10.5, -5.5], [13.8, 2.4], [13.4, 9.5], [8.6, 14.6], [0, 16]], ey: 0.56, gap: 4.6 },
+  { id: "wing", label: "Wing", rx: 15.5, ry: 16.5, h: { 1: -0.04 }, maxW: 34, feature: "wing" },
+  { id: "puff", label: "Puff", rx: 17, ry: 16.5, h: { 12: 0.022 }, beak: false },
+];
+
+function chickFeature(o, box) {
+  const { cx, y0, x0, x1, h } = box;
+  if (o.feature === "tuft") {
+    return [[-3.2, -2.6], [0, 0], [3.2, 2.6]].map(([dx, lean]) => {
+      const x = cx + dx;
+      return `<path d="M${f(x - 2.2)} ${f(y0 + 3)}Q${f(x - 2.4 + lean * 0.3)} ${f(y0 - 3)} ${f(x + lean)} ${f(y0 - 5.8 + Math.abs(dx) * 0.5)}Q${f(x + 1.8)} ${f(y0 - 1)} ${f(x + 2.2)} ${f(y0 + 3)}Z" fill="FILL"/>`;
+    }).join("");
+  }
+  if (o.feature === "crest") {
+    return `<path d="M${f(cx - 3.4)} ${f(y0 + 3)}C${f(cx - 3.6)} ${f(y0 - 4.4)} ${f(cx + 4)} ${f(y0 - 8)} ${f(cx + 8.6)} ${f(y0 - 5.6)}C${f(cx + 4.4)} ${f(y0 - 3.4)} ${f(cx + 3.4)} ${f(y0 - 0.4)} ${f(cx + 3.4)} ${f(y0 + 3)}Z" fill="FILL"/>`;
+  }
+  if (o.feature === "wing") {
+    const wy = y0 + h * 0.6;
+    return [[x0 + 1.4, 24], [x1 - 1.4, -24]].map(([x, a]) =>
+      `<ellipse cx="${f(x)}" cy="${f(wy)}" rx="3.8" ry="7" fill="FILL" transform="rotate(${a} ${f(x)} ${f(wy)})"/>`).join("");
+  }
+  return "";
+}
+
+const beakPath = (x, y) => `M${f(x - 1.9)} ${f(y)}Q${f(x)} ${f(y - 0.7)} ${f(x + 1.9)} ${f(y)}Q${f(x + 0.5)} ${f(y + 2.6)} ${f(x)} ${f(y + 2.9)}Q${f(x - 0.5)} ${f(y + 2.6)} ${f(x - 1.9)} ${f(y)}Z`;
+
+function chickFace(s, box, color, o) {
+  const ey = box.y0 + box.h * (o.ey || 0.4), gap = o.gap || clamp(box.w * 0.18, 4.2, 6);
+  const beak = o.beak === false ? "" : `<path d="${beakPath(box.cx, ey + 1.5)}" fill="${isWarm(color) ? shade(color, 0.6) : BEAK}"/>`;
+  return eyes(s, box.cx - gap, box.cx + gap, ey, 2.3) + beak;
+}
+
+function chick({ color, v, s, pic }) {
+  const o = CHICK[v % CHICK.length], { d, box } = shapeOf(o);
+  const face = pic ? photo(d, box) : chickFace(s, box, color, o);
+  return groundShadow(box) + pose(s, softBody(d, box, color, chickFeature(o, box)) + face);
+}
+
+/* ---- 2. Mochi ----------------------------------------------------------- */
+const MOCHI = [
+  { label: "Squircle", rx: 17.5, ry: 16, n: 3.4 },
+  { label: "Bean", rx: 19.5, ry: 14, n: 2.3, sk: { 2: -0.05 } },
+  { label: "Drop", half: [[0, -19.5], [1.8, -17.6], [6, -12.6], [12, -4.6], [15.4, 3.2], [14.6, 10], [9, 14.6], [0, 15.6]], ey: 0.66 },
+  { label: "Cloud", rx: 19, ry: 14.5, n: 2.4, h: { 6: 0.045 }, flat: 0.82 },
+  { label: "Puffy star", rx: 18, ry: 17.5, h: { 5: 0.085 }, ey: 0.56 },
+  { label: "Dumpling", rx: 19.5, ry: 15, n: 2.2, h: { 1: 0.06 }, flat: 0.55, ey: 0.62 },
+  { label: "Loaf", rx: 19.5, ry: 14, n: 3.6, h: { 1: 0.04 }, flat: 0.9 },
+  { label: "Pillow", rx: 18, ry: 15.5, n: 4, h: { 4: 0.05 } },
+  { label: "Peach", rx: 17, ry: 17, h: { 1: -0.02, 2: 0.015 }, feature: "cleft" },
+  { label: "Tall", rx: 14, ry: 18.5, n: 2.8, ey: 0.58 },
+  { label: "Puff", rx: 18, ry: 17, h: { 9: 0.03 } },
+  { label: "Daifuku", rx: 20.5, ry: 13, n: 2.2, flat: 0.7, ey: 0.56 },
+];
+
+function mochiFace(s, box, color, o) {
+  const ey = box.y0 + box.h * (o.ey || 0.6), gap = clamp(box.w * 0.26, 6, 8.6);
+  const blush = s === "stuck" ? "" : [-1, 1].map((k) =>
+    `<ellipse cx="${f(box.cx + k * (gap + 3.4))}" cy="${f(ey + 2.8)}" rx="2.5" ry="1.4" fill="${BLUSH}" opacity=".5"/>`).join("");
+  return blush + eyes(s, box.cx - gap, box.cx + gap, ey, 2.2, { dizzy: true });
+}
+
+function mochi({ color, v, s, pic }) {
+  const o = MOCHI[v % MOCHI.length], { d, box } = shapeOf(o);
+  const cleft = o.feature === "cleft" ? `<path d="M${f(box.cx)} ${f(box.y0 + 0.6)}q-1.6 4 0 7.4" stroke="${shade(color, 0.72)}" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".8"/>` : "";
+  const face = pic ? photo(d, box) : mochiFace(s, box, color, o);
+  return groundShadow(box) + pose(s, softBody(d, box, color) + cleft + face, { rest: "a-breathe", onit: "a-squash" });
+}
+
+/* ---- 3. Pebble face ----------------------------------------------------- */
+const PEBBLE = [
+  { label: "Round", rx: 17, ry: 15, n: 2.2, face: "slit" },
+  { label: "River", rx: 20, ry: 12.5, n: 2.3, sk: { 2: 0.04 }, face: "arcs" },
+  { label: "Tall", rx: 13.5, ry: 18, n: 2.3, face: "slit" },
+  { label: "Flat", rx: 20.5, ry: 11, n: 2.6, face: "arcs" },
+  { label: "Egg", rx: 15.5, ry: 17, h: { 1: -0.06 }, face: "slit" },
+  { label: "Cairn", rx: 19, ry: 11, n: 2.5, face: "arcs", feature: "cairn" },
+  { label: "Worn square", rx: 16.5, ry: 15.5, n: 3.4, face: "slit" },
+  { label: "Cobble", rx: 17.5, ry: 15, n: 2.6, h: { 3: 0.035 }, face: "arcs" },
+  { label: "Lens", rx: 19, ry: 14, n: 1.75, face: "slit" },
+  { label: "Bean", rx: 18.5, ry: 13.5, n: 2.3, sk: { 2: -0.06 }, face: "arcs" },
+  { label: "Tri", rx: 18, ry: 16.5, h: { 3: 0.07 }, face: "slit" },
+  { label: "Skipper", rx: 21, ry: 9.5, n: 2.3, face: "arcs" },
+];
+
+/** The visor slit: one soft dark slot, with two short lights for eyes. */
+function slitFace(s, box, color) {
+  const ey = box.y0 + box.h * 0.46, vw = clamp(box.w * 0.52, 15, 21), vh = 6, light = tint(color, 0.66), cx = box.cx;
+  const dash = (x, w = 3.4, hgt = 2.2) => `<rect x="${f(x - w / 2)}" y="${f(ey - hgt / 2)}" width="${f(w)}" height="${f(hgt)}" rx="${f(hgt / 2)}" fill="${light}"/>`;
+  const pair = dash(cx - 3.6) + dash(cx + 3.6);
+  const inner = {
+    rest: `<g class="a-blink">${pair}</g>`,
+    onit: `<g class="a-look">${pair}</g>`,
+    ask: `<circle cx="${f(cx - 2.6)}" cy="${f(ey - 0.5)}" r="1.5" fill="${light}"/><circle cx="${f(cx + 4.4)}" cy="${f(ey - 0.5)}" r="1.5" fill="${light}"/>`,
+    stuck: `<path d="M${f(cx - 6)} ${f(ey)}l2 -1.6 2 3.2 2 -3.2 2 3.2 2 -3.2 2 1.6" stroke="${STUCK_LIGHT}" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`,
+    off: `<path d="M${f(cx - 4)} ${f(ey)}h8" stroke="${light}" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round"/>`,
+  }[s];
+  return `<path d="${rr(cx - vw / 2, ey - vh / 2, vw, vh, vh / 2)}" fill="${SCREEN}"/>` +
+    `<path d="M${f(cx - vw / 2 + 3)} ${f(ey - vh / 2 + 1.1)}h${f(vw * 0.3)}" stroke="#fff" stroke-opacity=".1" stroke-width="1" stroke-linecap="round"/>` + inner;
+}
+
+/** The ^ ^ face: happy arcs that blink and hop, one arc and a dot when asking, x x when stuck. */
+function arcsFace(s, box) {
+  const ey = box.y0 + box.h * 0.48, gap = clamp(box.w * 0.15, 4, 5.2), r = 2.2, cx = box.cx;
+  const stroke = `stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+  const arc = (x, y = ey) => `<path d="M${f(x - r)} ${f(y + r * 0.45)}q${f(r)} ${f(-r * 1.5)} ${f(r * 2)} 0" ${stroke}/>`;
+  if (s === "rest") return `<g class="a-blink">${arc(cx - gap)}${arc(cx + gap)}</g>`;
+  if (s === "onit") return `<g class="a-hop">${arc(cx - gap)}${arc(cx + gap)}</g>`;
+  if (s === "ask") return arc(cx - gap, ey - 0.6) + dotEye(cx + gap + 0.5, ey - 0.8, 2, INK, true);
+  if (s === "stuck") return eyes("stuck", cx - gap, cx + gap, ey, 2.2);
+  return [cx - gap, cx + gap].map((x) => `<path d="M${f(x - r)} ${f(ey)}h${f(r * 2)}" ${stroke}/>`).join("");
+}
+
+function pebble({ color, v, s, pic }) {
+  const o = PEBBLE[v % PEBBLE.length], { d, box } = shapeOf(o);
+  const cairn = o.feature === "cairn" ? `<ellipse cx="${f(box.cx + 1)}" cy="${f(box.y0 - 2.2)}" rx="7.4" ry="4.8" fill="FILL"/>` : "";
+  const speck = [[0.7, 0.72], [0.78, 0.6], [0.26, 0.78]].map(([a, b]) =>
+    `<circle cx="${f(box.x0 + box.w * a)}" cy="${f(box.y0 + box.h * b)}" r=".75" fill="${shade(color, 0.78)}" opacity=".7"/>`).join("");
+  let face = o.face === "slit" ? slitFace(s, box, color) : arcsFace(s, box);
+  if (pic) face = photo(d, box);
+  return groundShadow(box) + pose(s, softBody(d, box, color, cairn) + speck + face);
+}
+
+/* ---- 4. Gem ------------------------------------------------------------- */
+function ngon(n, rx, ry, rot = 0) {
+  return Array.from({ length: n }, (_, i) => { const a = rot + (i * 2 * Math.PI) / n; return [rx * Math.sin(a), -ry * Math.cos(a)]; });
+}
+const GEM = [
+  { label: "Round", pts: ngon(8, 18, 18, Math.PI / 8), r: 4 },
+  { label: "Cushion", pts: [[-13, -17], [13, -17], [17, -13], [17, 13], [13, 17], [-13, 17], [-17, 13], [-17, -13]], r: 5 },
+  { label: "Emerald", pts: [[-12, -14], [12, -14], [19, -7], [19, 7], [12, 14], [-12, 14], [-19, 7], [-19, -7]], r: 3.5 },
+  { label: "Oval", pts: ngon(10, 19, 15.5, Math.PI / 10), r: 4 },
+  { label: "Pear", pts: [[0, -19], [9, -10], [14, 2], [12, 12], [0, 17], [-12, 12], [-14, 2], [-9, -10]], r: 4 },
+  { label: "Marquise", pts: [[-21, 0], [-12, -10], [0, -13], [12, -10], [21, 0], [12, 10], [0, 13], [-12, 10]], r: 4 },
+  { label: "Heart", pts: [[0, -9], [7, -16], [16, -13], [18.5, -4], [0, 16], [-18.5, -4], [-16, -13], [-7, -16]], r: 4.5 },
+  { label: "Hex", pts: ngon(6, 19, 17.5, Math.PI / 6), r: 4 },
+  { label: "Trillion", pts: ngon(3, 22, 21, Math.PI), r: 7 },
+  { label: "Kite", pts: [[0, -19], [14.5, -5], [0, 18], [-14.5, -5]], r: 5 },
+  { label: "Shield", pts: [[-16, -15], [16, -15], [16, 2], [0, 17], [-16, 2]], r: 5 },
+  { label: "Baguette", pts: [[-10, -18], [10, -18], [13, -15], [13, 15], [10, 18], [-10, 18], [-13, 15], [-13, -15]], r: 3 },
+];
+
+/** Facets: a smaller table up top and a fine line from each corner to it. Quiet, so 24px stays clean. */
+function facets(pts, box) {
+  const tx = box.cx, ty = box.y0 + box.h * 0.42, k = 0.5;
+  const table = pts.map(([x, y]) => [tx + (x - tx) * k, ty + (y - ty) * k]);
+  const lines = pts.map(([x, y], i) => `M${f(x)} ${f(y)}L${f(table[i][0])} ${f(table[i][1])}`).join("");
+  return `<path d="${roundPoly(table, 2)}" fill="#fff" fill-opacity=".07" stroke="#fff" stroke-opacity=".2" stroke-width=".7"/>` +
+    `<path d="${lines}" stroke="#fff" stroke-opacity=".14" stroke-width=".7"/>`;
+}
+
+function gemBody(d, box, color) {
+  const g = uid("j");
+  return `<defs><linearGradient id="${g}" gradientUnits="userSpaceOnUse" x1="${f(box.x0)}" y1="${f(box.y0)}" x2="${f(box.x1)}" y2="${f(box.y1)}">` +
+    `<stop offset="0" stop-color="${tint(color, 0.38)}"/><stop offset=".5" stop-color="${color}"/><stop offset="1" stop-color="${shade(color, 0.66)}"/></linearGradient></defs>` +
+    `<path d="${d}" fill="url(#${g})"/>`;
+}
+
+function gemFace(s, box, color) {
+  const sw = clamp(box.w * 0.5, 14, 18), sh = 10, cx = box.cx, cy = box.y0 + box.h * 0.58;
+  const screen = `<path d="${rr(cx - sw / 2, cy - sh / 2, sw, sh, 4)}" fill="${SCREEN}" stroke="${tint(color, 0.4)}" stroke-opacity=".5" stroke-width=".7"/>`;
+  return screen + eyes(s, cx - 3.4, cx + 3.4, cy, 1.75, { ink: tint(color, 0.66), shine: false, stuckInk: STUCK_LIGHT });
+}
+
+function gem({ color, v, s, pic }) {
+  const o = GEM[v % GEM.length], p = place(o.pts, 38, 37), d = roundPoly(p.pts, o.r), box = p.box;
+  const sx = box.x0 + box.w * 0.24, sy = box.y0 + box.h * 0.22;
+  const sparkle = `<path d="M${f(sx)} ${f(sy - 2.6)}q.4 2.2 2.6 2.6q-2.2 .4 -2.6 2.6q-.4 -2.2 -2.6 -2.6q2.2 -.4 2.6 -2.6z" fill="#fff" opacity=".8"/>`;
+  const face = pic ? photo(d, box, 0.8) : facets(p.pts, box) + sparkle + gemFace(s, box, color);
+  return groundShadow(box) + pose(s, gemBody(d, box, color) + face);
+}
+
+/* ---- 5. Hatchling (wildcard) -------------------------------------------- */
+const HATCH = [
+  { label: "Zigzag", rx: 15, ry: 18, edge: "zig", at: 0.56 },
+  { label: "Wave", rx: 16.5, ry: 16.5, edge: "wave", at: 0.56 },
+  { label: "Scallop", rx: 18.5, ry: 15, n: 2.2, edge: "scallop", at: 0.6 },
+  { label: "Low shell", rx: 15.5, ry: 18, edge: "zig", at: 0.7 },
+  { label: "Deep shell", rx: 15.5, ry: 18, edge: "wave", at: 0.48 },
+  { label: "Cap", rx: 15.5, ry: 17, edge: "zig", at: 0.6, cap: -14, maxH: 33 },
+  { label: "Tall", rx: 13, ry: 19, edge: "zig", at: 0.58 },
+  { label: "Round cap", rx: 17, ry: 16.5, edge: "scallop", at: 0.6, cap: 0, maxH: 33 },
+  { label: "Wide", rx: 19.5, ry: 14.5, n: 2.3, edge: "wave", at: 0.6 },
+  { label: "Peek", rx: 16, ry: 18, edge: "zig", at: 0.44 },
+  { label: "Crack", rx: 16, ry: 17.5, edge: "crack", at: 0.56 },
+  { label: "Tilted cap", rx: 17.5, ry: 16, n: 2.2, edge: "wave", at: 0.62, cap: 16, maxH: 33 },
+];
+
+/** The shell's top edge, from left to right, then down and back so it closes below the egg. */
+function shellPath(kind, box, y) {
+  const x0 = box.x0 - 2, x1 = box.x1 + 2, w = x1 - x0, a = 2.4;
+  let top = `M${f(x0)} ${f(y)}`;
+  if (kind === "zig" || kind === "crack") {
+    const teeth = kind === "zig" ? 6 : 3;
+    for (let i = 1; i <= teeth * 2; i += 1) top += `L${f(x0 + (w * i) / (teeth * 2))} ${f(y + (i % 2 ? -a : a) * (kind === "crack" ? 1.5 : 1))}`;
+  } else if (kind === "wave") {
+    top += `q${f(w / 8)} ${-a * 1.6} ${f(w / 4)} 0t${f(w / 4)} 0t${f(w / 4)} 0t${f(w / 4)} 0`;
+  } else {
+    for (let i = 0; i < 4; i += 1) top += `a${f(w / 8)} ${f(w / 9)} 0 0 1 ${f(w / 4)} 0`;
+  }
+  return `${top}V48H${f(x0)}Z`;
+}
+
+/** A piece of shell worn as a cap, at an angle. */
+function capDraw(box, angle, fill) {
+  const { cx, y0 } = box;
+  const d = `M${f(cx - 8)} ${f(y0 + 3.4)}Q${f(cx)} ${f(y0 - 7.2)} ${f(cx + 8)} ${f(y0 + 3.4)}l-2.7 -2.2 -2.6 2.2 -2.7 -2.2 -2.7 2.2 -2.6 -2.2Z`;
+  return `<g transform="rotate(${angle} ${f(cx)} ${f(y0 + 1)})"><path d="${d}" fill="${fill}"/></g>`;
+}
+
+function hatch({ color, v, s, pic }) {
+  const o = HATCH[v % HATCH.length], { d, box } = shapeOf({ h: { 1: -0.07 }, ...o });
+  const shell = tint(color, 0.74), rim = shade(color, 0.6), clip = uid("e");
+  const sy = box.y0 + box.h * o.at, sp = shellPath(o.edge, box, sy);
+  const shellDraw = `<g clip-path="url(#${clip})"><path d="${sp}" fill="${rim}" opacity=".45" transform="translate(0 -1.2)"/><path d="${sp}" fill="${shell}"/>` +
+    `<path d="${rr(box.x0, BASE_Y - 4, box.w, 6, 3)}" fill="${shade(shell, 0.9)}" opacity=".6"/></g>`;
+  const cap = o.cap === undefined ? "" : capDraw(box, o.cap, shell);
+  const ey = sy - 5.6, gap = clamp(box.w * 0.2, 4.4, 6);
+  const face = pic ? photo(d, box, 0.9) : eyes(s, box.cx - gap, box.cx + gap, ey, 2.3);
+  return groundShadow(box) + pose(s, `<clipPath id="${clip}"><path d="${d}"/></clipPath>` + softBody(d, box, color) + face + shellDraw + cap);
+}
+
+/* ---- The five directions ------------------------------------------------ */
+const DIRECTIONS = [
+  { id: "chick", name: "Chick", draw: chick, shapes: CHICK,
+    idea: "Soft, round, bird-like bodies that sit on a perch line. Two small round eyes with a highlight sit over a tiny beak notch.",
+    hook: "Roost's own story: where birds rest. Tuft, crest and wing come from the first bird avatars.",
+    why: "The most readable at 24px: a coloured egg with two dots. Statuses act like a bird would: it cocks its head to ask and tucks down to sleep. Twelve shapes vary enough for a big team." },
+  { id: "mochi", name: "Mochi", draw: mochi, shapes: MOCHI,
+    idea: "Squishy rounded shapes (squircle, bean, cloud, puffy star, daifuku). Two round eyes with a white shine sit low and wide, with blush.",
+    hook: "A rice-cake body that squashes when it works and gently breathes when it rests.",
+    why: "The closest to the soft feel you liked, and it is still clearly ours: the shapes are named and mirrored, and the eyes are round and set low. The squash is the most charming On it of the five. It is less tied to Roost's story than Chick." },
+  { id: "pebble", name: "Pebble face", draw: pebble, shapes: PEBBLE,
+    idea: "Smooth river stones with a few specks. The face is either one soft visor slit with two lights, or happy ^ ^ arcs.",
+    hook: "Calm and quiet: the stones a bird might perch on.",
+    why: "The calmest family and the furthest from any competitor. The slit keeps a hint of round two's robot. At 24px the arcs face is the easier one to read, and the slit's lights blur a little." },
+  { id: "gem", name: "Gem", draw: gem, shapes: GEM,
+    idea: "Rounded cut gems with a soft gradient, quiet facets and a sparkle. A small screen inset carries glowing eyes.",
+    hook: "A gem for each bot: the cut tells them apart, the colour says who they are.",
+    why: "The most distinctive silhouettes, and the cuts are easy to tell apart. The screen inset is small, so the face is the weakest at 24px and the glints do the work there. It feels precious rather than squishy." },
+  { id: "hatch", name: "Hatchling", draw: hatch, shapes: HATCH,
+    idea: "Wildcard: an egg bot peeking out of its own cracked shell. The shell's edge (zigzag, wave, scallop, crack) and an optional cap make each one different.",
+    hook: "Fresh out of the egg at the roost. The shell is tinted with the bot's own colour.",
+    why: "The most Roost-only idea and very charming at 56px and up. At 24px the shell edge turns into a two-tone egg, which still reads. A few of its shapes could join Chick's family." },
+];
+
+/* ---- Assembly ----------------------------------------------------------- */
+const statusName = (s) => (STATUSES.find(([k]) => k === s) || ["", ""])[1];
+
+/** One avatar as an SVG string. The glints and the star sit outside the pose, so they never tilt or dim. */
+function avatar(dir, { color, v = 0, s = "rest", star = false, pic = false, size = 96, ring = RING }) {
+  const inner = dir.draw({ color, v, s, pic });
+  const label = `${dir.name} ${dir.shapes[v % dir.shapes.length].label}, ${statusName(s)}${star ? ", main bot" : ""}${pic ? ", with a picture" : ""}`;
+  return `<svg class="bot s-${s}" viewBox="0 0 48 48" width="${size}" height="${size}" role="img" aria-label="${label}">` +
+    inner + glint(s, ring) + (star ? starMark(ring) : "") + `</svg>`;
+}
+
+const colorOf = (i) => PALETTE[i % PALETTE.length][0];
+const cell = (svgs, caption) => `<div class="cell"><div class="sizes">${svgs}</div>${caption ? `<b>${caption}</b>` : ""}</div>`;
+
+function familyBlock(dir) {
+  const cells = dir.shapes.map((o, v) => cell(avatar(dir, { color: colorOf(FAMILY_COLOR), v, size: 56 }), o.label)).join("");
+  return `<section class="blk full"><h4>The family · 12 shapes in one bot's colour · 56 px</h4><div class="grid12">${cells}</div></section>`;
+}
+
+function colourBlock(dir) {
+  const cols = SIX.map((i, n) => {
+    const c = colorOf(i), v = (n * 5) % dir.shapes.length;
+    return `<div class="cell">${avatar(dir, { color: c, v, size: 96 })}<div class="sizes">${avatar(dir, { color: c, v, size: 40 })}${avatar(dir, { color: c, v, size: 24 })}</div><b>${PALETTE[i][1]}</b></div>`;
+  }).join("");
+  return `<section class="blk full"><h4>Six colours · 96 · 40 · 24 px</h4><div class="row">${cols}</div></section>`;
+}
+
+function statusBlock(dir) {
+  const color = colorOf(FAMILY_COLOR);
+  const cells = STATUSES.map(([s, name]) => `<div class="cell">${avatar(dir, { color, s, size: 72 })}<div class="sizes">${avatar(dir, { color, s, size: 40 })}${avatar(dir, { color, s, size: 24 })}</div><b>${name}</b></div>`).join("");
+  return `<section class="blk full"><h4>The five statuses, face and posture only · 72 · 40 · 24 px</h4><div class="row">${cells}</div></section>`;
+}
+
+function starPicBlock(dir) {
+  const starRow = [72, 40, 24].map((size) => avatar(dir, { color: colorOf(0), v: 1, star: true, s: "onit", size })).join("");
+  const picRow = [72, 40, 24].map((size) => avatar(dir, { color: colorOf(3), v: 0, pic: true, s: "ask", size })).join("");
+  return `<section class="blk"><h4>Main bot star · an uploaded picture</h4><div class="row">${cell(starRow, "Main bot, On it")}${cell(picRow, "Picture, Asking you")}</div>` +
+    `<p class="why">A picture fills the shape inside a thin rim of the bot's colour. With a picture, a status shows through the posture and the glints, and the status pill beside the name.</p></section>`;
+}
+
+const TEAM = [
+  { name: "Chief", c: 0, v: 0, s: "onit", star: true, line: "I've added the three tasks for Monday." },
+  { name: "Scout", c: 1, v: 3, s: "ask", line: "Which flat should I book a viewing for?" },
+  { name: "Ledger", c: 3, v: 5, s: "rest", line: "The October total is ready." },
+  { name: "Quill", c: 7, v: 8, s: "stuck", line: "Stuck on a sign-in page." },
+  { name: "Archivist", c: 8, v: 10, s: "off", line: "Off duty" },
+];
+
+function sideRow(dir, b, size, on) {
+  return `<div class="cz-row${on ? " on" : ""}">${avatar(dir, { color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size, ring: "#16161b" })}` +
+    `<div><b>${b.name}</b><small>${b.line}</small></div>${b.s === "ask" || b.s === "stuck" ? '<i class="unread"></i>' : ""}</div>`;
+}
+
+function sidebarBlock(dir) {
+  return `<section class="blk"><h4>A sidebar with five bots · 32 px</h4><div class="cz-side">${TEAM.map((b, i) => sideRow(dir, b, 32, i === 0)).join("")}</div></section>`;
+}
+
+function directionCard(dir, n) {
+  return `<article class="dir" id="d-${dir.id}" data-picked="false"><div class="dir-head"><span class="dir-num">${n}</span>` +
+    `<div class="dir-title"><h3>${dir.name}</h3><p>${dir.idea}</p><p class="hook">${dir.hook}</p></div>` +
+    `<button type="button" class="pick" data-pick="${dir.id}" aria-pressed="false">Pick this</button></div>` +
+    `<div class="blocks">${familyBlock(dir)}${colourBlock(dir)}${statusBlock(dir)}${starPicBlock(dir)}${sidebarBlock(dir)}` +
+    `<section class="blk full"><h4>Verdict</h4><p class="why">${dir.why}</p></section></div></article>`;
+}
+
+/* ---- Section B: the cozy kit -------------------------------------------- */
+function heroPiece(dir) {
+  const c = colorOf(1);
+  return `<div class="cz-hero"><div class="cz-hero-band" style="background:linear-gradient(180deg, ${c}40, ${c}00)"></div><div class="cz-hero-body">` +
+    `<div class="cz-hero-top">${avatar(dir, { color: c, v: 3, s: "onit", size: 64, ring: "#16161b" })}<div class="acts"><span class="cz-btn icon" aria-label="More"><svg class="ico"><use href="#i-more"/></svg></span></div></div>` +
+    `<div><h5>Scout</h5><p class="sub">Finds flats, compares prices</p></div><span class="cz-status"><i class="dot"></i>On it · comparing three listings</span>` +
+    `<div class="cz-hero-acts"><span class="cz-btn primary"><svg class="ico"><use href="#i-chat"/></svg>Chat</span><span class="cz-btn"><svg class="ico"><use href="#i-hand"/></svg>Take control</span></div></div></div>`;
+}
+
+function sidebarPiece(dir) {
+  const pin = (b) => `<div class="cz-pin">${avatar(dir, { color: colorOf(b.c), v: b.v, s: b.s, star: b.star, size: 40, ring: "#16161b" })}${b.name}${b.s === "ask" ? '<i class="unread"></i>' : ""}</div>`;
+  return `<div class="cz-side cz"><div class="cz-label"><svg class="ico" style="width:12px;height:12px"><use href="#i-pin"/></svg>Pinned</div>` +
+    `<div class="cz-pins">${TEAM.slice(0, 3).map(pin).join("")}</div><div class="cz-sep"></div>${TEAM.slice(3).map((b, i) => sideRow(dir, b, 32, i === 0)).join("")}</div>`;
+}
+
+function pickerPiece(dir) {
+  const c = colorOf(1);
+  const tiles = dir.shapes.map((o, v) => `<span class="cz-tile${v === 3 ? " on" : ""}" title="${o.label}">${avatar(dir, { color: c, v, size: 30, ring: "#1d1d24" })}</span>`).join("");
+  const dots = PALETTE.map(([hex, name], i) => `<i class="cz-sw${i === 1 ? " on" : ""}" style="background:${hex}" title="${name}"></i>`).join("");
+  return `<div class="cz-surface cz-pop cz"><div class="cz-pop-head">${avatar(dir, { color: c, v: 3, size: 44, ring: "#1d1d24" })}<div><b>Scout</b><small>${dir.name} · ${dir.shapes[3].label} · Blue</small></div></div>` +
+    `<div class="cz-tabs" role="presentation"><span class="cz-tab on"><svg class="ico"><use href="#i-bot"/></svg>Robot</span><span class="cz-tab"><svg class="ico"><use href="#i-upload"/></svg>Upload</span><span class="cz-tab"><svg class="ico"><use href="#i-reset"/></svg>Reset</span></div>` +
+    `<div class="cz-tiles">${tiles}</div><div class="cz-swatches">${dots}</div></div>`;
+}
+
+function kitCard(dir, rank) {
+  return `<article class="kit"><div class="kit-head"><h3>${rank} · ${dir.name}</h3><p>${dir.idea}</p></div><div class="kit-row">` +
+    `<div class="kit-slot"><h4>Panel hero · 64 px</h4>${heroPiece(dir)}</div>` +
+    `<div class="kit-slot"><h4>Sidebar · pinned 40 px, rows 32 px</h4>${sidebarPiece(dir)}</div>` +
+    `<div class="kit-slot"><h4>Avatar picker · 30 px tiles</h4>${pickerPiece(dir)}</div></div></article>`;
+}
+
+/* ---- Section C: old shapes keep drawing ---------------------------------- */
+const LEGACY = [
+  ["classic", "Robot head (V1)", "round"], ["tall", "Robot head (V1)", "tall"], ["wide", "Robot head (V1)", "wide"],
+  ["soft", "Robot head (V1)", "bean"], ["cube", "Robot head (V1)", "plump"], ["monitor", "Robot head (V1)", "wide"],
+  ["round", "Bird (S1.6)", "round"], ["egg", "Bird (S1.6)", "egg"], ["pear", "Bird (S1.6)", "pear"],
+  ["plump", "Bird (S1.6)", "plump"], ["crest", "Bird (S1.6)", "crest"],
+];
+
+function legacyRows() {
+  const dir = DIRECTIONS[0];
+  return LEGACY.map(([stored, from, to], i) => {
+    const v = CHICK.findIndex((o) => o.id === to);
+    const same = stored === to ? " (itself)" : "";
+    return `<tr><td><code>${stored}</code></td><td>${from}</td><td>${avatar(dir, { color: colorOf(i), v, size: 24, ring: "#16161b" })}<code>${to}</code>${same}</td></tr>`;
+  }).join("");
+}
+
+function buildAll() {
+  const byId = (id) => DIRECTIONS.find((d) => d.id === id);
+  return {
+    dirs: DIRECTIONS.map((d, i) => directionCard(d, i + 1)).join(""),
+    kit: BEST.map((id, i) => kitCard(byId(id), i === 0 ? "Recommended" : "Runner-up")).join(""),
+    hero: DIRECTIONS.map((d, i) => avatar(d, { color: colorOf([1, 8, 3, 0, 5][i]), v: [5, 0, 1, 6, 5][i], s: ["rest", "onit", "rest", "ask", "rest"][i], star: i === 0, size: 72 })).join(""),
+    reco: PALETTE.slice(0, 8).map(([c], i) => avatar(DIRECTIONS[0], { color: c, v: [0, 1, 5, 3, 6, 10, 4, 11][i], s: STATUSES[i % 5][0], star: i === 0, size: 52, ring: "#16161b" })).join(""),
+    legacy: legacyRows(),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { buildAll, avatar, DIRECTIONS, PALETTE, STATUSES, shapeOf, roundPoly, place, tint, shade };
+}
+
+if (typeof document !== "undefined") {
+  const built = buildAll();
+  document.getElementById("dirs").innerHTML = built.dirs;
+  document.getElementById("kit").innerHTML = built.kit;
+  document.getElementById("heroStrip").innerHTML = built.hero;
+  document.getElementById("recoRow").innerHTML = built.reco;
+  document.getElementById("legacyRows").innerHTML = built.legacy;
+
+  const pickName = document.getElementById("pickName");
+  document.getElementById("dirs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-pick]");
+    if (!button) return;
+    const id = button.dataset.pick;
+    document.querySelectorAll(".dir[id^='d-']").forEach((card) => {
+      const on = card.id === `d-${id}`;
+      card.dataset.picked = String(on);
+      const b = card.querySelector("[data-pick]");
+      b.setAttribute("aria-pressed", String(on));
+      b.textContent = on ? "Picked" : "Pick this";
+    });
+    pickName.textContent = (DIRECTIONS.find((d) => d.id === id) || { name: "none yet" }).name;
+  });
+}
+</script>
+</body>
+</html>

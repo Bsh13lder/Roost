@@ -1,0 +1,28 @@
+{
+  "Chief": [
+    [
+      { "tool": "add_task", "args": { "title": "Order oat milk (2 crates)", "due_date": "tomorrow at 9", "priority": "high", "project": "Café Lumen" } },
+      { "tool": "add_task", "args": { "title": "Call the technician about the espresso machine", "due_date": "today at 15", "priority": "urgent", "project": "Café Lumen" } }
+    ],
+    [{ "wait": 1 }, { "text": "Added both to **Café Lumen**.\n\n- **Order oat milk**, 2 crates, tomorrow at 09:00\n- **Call the espresso technician**, today at 15:00\n\n### This week\n\n| Day | What |\n| --- | --- |\n| Tue | Coffee beans arrive from the roaster |\n| Wed | Pay the dairy and bakery invoices (€412) |\n| Fri | Staff schedule for next week |\n\nWant me to ask **Shop helper** to reorder the oat milk from our usual shop?" }]
+  ],
+  "Social media": [
+    [{ "text": "Three ideas for the pumpkin latte:\n\n1. *Autumn in a cup.* Our pumpkin latte is back, made with real roasted pumpkin. 🎃\n2. *Rainy morning? We've got you.* Pumpkin latte + a warm cinnamon bun = €5.50 until Sunday.\n3. *Behind the bar:* a 10-second clip of the latte art, no caption needed.\n\nI'd post #2 on Thursday at 08:30, when most of your followers are online." }]
+  ],
+  "Bookkeeper": [
+    [{ "text": "**Yesterday at Café Lumen:** 142 orders, €1,284 in sales (up 6% on last Monday).\n\n- The dairy invoice (€86.40) is due **today**\n- Coffee beans: about 4 days left at this pace\n\nNothing else needs you." }]
+  ],
+  "Shop helper": [
+    [{ "wait": 1 }, { "tool": "look", "args": {} }],
+    [{ "tool": "click", "args": { "target": { "text": "Search", "kind": "field" }, "expect": "the search box has the cursor" } }],
+    [{ "wait": 1 }, { "tool": "type", "args": { "text": "blue mug", "source": { "from": "message" }, "expect": "blue mug is in the search box" } }],
+    [{ "tool": "look", "args": {} }],
+    [{ "wait": 1 }, { "tool": "press_key", "args": { "key": "Enter", "expect": "the results for blue mug" } }],
+    [{ "tool": "look", "args": {} }],
+    [{ "wait": 1 }, { "tool": "click", "args": { "target": { "text": "Blue mug", "kind": "link" }, "expect": "the blue mug's page" } }],
+    [{ "wait": 2 }, { "tool": "look", "args": {} }],
+    [{ "wait": 1 }, { "tool": "click", "args": { "target": { "text": "Buy now", "kind": "button" }, "expect": "the order is placed" } }],
+    [{ "tool": "look", "args": {} }],
+    [{ "text": "Done: order **1001** is placed, one blue mug for €9. It ships to the café." }]
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "url": "https://deals.example/",
+  "title": "deals.example",
+  "text": "deals.example\nOne more step\nPlease solve the puzzle below to continue to deals.example.",
+  "truncated": false,
+  "status": 200,
+  "password_field": false,
+  "captcha_frame": true,
+  "notice": null
+}

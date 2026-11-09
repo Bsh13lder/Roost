@@ -1,0 +1,229 @@
+/* ---------------------------------------------------------------------
+   The shared Board (D1): the user's Tasks, Money, Notes and Documents,
+   one Board for every bot, opened from Home.
+   --------------------------------------------------------------------- */
+
+.board-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.board-page__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 10px 8px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.board-page__head > .icon-btn {
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.board-page__head > .icon-btn:hover {
+  color: var(--color-text);
+  background: var(--color-raised);
+}
+
+.board-page__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* The Board page: a sticky head (title row and line tabs) over a 1120px column. */
+
+.board-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.board-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.board-head__row {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  max-width: var(--board-width);
+  margin: 0 auto;
+  padding: var(--space-4) var(--gutter) 0;
+}
+
+.board-head__title {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 650;
+}
+
+.board-head .tabs__list {
+  max-width: var(--board-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* The panel is a flex item of the Tabs column, and its auto margins would shrink it to its content (a
+   calendar's grid has none, so the Month came out as one narrow column): it takes the whole row instead,
+   up to the Board's width. */
+.board-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--board-width);
+  container: board / inline-size;
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+@media (max-width: 768px) {
+  .board-head__title {
+    font-size: var(--fs-heading);
+  }
+}
+
+.board-page__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px var(--gutter) 48px;
+}
+
+.board-page__body > * {
+  width: 100%;
+  max-width: var(--reading-width);
+}
+
+.board-page .error-notice {
+  margin: 0;
+}
+
+.board-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.board-empty,
+.board-loading {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+}
+
+.board-loading {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+/* ---- Tasks ------------------------------------------------------------ */
+
+.tasks-board {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+
+
+.board-chip {
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font: 500 var(--fs-caption) / 1 var(--font-mono);
+  white-space: nowrap;
+}
+
+/* Which bot made the row: quiet, it only names the maker. */
+.board-chip--maker {
+  border-style: solid;
+  color: var(--color-text-faint);
+}
+
+.board-chip--web {
+  border-style: dashed;
+  border-color: var(--color-danger-edge);
+  background: var(--color-danger-tint);
+  color: var(--color-text);
+}
+
+.board-keep {
+  padding: 4px 10px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: 600 var(--fs-caption) / 1 var(--font-mono);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.board-keep:hover {
+  background: var(--color-danger-tint);
+}
+
+
+
+/* ---- Money ------------------------------------------------------------ */
+
+.money-board {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.money-board__total {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.money-board__total strong {
+  color: var(--color-text);
+  font: 600 var(--fs-display) / 1.1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.money-board__other {
+  margin: -8px 0 0;
+  color: var(--color-warn);
+  font: var(--fs-caption) var(--font-mono);
+}
+
+.money-board__past {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .board-page__body {
+    padding-top: 16px;
+  }
+}

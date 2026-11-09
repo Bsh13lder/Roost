@@ -1,0 +1,9 @@
+#!/bin/sh
+# The Browser shortcut (tray, Super+B, roost-input's `open browser`). Brave runs only when wanted (D5): with
+# none running it asks roost-computerd for one (`roost-pipe want`), which opens one fresh window with the proxy
+# flags and the DevTools pipe. With Brave up it asks that Brave for a new window. It never starts its own Brave.
+profile=/home/comp/profile
+if [ -S "$profile/SingletonSocket" ] || [ -L "$profile/SingletonSocket" ]; then
+  exec brave-browser --user-data-dir=/home/comp/profile --proxy-server=http://roost-egress:3128 --new-window "$@"
+fi
+exec /usr/local/bin/roost-pipe want </dev/null >/dev/null

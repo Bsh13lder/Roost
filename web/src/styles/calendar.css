@@ -1,0 +1,120 @@
+/* ---------------------------------------------------------------------
+   The month grid (react-day-picker's rdp-* class names, redesign P1),
+   in Roost's tokens. Imported by ui/date/Calendar.tsx only, so it loads
+   with the calendar's lazy chunk.
+   --------------------------------------------------------------------- */
+
+.rdp-root {
+  position: relative;
+  color: var(--color-text);
+  font-size: var(--fs-label);
+}
+
+.rdp-months {
+  display: flex;
+}
+
+.rdp-month_caption {
+  display: flex;
+  align-items: center;
+  height: var(--control-md);
+  padding: 0 var(--space-2);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.rdp-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.rdp-button_previous,
+.rdp-button_next {
+  display: inline-grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.rdp-chevron {
+  fill: currentColor;
+}
+
+.rdp-month_grid {
+  border-collapse: collapse;
+}
+
+.rdp-weekday {
+  width: var(--control-md);
+  height: var(--control-sm);
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+}
+
+.rdp-day {
+  padding: 1px;
+  text-align: center;
+}
+
+.rdp-day_button {
+  width: var(--control-md);
+  height: var(--control-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rdp-day_button:hover:not(:disabled) {
+  background: var(--color-raised);
+}
+
+.rdp-today .rdp-day_button {
+  color: var(--color-accent-strong);
+  font-weight: 700;
+}
+
+.rdp-selected .rdp-day_button {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.rdp-outside .rdp-day_button {
+  color: var(--color-text-faint);
+}
+
+.rdp-disabled .rdp-day_button {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Range mode (Money date filter): the days between are tinted, the two ends are solid. */
+.rdp-range_middle .rdp-day_button {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-soft);
+  border-radius: 0;
+}
+
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button {
+  background: var(--color-accent-strong);
+  color: var(--color-bg);
+}

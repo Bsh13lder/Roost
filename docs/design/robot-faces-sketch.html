@@ -1,0 +1,181 @@
+<title>Roost Robot Faces</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: Boxbot with no face. Three screen styles (S1 to S3) as cards, each with head shapes, every status and moment, and colours. */
+:root {
+  --bg: #f4f2fb; --panel: #ffffff; --ink: #1b1830; --muted: #625d7a; --line: #dcd8ec; --pick: #7c4dff;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121019; --panel: #1b1826; --ink: #f1eefb; --muted: #a49fbd; --line: #2e2a3f; --pick: #a98bff; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121019; --panel: #1b1826; --ink: #f1eefb; --muted: #a49fbd; --line: #2e2a3f; --pick: #a98bff; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+main { max-width: 1000px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 6px 0 0; color: var(--muted); max-width: 68ch; }
+.families { display: grid; gap: 18px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 22px; align-items: start; cursor: pointer; text-align: left; color: inherit; font: inherit; }
+.card:focus-visible { outline: 3px solid var(--pick); outline-offset: 3px; }
+.card[aria-pressed="true"] { border-color: var(--pick); box-shadow: 0 0 0 2px var(--pick); }
+.hero svg { width: 180px; height: 180px; display: block; overflow: visible; }
+.info { min-width: 0; display: grid; gap: 10px; }
+.title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.title b { font-family: var(--display); font-weight: 800; font-size: 1.35rem; }
+.tag { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.desc { color: var(--muted); margin: 0; max-width: 62ch; }
+.label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.cell { display: grid; justify-items: center; gap: 2px; }
+.cell svg { width: 64px; height: 64px; overflow: visible; }
+.cell span { font-family: var(--mono); font-size: 0.66rem; color: var(--muted); text-align: center; max-width: 72px; }
+.pick { font-family: var(--mono); font-size: 0.8rem; color: var(--pick); min-height: 1.2em; }
+footer { color: var(--muted); font-size: 0.9rem; }
+@media (max-width: 620px) { .card { grid-template-columns: 1fr; } .hero svg { width: 140px; height: 140px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .spin { animation: spin 1.1s linear infinite; transform-box: fill-box; transform-origin: center; }
+  .pulse { animation: pulse 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .bob { animation: bob 0.9s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom; }
+  .blinkc { animation: blinkc 1s steps(1) infinite; }
+  .glitch { animation: glitch 0.6s steps(2) infinite; }
+  .ripple { animation: ripple 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  .seq { animation: seq 1.2s steps(1) infinite; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: .55; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.06); } }
+@keyframes bob { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+@keyframes blinkc { 50% { opacity: 0; } }
+@keyframes glitch { 0% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
+@keyframes ripple { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(1.3); } }
+@keyframes seq { 0%, 24% { opacity: .2; } 25%, 100% { opacity: 1; } }
+</style>
+
+<main>
+  <header>
+    <h1>Boxbot, screen faces</h1>
+    <p class="lede">Boxbot keeps its boxy head, rivets and antenna, with no face. Its dark screen shows live signals instead: what the bot is doing right now. Three screen styles (S1 to S3), each shown on six head shapes, Roost's five statuses (Resting, On it, Asking you, Stuck, Off duty), three extra moments (Thinking, New message, Done) and six colours. The signals move. Tap a style and tell Claude, e.g. "S1 with the Wide shape".</p>
+  </header>
+  <section class="families" id="styles" aria-label="Screen styles"></section>
+  <footer>Signals are drawn in the bot's colour, lightened to glow on the dark screen. The main bot wears the star.</footer>
+</main>
+
+<script>
+(() => {
+  const COLORS = ["#8b5cf6", "#3b82f6", "#14b8a6", "#22c55e", "#f97316", "#ec4899"];
+  const tint = (hex, t) => { const n = parseInt(hex.slice(1), 16); const ch = (s) => Math.round(((n >> s) & 255) + (255 - ((n >> s) & 255)) * t); return `rgb(${ch(16)},${ch(8)},${ch(0)})`; };
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const ch = (s) => Math.max(0, Math.min(255, Math.round(((n >> s) & 255) * k))); return `rgb(${ch(16)},${ch(8)},${ch(0)})`; };
+  const SCREEN = "#0b0a11";
+  const svg = (inner, label) => `<svg viewBox="0 0 120 120" role="img" aria-label="${label}">${inner}</svg>`;
+  const rivets = (pts, c) => pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${shade(c, .65)}"/>`).join("");
+  const zig = (c) => `<path d="M60 24 l-6 -9 h12 l-6 -9" stroke="${shade(c, .7)}" stroke-width="3.5" fill="none" stroke-linejoin="round"/>`;
+
+  // ---- Six head shapes. Each returns the body markup and its screen box. ----
+  const HEADS = {
+    Classic: (c) => ({ body: `${zig(c)}<rect x="20" y="24" width="80" height="72" rx="10" fill="${c}"/>${rivets([[28,32],[92,32],[28,88],[92,88]], c)}`, s: [30, 38, 60, 48] }),
+    Tall: (c) => ({ body: `${zig(c).replace("M60 24", "M60 16").replace("l-6 -9 h12 l-6 -9", "l-5 -7 h10 l-5 -7")}<rect x="28" y="16" width="64" height="90" rx="10" fill="${c}"/>${rivets([[35,23],[85,23],[35,99],[85,99]], c)}`, s: [36, 30, 48, 58] }),
+    Wide: (c) => ({ body: `<path d="M44 30 l-12 -18 M76 30 l12 -18" stroke="${shade(c, .7)}" stroke-width="3.5" stroke-linecap="round"/><circle cx="32" cy="11" r="4" fill="${tint(c, .3)}"/><circle cx="88" cy="11" r="4" fill="${tint(c, .3)}"/>
+        <rect x="10" y="30" width="100" height="66" rx="12" fill="${c}"/><rect x="4" y="52" width="8" height="22" rx="3" fill="${shade(c, .7)}"/><rect x="108" y="52" width="8" height="22" rx="3" fill="${shade(c, .7)}"/>`, s: [20, 40, 80, 46] }),
+    Soft: (c) => ({ body: `<line x1="60" y1="8" x2="60" y2="22" stroke="${shade(c, .7)}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="8" r="5" fill="${tint(c, .3)}"/>
+        <rect x="18" y="22" width="84" height="78" rx="26" fill="${c}"/>`, s: [30, 36, 60, 50] }),
+    Cube: (c) => ({ body: `${zig(c).replace(/M60 24/, "M54 28")}<path d="M22 32 L38 18 H104 L88 32 Z" fill="${tint(c, .25)}"/><path d="M88 32 L104 18 V86 L88 100 Z" fill="${shade(c, .72)}"/>
+        <rect x="22" y="32" width="66" height="68" rx="6" fill="${c}"/>${rivets([[29,39],[81,39],[29,93],[81,93]], c)}`, s: [30, 42, 50, 46] }),
+    Monitor: (c) => ({ body: `<rect x="14" y="14" width="92" height="74" rx="10" fill="${c}"/><rect x="50" y="88" width="20" height="12" fill="${shade(c, .7)}"/><rect x="36" y="100" width="48" height="7" rx="3" fill="${shade(c, .7)}"/>
+        <circle cx="96" cy="81" r="2.5" fill="${tint(c, .5)}"/>`, s: [22, 22, 76, 56] }),
+  };
+  const SHAPE_NAMES = Object.keys(HEADS);
+
+  // ---- Signals. Each style maps a status or moment to markup centred at (cx, cy), with ink colour g. ----
+  const PIX = {
+    heart: [".##.##.", "#######", "#######", ".#####.", "..###..", "...#..."],
+    q: [".###.", "#...#", "....#", "...#.", "..#..", ".....", "..#.."],
+    bang: ["##", "##", "##", "##", "..", "##"],
+    moon: ["..###", ".##..", "##...", "##...", "##...", ".##..", "..###"],
+    check: ["......#", ".....##", "#...##.", "##.##..", ".###...", "..#...."],
+    bubble: ["#######", "#.....#", "#.#.#.#", "#.....#", "#######", ".##....", ".#....."],
+    think: ["..#..", ".###.", "#####", ".###.", "..#.."],
+  };
+  const pixels = (rows, cx, cy, g, cell = 3.6, cls = "") => {
+    const w = rows[0].length * cell, h = rows.length * cell, x0 = cx - w / 2, y0 = cy - h / 2;
+    return `<g class="${cls}">` + rows.flatMap((r, y) => [...r].map((ch, x) => ch === "#" ? `<rect x="${(x0 + x * cell).toFixed(1)}" y="${(y0 + y * cell).toFixed(1)}" width="${cell - .5}" height="${cell - .5}" rx=".6" fill="${g}"/>` : "")).join("") + "</g>";
+  };
+  const MOMENTS = [["rest", "Resting"], ["onit", "On it"], ["ask", "Asking you"], ["stuck", "Stuck"], ["off", "Off duty"], ["think", "Thinking"], ["msg", "New message"], ["done", "Done"]];
+
+  const STYLES = [
+    { id: "S1", name: "Glow icons", tag: "Clean line signals", desc: "Simple glowing line icons, like a status light panel. A slow breathing wave at rest, an orbiting spinner when working, a chat bubble with a question, a warning sign, a moon.",
+      sig: (m, cx, cy, g) => ({
+        rest: `<path class="pulse" d="M${cx - 16} ${cy} q4 -7 8 0 t8 0 t8 0 t8 0" stroke="${g}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+        onit: `<g class="spin">${[...Array(8)].map((_, i) => { const a = i * Math.PI / 4; return `<circle cx="${(cx + 11 * Math.cos(a)).toFixed(1)}" cy="${(cy + 11 * Math.sin(a)).toFixed(1)}" r="2.6" fill="${g}" opacity="${(0.2 + i * 0.1).toFixed(2)}"/>`; }).join("")}</g>`,
+        ask: `<path d="M${cx - 15} ${cy - 11} h30 a4 4 0 0 1 4 4 v12 a4 4 0 0 1 -4 4 h-20 l-7 6 v-6 h-3 a4 4 0 0 1 -4 -4 v-12 a4 4 0 0 1 4 -4z" stroke="${g}" stroke-width="2.6" fill="none" stroke-linejoin="round"/><text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="500" fill="${g}">?</text>`,
+        stuck: `<path d="M${cx} ${cy - 13} l14 24 h-28z" stroke="${g}" stroke-width="2.8" fill="none" stroke-linejoin="round"/><path class="blinkc" d="M${cx} ${cy - 4} v7 M${cx} ${cy + 7} v.5" stroke="${g}" stroke-width="3" stroke-linecap="round"/>`,
+        off: `<path d="M${cx + 4} ${cy - 12} a12 12 0 1 0 8 19 a10 10 0 0 1 -8 -19z" fill="${g}" opacity=".65"/>`,
+        think: `${[0, 1, 2].map((i) => `<circle class="pulse" style="animation-delay:${i * 0.25}s" cx="${cx - 10 + i * 10}" cy="${cy}" r="3.4" fill="${g}"/>`).join("")}`,
+        msg: `<rect x="${cx - 15}" y="${cy - 10}" width="30" height="20" rx="3" stroke="${g}" stroke-width="2.6" fill="none"/><path d="M${cx - 15} ${cy - 9} l15 11 l15 -11" stroke="${g}" stroke-width="2.6" fill="none" stroke-linejoin="round"/><circle class="pulse" cx="${cx + 15}" cy="${cy - 10}" r="4" fill="#f59e0b"/>`,
+        done: `<path d="M${cx - 12} ${cy} l8 8 l16 -16" stroke="${g}" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+      })[m] },
+    { id: "S2", name: "Pixel icons", tag: "8-bit screen", desc: "Chunky pixel icons, like an old handheld game. A beating pixel heart at rest, a loading bar filling up while working, a pixel question mark, exclamation, moon and tick.",
+      sig: (m, cx, cy, g) => ({
+        rest: pixels(PIX.heart, cx, cy, g, 3.6, "pulse"),
+        onit: [0, 1, 2, 3].map((i) => `<rect class="seq" style="animation-delay:${i * 0.3}s" x="${cx - 17 + i * 9}" y="${cy - 4}" width="7" height="8" rx="1" fill="${g}"/>`).join("") + `<rect x="${cx - 19}" y="${cy - 7}" width="38" height="14" rx="2" stroke="${g}" stroke-width="1.6" fill="none" opacity=".5"/>`,
+        ask: pixels(PIX.q, cx, cy, g),
+        stuck: pixels(PIX.bang, cx, cy, g, 4, "blinkc"),
+        off: pixels(PIX.moon, cx, cy, g, 3.2) .replace(/fill="/g, 'opacity=".65" fill="'),
+        think: pixels(PIX.think, cx, cy, g, 3.4, "spin"),
+        msg: pixels(PIX.bubble, cx, cy, g, 3.4),
+        done: pixels(PIX.check, cx, cy, g, 3.4),
+      })[m] },
+    { id: "S3", name: "Signals", tag: "Abstract motion", desc: "No icons, just motion, like an instrument display. A slow ring that breathes at rest, an equaliser that bounces while working, a blinking prompt cursor when it needs you, a glitch when stuck.",
+      sig: (m, cx, cy, g) => ({
+        rest: `<circle class="pulse" cx="${cx}" cy="${cy}" r="9" stroke="${g}" stroke-width="3" fill="none"/>`,
+        onit: [0, 1, 2, 3, 4].map((i) => `<rect class="bob" style="animation-delay:${i * 0.12}s" x="${cx - 14 + i * 6}" y="${cy - 10}" width="4" height="20" rx="2" fill="${g}"/>`).join(""),
+        ask: `<path d="M${cx - 15} ${cy - 6} l6 6 l-6 6" stroke="${g}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect class="blinkc" x="${cx - 4}" y="${cy - 8}" width="10" height="16" rx="1.5" fill="${g}"/>`,
+        stuck: `<g class="glitch">${[[-14, -8, 24], [-8, -1, 22], [-16, 6, 26]].map(([x, y, w]) => `<rect x="${cx + x}" y="${cy + y}" width="${w}" height="4" fill="${g}"/>`).join("")}</g><rect x="${cx + 6}" y="${cy - 1}" width="6" height="4" fill="#f87171"/>`,
+        off: `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${g}" opacity=".45"/>`,
+        think: `<circle class="spin" cx="${cx}" cy="${cy}" r="10" stroke="${g}" stroke-width="3" fill="none" stroke-dasharray="16 48" stroke-linecap="round"/>`,
+        msg: `<circle class="ripple" cx="${cx}" cy="${cy}" r="12" stroke="${g}" stroke-width="2.5" fill="none"/><circle cx="${cx}" cy="${cy}" r="4" fill="${g}"/>`,
+        done: `<circle cx="${cx}" cy="${cy}" r="12" fill="${g}" opacity=".9"/><path d="M${cx - 6} ${cy} l4 4 l8 -8" stroke="${SCREEN}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+      })[m] },
+  ];
+
+  const star = `<g transform="translate(98 99)"><circle r="12" fill="#f59e0b" stroke="var(--panel)" stroke-width="3"/><path d="M0 -6.5 l2 4 4.4 .7 -3.2 3.1 .8 4.4 -4 -2.1 -4 2.1 .8 -4.4 -3.2 -3.1 4.4 -.7z" fill="#fff"/></g>`;
+  const robot = (style, head, c, m) => {
+    const h = HEADS[head](c);
+    const [x, y, w, hh] = h.s;
+    const g = tint(c, 0.55);
+    return `${h.body}<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="8" fill="${SCREEN}"/>
+      <rect x="${x + 3}" y="${y + 3}" width="${w - 6}" height="${hh / 3}" rx="5" fill="#fff" opacity=".05"/>
+      <g style="filter: drop-shadow(0 0 3px ${g})">${style.sig(m, x + w / 2, y + hh / 2, g)}</g>`;
+  };
+
+  document.getElementById("styles").innerHTML = STYLES.map((st) => `
+    <button class="card" type="button" id="style-${st.id}" aria-pressed="false" data-id="${st.id}">
+      <div class="hero">${svg(robot(st, "Classic", COLORS[0], "onit") + star, `${st.name}, main bot, on it`)}</div>
+      <div class="info">
+        <div class="title"><b>${st.id} · ${st.name}</b><span class="tag">${st.tag}</span></div>
+        <p class="desc">${st.desc}</p>
+        <span class="label">Head shapes</span>
+        <div class="grid">${SHAPE_NAMES.map((s, i) => `<div class="cell">${svg(robot(st, s, COLORS[i], "rest"), `${st.name}, ${s}`)}<span>${s}</span></div>`).join("")}</div>
+        <span class="label">Statuses and moments</span>
+        <div class="grid">${MOMENTS.map(([m, label]) => `<div class="cell">${svg(robot(st, "Classic", COLORS[1], m), `${st.name}, ${label}`)}<span>${label}</span></div>`).join("")}</div>
+        <span class="label">Colours</span>
+        <div class="grid">${COLORS.map((c) => `<div class="cell">${svg(robot(st, "Soft", c, "think"), `${st.name} in ${c}`)}</div>`).join("")}</div>
+        <div class="pick" aria-live="polite"></div>
+      </div>
+    </button>`).join("");
+
+  document.getElementById("styles").addEventListener("click", (event) => {
+    const picked = event.target.closest(".card");
+    if (!picked) return;
+    document.querySelectorAll(".card").forEach((other) => {
+      const on = other === picked;
+      other.setAttribute("aria-pressed", String(on));
+      other.querySelector(".pick").textContent = on ? `Picked ${other.dataset.id}. Tell Claude: "${other.dataset.id}" (add a head shape if you like, e.g. "${other.dataset.id} Wide")` : "";
+    });
+  });
+})();
+</script>

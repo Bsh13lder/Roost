@@ -1,0 +1,410 @@
+/* ---------------------------------------------------------------------
+   Base: page, type, focus, and the shared controls (buttons, inputs,
+   fields, chips, error banner) every screen uses.
+   --------------------------------------------------------------------- */
+
+html,
+body {
+  background: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-accent-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-selection);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Page scaffolding ------------------------------------------------ */
+
+.page {
+  width: 100%;
+  max-width: 1080px;
+  padding: 32px var(--gutter) 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.page__lede {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--color-text-secondary);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.page-loading,
+.app-loading {
+  margin: 0;
+  padding: 40px var(--gutter);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--color-text-secondary);
+}
+
+/* ---- Buttons --------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-tight);
+  height: var(--control-md);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.btn--secondary,
+.btn--quiet {
+  background: var(--color-raised);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover:not(:disabled),
+.btn--quiet:hover:not(:disabled) {
+  background: var(--color-overlay);
+  border-color: var(--color-border-strong);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.btn--danger {
+  background: transparent;
+  border-color: var(--color-danger-edge);
+  color: var(--color-danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--color-danger-tint);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--sm,
+.btn--small {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-label);
+}
+
+.btn--lg {
+  height: var(--control-lg);
+  padding: 0 var(--space-5);
+}
+
+.btn-text {
+  padding: 4px 6px;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  border-radius: 6px;
+}
+
+.btn-text:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.icon-btn:hover {
+  background: var(--color-raised);
+}
+
+.icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-btn--sm {
+  width: var(--control-sm);
+  height: var(--control-sm);
+}
+
+.icon-btn--md {
+  width: var(--control-md);
+  height: var(--control-md);
+}
+
+.icon-btn--lg {
+  width: var(--control-lg);
+  height: var(--control-lg);
+}
+
+.icon-btn--secondary {
+  border-color: var(--color-border);
+  background: var(--color-raised);
+}
+
+/* ---- Fields ---------------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.field__label {
+  padding: 0;
+  font-size: var(--fs-label);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+legend.field__label {
+  margin-bottom: 8px;
+}
+
+.field__optional {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  color: var(--color-text-faint);
+}
+
+.input {
+  width: 100%;
+  height: var(--control-lg);
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
+}
+
+.input--area {
+  height: auto;
+  min-height: 104px;
+  padding: 12px 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.form-error {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-tint);
+  color: var(--color-danger-text);
+  font-size: var(--fs-body);
+}
+
+/* ---- Chips (pill toggles) -------------------------------------------- */
+
+.chip {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.chip:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--color-accent-tint);
+  border-color: var(--color-accent-edge);
+  color: var(--color-accent-soft);
+}
+
+/* ---- Error banner (ErrorNotice) -------------------------------------- */
+
+.error-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px var(--gutter) 0;
+  padding: 12px 12px 12px 16px;
+  border: 1px solid var(--color-danger-edge);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-tint);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.error-notice::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+}
+
+.error-notice__message {
+  margin: 0;
+  flex: 1;
+}
+
+.error-notice__retry {
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-raised);
+  color: var(--color-text);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.error-notice__retry:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.page .error-notice,
+.ask .error-notice,
+.chat-page__dock .error-notice {
+  margin: 0;
+}
+
+/* ---- Reduced motion: no transitions or keyframes anywhere ------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

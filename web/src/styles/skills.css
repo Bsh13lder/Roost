@@ -1,0 +1,286 @@
+/* ---------------------------------------------------------------------
+   Skills (docs/plans/2026-10-21-roost-skills.md): the Skills fold on Info, a skill row, the skill editor,
+   the skill proposal card in the chat, and the Add its skills? sheet. Tokens only.
+   --------------------------------------------------------------------- */
+
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+}
+
+.skills__head {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.skills__empty,
+.skills__loading {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-body);
+}
+
+.skills__list,
+.template-skills__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.skill-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skill-row__main:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.skill-row__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.skill-row__when {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  overflow-wrap: anywhere;
+}
+
+.skill-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.skill-editor__conflict,
+.skill-editor__ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-warn-tint);
+}
+
+.skill-editor__conflict p,
+.skill-editor__ask p {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.skill-editor__preview {
+  min-height: var(--control-lg);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+}
+
+.skill-editor__error,
+.skill-card__error {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: var(--fs-body);
+}
+
+.skill-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: var(--reading-width);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-raised);
+}
+
+.skill-card__kicker {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.skill-card__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.skill-card__when,
+.skill-card__note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  overflow-wrap: anywhere;
+}
+
+.skill-card__steps {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+}
+
+.skill-card__diff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.skill-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.skill-card__label {
+  color: var(--color-text-faint);
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.skill-card__before {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--diff-remove-bg);
+  color: var(--diff-remove-text);
+  font-size: var(--fs-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.skill-card__after {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--diff-add-bg);
+  color: var(--diff-add-text);
+  font-size: var(--fs-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.skill-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.skill-card__state {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.template-skills {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.template-skills__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.template-skill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.template-skill__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.template-skill__head input {
+  margin-top: var(--space-1);
+  accent-color: var(--color-accent);
+}
+
+.template-skill__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.template-skill__name {
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.template-skill__when,
+.template-skill__have {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+}
+
+.template-skill details summary {
+  color: var(--color-accent);
+  font-size: var(--fs-label);
+  cursor: pointer;
+}
+
+.template-skill__steps {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

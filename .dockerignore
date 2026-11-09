@@ -1,0 +1,23 @@
+# Build context for docker/gateway/Dockerfile (repo root). The image needs
+# only pyproject.toml, uv.lock, README.md, roost/ and web/ — keep secrets,
+# local venvs, build output and dev state out of every layer.
+.git
+.venv
+.claude
+.superpowers
+.coverage
+.pytest_cache
+.ruff_cache
+**/__pycache__
+*.egg-info
+build
+dist
+*.secret
+**/*.secret
+tests
+docs
+scripts
+web/node_modules
+web/dist
+web/test-results
+web/playwright-report

@@ -1,0 +1,10 @@
+{
+  "url": "https://data.example/reports/2026.csv",
+  "title": "403 Forbidden",
+  "text": "403 Forbidden\nnginx",
+  "truncated": false,
+  "status": 403,
+  "password_field": false,
+  "captcha_frame": false,
+  "notice": null
+}
