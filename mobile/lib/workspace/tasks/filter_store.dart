@@ -84,7 +84,8 @@ class TaskFilterController extends Notifier<TaskFilter> {
   void toggleHigh() => _set(state.toggleHigh());
   void toggleDone() => _set(state.toggleDone());
   void toggleProject(String id) => _set(state.toggleProject(id));
-  void clear() => _set(const TaskFilter());
+  void toggleWithDone() => _set(state.toggleWithDone());
+  void clear() => _set(state.cleared());
 }
 
 final taskFilterProvider =

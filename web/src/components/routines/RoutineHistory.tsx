@@ -6,6 +6,7 @@ import * as routinesApi from "../../api/routines";
 import type { RoutineOut, RoutineRunOut } from "../../api/routines";
 import { ErrorNotice } from "../ErrorNotice";
 import { RUN_STATE_WORDS } from "./constants";
+import { finishedLine, lastErrorLine } from "./lastError";
 import { zoneStamp } from "./zoneTime";
 
 // A routine's runs, newest first, each in plain words. A run with a Report links to the chat.
@@ -19,9 +20,13 @@ export function RoutineHistory({ botId, routine, onClose }: { botId: string; rou
       .catch((err: unknown) => { if (live) setError(describeError(err)); });
     return () => { live = false; };
   }, [routine.id]);
+  const lastError = lastErrorLine(routine.last_error);
+  const finished = finishedLine(routine.finished);
   return (
     <Sheet open title={`History · ${routine.builtin ? "End-of-day summary" : routine.name}`} onOpenChange={(open) => { if (!open) onClose(); }}>
       {error ? <ErrorNotice message={error} /> : null}
+      {finished ? <p className="routine-history__empty" role="status">{finished}</p> : null}
+      {lastError ? <p className="routine-history__error" role="status">{lastError}</p> : null}
       {runs === null && !error ? <p className="routine-history__empty">Loading&hellip;</p> : null}
       {runs?.length === 0 ? <p className="routine-history__empty">No runs yet.</p> : null}
       <ul className="routine-history">

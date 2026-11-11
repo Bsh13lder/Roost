@@ -45,6 +45,23 @@ export function parseNoteLine(body: string): string | null {
   return data ? text(data.text) : null;
 }
 
+// A routine_finished line (owner, 2026-11-11): the routine, the bot's reason and the line the server wrote.
+export interface FinishedData {
+  routine_id: string;
+  name: string;
+  reason: string;
+  delete_at: string | null;
+  text: string;
+}
+
+export function parseFinished(body: string): FinishedData | null {
+  const data = parse(body);
+  const routine_id = data ? text(data.routine_id) : null;
+  const line = data ? text(data.text) : null;
+  if (!data || !routine_id || !line) return null;
+  return { routine_id, name: text(data.name) ?? "", reason: text(data.reason) ?? "", delete_at: text(data.delete_at), text: line };
+}
+
 export function parseProposalMessage(body: string): string | null {
   const data = parse(body);
   return data ? text(data.proposal_id) : null;

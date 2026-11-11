@@ -402,12 +402,15 @@ class KeeperDesk(PageKeeping):
         on_fresh: Callable[[], Awaitable[None]] | None = None,
         wake_check_after_s: float = DESK_WAKE_CHECK_AFTER_S,
         clock: Callable[[], float] = time.monotonic,
+        on_healed: Callable[[], Awaitable[None]] | None = None,
     ) -> None:
         self._config = config
         self._wake_check_after_s = wake_check_after_s
         self._clock = clock
         self._last_page_use = float("-inf")
         self._last_hung_restart = float("-inf")
+        self._answer_fails: tuple[float, ...] = ()   # the unanswered-call streak (PageKeeping)
+        self._on_healed = on_healed      # told once after a hung browser's computer was restarted (one chat line)
         self._on_fresh = on_fresh        # Install an app: a computer created fresh gets its approved apps back
         self._bot_id = bot_id
         self._computer = computer
@@ -542,7 +545,18 @@ class KeeperDesk(PageKeeping):
             return False
         if self._page is not None:
             await self._drop_page(self._page)
+        await self._say_healed()
         return True
+
+    async def _say_healed(self) -> None:
+        """The one quiet chat line after a restart; a hook that fails never breaks the page call that healed."""
+        if self._on_healed is None:
+            return
+        try:
+            await self._on_healed()
+        except Exception as exc:
+            logger.warning("could not say that the computer of bot %s was restarted: %s", self._bot_id,
+                           type(exc).__name__)
 
     def _relay(self) -> str:
         return _relay_url(self._config.keeper_url, self._bot_id, self._computer)

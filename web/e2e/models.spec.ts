@@ -36,11 +36,11 @@ test("the main bot's card: Switch changes the bot, and Info shows the new model"
   await openChat(page, "Chief");
   const detail = detailPane(page);
   await say(page, "Chief", "which model should Scout use for price hunts?");
-  const card = detail.getByRole("group", { name: "Switch Scout to Fable 5.1" });
+  const card = detail.getByRole("group", { name: "Switch Scout to Fable 5.2" });
   await expect(card).toBeVisible();
   await expect(card).toContainText("Long price hunts need deeper reasoning.");
   await card.getByRole("button", { name: "Switch", exact: true }).click();
-  await expect(detail.getByText("Switched Scout to Fable 5.1 at high effort")).toBeVisible();
+  await expect(detail.getByText("Switched Scout to Fable 5.2 at high effort")).toBeVisible();
 
   const info = await openInfo(page, "Scout");
   await expect(info.getByRole("combobox", { name: "Model" })).toHaveText(/Fable 5\.1/);

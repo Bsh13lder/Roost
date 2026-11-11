@@ -54,6 +54,12 @@ class Routine:
     created_at: datetime
     updated_at: datetime
     watch: Watch | None = None      # "Only run when the page changes": checked every few minutes, no model
+    model: str | None = None        # its own model (owner, 2026-11-09); None: the bot's
+    model_failures: int = 0         # runs that failed in a row on that model; 2 falls back to the bot's
+    last_error_kind: str | None = None   # v47: a ROUTINE_ERROR_* word, cleared by the next good check or finished run
+    last_error_at: datetime | None = None
+    finished_at: datetime | None = None     # v48: the bot finished it in its own run; deleted keep-days later
+    finished_reason: str | None = None      # its short reason (sealed); None with finished_at None
 
 
 @dataclass(frozen=True)
@@ -67,12 +73,13 @@ class RoutineDraft:
     builtin: str | None = None
     enabled: bool = True
     watch: Watch | None = None
+    model: str | None = None
 
 
 @dataclass(frozen=True)
 class RoutinePatch:
-    """The fields to change: any of ``name``, ``instructions``, ``schedule``, ``tainted`` and ``watch`` (a ``Watch``,
-    or None for no watch)."""
+    """The fields to change: any of ``name``, ``instructions``, ``schedule``, ``tainted``, ``watch`` (a ``Watch``,
+    or None for no watch) and ``model`` (a model id, or None for the bot's; a change starts its failure count over)."""
     changes: Mapping
 
 
@@ -151,6 +158,7 @@ class RoutineSection:
     """A routine run's "nobody is watching" section, and whether what it quotes carries outside content."""
     text: str
     tainted: bool = False
+    model: str | None = None   # the routine's own model, when it has one
 
 
 class Job(Protocol):

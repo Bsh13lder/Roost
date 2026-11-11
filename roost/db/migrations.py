@@ -471,6 +471,28 @@ MIGRATIONS: tuple[Migration, ...] = (
         AddColumn("users", "timezone", "TEXT"),
         f"UPDATE users SET timezone = '{TIMEZONE_LEGACY}' WHERE timezone IS NULL",
     )),
+    # A routine's own model (owner, 2026-11-09, docs/plans/2026-11-09-roost-tool-groups.md §2): a model id, plaintext
+    # (a setting), NULL for "Same as the bot"; model_failures counts its runs that failed in a row on that model.
+    Migration(46, "routine model", (
+        AddColumn("routines", "model", "TEXT"),
+        AddColumn("routines", "model_failures", "INTEGER NOT NULL DEFAULT 0"),
+    )),
+    # Self-healing (owner, 2026-11-10, docs/plans/2026-11-10-roost-self-healing.md): a routine's last error as a
+    # fixed word (``ROUTINE_ERROR_*``) and its UTC time, both plaintext (no user content), cleared by the next good
+    # check or finished run; and a watch's failed checks in a row with the run-log row they fold into.
+    Migration(47, "routine last error and watch fails", (
+        AddColumn("routines", "last_error_kind", "TEXT"),
+        AddColumn("routines", "last_error_at", "TEXT"),
+        AddColumn("routine_watches", "fail_count", "INTEGER NOT NULL DEFAULT 0"),
+        AddColumn("routine_watches", "fail_run_id", "TEXT"),
+    )),
+    # A finished routine (owner, 2026-11-11, docs/plans/2026-11-11-roost-routine-finish.md): the bot ended it in
+    # its own run. ``finished_at`` is a plaintext UTC time (the scheduler deletes the routine ROUTINE_FINISHED_KEEP_DAYS
+    # later); ``finished_reason`` is the bot's short reason, sealed under routines:finished_reason. Resume clears both.
+    Migration(48, "finished routines", (
+        AddColumn("routines", "finished_at", "TEXT"),
+        AddColumn("routines", "finished_reason", "TEXT"),
+    )),
 )
 
 

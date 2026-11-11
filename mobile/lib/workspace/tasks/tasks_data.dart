@@ -31,7 +31,7 @@ final shownTasksProvider =
   final typed = ref.watch(workspaceQueryProvider);
   final botMade = ref.watch(screenTogglesProvider(screenTasks)).botMade;
   final open = ref.watch(taskListProvider(openTasksQuery));
-  final done = filter.done ? ref.watch(taskListProvider(doneTasksQuery)) : _none;
+  final done = filter.showsDone ? ref.watch(taskListProvider(doneTasksQuery)) : _none;
   if (open.hasValue && done.hasValue) {
     final shown = applyFilter(filter,
         open: open.requireValue, done: done.requireValue, typed: typed);

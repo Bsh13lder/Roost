@@ -38,7 +38,8 @@ class TasksTitle extends ConsumerWidget {
   }
 }
 
-/// The top bar's buttons on Tasks: Show (Made by bots on the list; Done and
+/// The top bar's buttons on Tasks: Show (Done, which adds the done tasks under the open ones, and
+/// Made by bots on the list; Done and
 /// Made by bots on the Kanban, kept apart), the layout menu
 /// (List · Kanban · Calendar) and ⋯ (Clear filters, All projects, All money).
 class TasksActions extends ConsumerWidget {
@@ -49,7 +50,11 @@ class TasksActions extends ConsumerWidget {
     final layout = ref.watch(workLayoutProvider);
     return Row(mainAxisSize: MainAxisSize.min, children: [
       if (layout == TaskLayout.list)
-        const ShowMenuButton(screen: screenTasks, options: [ShowToggle.botMade]),
+        ShowMenuButton(
+            screen: screenTasks,
+            options: const [ShowToggle.done, ShowToggle.botMade],
+            done: ref.watch(taskFilterProvider).withDone,
+            onDone: ref.read(taskFilterProvider.notifier).toggleWithDone),
       if (layout == TaskLayout.kanban)
         const ShowMenuButton(
             screen: screenKanban, options: [ShowToggle.done, ShowToggle.botMade]),

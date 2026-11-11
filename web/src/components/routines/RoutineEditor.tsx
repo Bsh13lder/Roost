@@ -10,6 +10,7 @@ import type { RoutineDraftIn, RoutineOut, ScheduleIn } from "../../api/routines"
 import { BUILTIN_TITLE, DEFAULT_TIME, WORKDAYS } from "./constants";
 import { ScheduleFields } from "./ScheduleFields";
 import { StandingPermissions } from "./StandingPermissions";
+import { RoutineModelField } from "./RoutineModelField";
 import { WatchFields, watchDraft, watchIn, type WatchDraft } from "./WatchFields";
 
 export interface RoutineEditorProps {
@@ -36,6 +37,7 @@ export function RoutineEditor({ botId, routine, onClose, onSaved }: RoutineEdito
   const [instructions, setInstructions] = useState(routine?.instructions ?? "");
   const [schedule, setSchedule] = useState<ScheduleIn>(routine?.schedule ?? NEW_SCHEDULE);
   const [watch, setWatch] = useState<WatchDraft>(watchDraft(routine?.watch));
+  const [model, setModel] = useState<string | null>(routine?.model ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -43,7 +45,7 @@ export function RoutineEditor({ botId, routine, onClose, onSaved }: RoutineEdito
     setSaving(true);
     setError(null);
     try {
-      const fields = { name, instructions, schedule, ...watchChange(routine, watch) };
+      const fields = { name, instructions, schedule, model, ...watchChange(routine, watch) };
       const saved = routine === null
         ? await routinesApi.createRoutine(botId, fields)
         : await routinesApi.patchRoutine(routine.id, builtin ? { schedule } : fields);
@@ -68,6 +70,7 @@ export function RoutineEditor({ botId, routine, onClose, onSaved }: RoutineEdito
             <Field label="Name"><Input value={name} onChange={(event) => setName(event.target.value)} /></Field>
             <Field label="What to do"><Textarea value={instructions} onChange={(event) => setInstructions(event.target.value)} /></Field>
             <WatchFields value={watch} onChange={setWatch} />
+            <RoutineModelField value={model} onChange={setModel} />
           </>
         )}
         {watch.on && !builtin ? null : <ScheduleFields value={schedule} onChange={setSchedule} />}

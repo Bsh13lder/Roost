@@ -17,20 +17,24 @@ from roost.approvals.announce import publish_card
 from roost.approvals.models import ApprovalCard, CardState
 from roost.bots.models import BotStatus
 from roost.constants import (
-    REPORT_TEXT_MAX_CHARS, ROUTINE_ASK_MAX_WAIT_HOURS, ROUTINE_LATE_GRACE_SECONDS, ROUTINE_NAME_MAX,
+    REPORT_TEXT_MAX_CHARS, ROUTINE_ASK_MAX_WAIT_HOURS, ROUTINE_ERROR_RUN, ROUTINE_LATE_GRACE_SECONDS,
+    ROUTINE_MODEL_FAILURES_MAX, ROUTINE_NAME_MAX,
 )
 from roost.desk.stuck import Block
 from roost.events.hub import EventHub
-from roost.routines.models import AnswerLine, Clock, ReportBody, Routine, RoutineRun, RoutineSection, RunState
+from roost.llm.registry import model_label
+from roost.routines.models import (
+    AnswerLine, Clock, ReportBody, Routine, RoutinePatch, RoutineRun, RoutineSection, RunState,
+)
 from roost.routines.reports import (
     is_quiet, post_report, post_routine_note, publish_run, report_body, with_headline,
 )
 from roost.routines.runs import RoutineRunStore, utc_now
 from roost.routines.store import RoutineStore
 from roost.routines.watch_store import WatchStore
-from roost.routines.watch_texts import change_section
+from roost.routines.watch_texts import change_section, watch_failing_line
 from roost.routines.texts import (
-    EXPIRED_NOTE, RETRY_NOTE, STOPPED_NOTE, STUCK_TEXT, UNFINISHED_TEXT, UNFINISHED_TWICE_TEXT, clip, expired_text,
+    EXPIRED_NOTE, MODEL_FALLBACK_TEXT, RETRY_NOTE, STOPPED_NOTE, STUCK_TEXT, UNFINISHED_TEXT, UNFINISHED_TWICE_TEXT, clip, expired_text,
     headline, slot_line,
 )
 from roost.standing.models import StandingState
@@ -83,8 +87,9 @@ class RoutineHooks:
         text = routine_section(routine.name, slot_line(run.slot_at, now, late=late), tuple(a.text for a in answers))
         change = await self._watch_change(user_id, routine, run)
         if change is not None:
-            return RoutineSection(f"{text}\n{change}", tainted=True)     # page content taints the run
-        return RoutineSection(text, tainted=any(a.tainted for a in answers))     # a tainted question taints the run
+            return RoutineSection(f"{text}\n{change}", tainted=True, model=routine.model)   # page content taints it
+        return RoutineSection(text, tainted=any(a.tainted for a in answers),   # a tainted question taints the run
+                              model=routine.model)
 
     async def _watch_change(self, user_id: str, routine: Routine, run: RoutineRun) -> str | None:
         """The page watch's line and the escaped change, for the run the change started (else None)."""
@@ -187,6 +192,16 @@ class RoutineHooks:
         await post_routine_note(self._talk, self._events, user_id, thread.id, routine.bot_id, "skipped",
                                 routine.name, routine_id=routine.id, text=text)
 
+    async def watch_failing(self, user_id: str, routine: Routine, kind: str) -> None:
+        """One quiet line in the bot's main chat: its page watch could not check the page WATCH_FAILS_STUCK times in
+        a row, and why (owner, 2026-11-10). Said once per streak; a good read starts a new one."""
+        if routine.watch is None:
+            return
+        text = watch_failing_line(routine.name, routine.watch.host, kind, routine.watch.every_min)
+        thread, _ = await self._talk.ensure_main_thread(user_id, routine.bot_id)
+        await post_routine_note(self._talk, self._events, user_id, thread.id, routine.bot_id, "watch_failed",
+                                routine.name, routine_id=routine.id, text=text)
+
     async def after_run(self, user_id: str, batch: ClaimedBatch, result: TurnResult, outcome: RunOutcome) -> None:
         """Close the runs of an all-routine batch (or of the card answers that carried a parked one on) and post
         their Report. A batch with any other item is ignored. A run that ended on an Ask card stays open."""
@@ -235,6 +250,8 @@ class RoutineHooks:
             await self.finish(user_id, run, "skipped", note=STOPPED_NOTE)
             return False
         wall = result.block or result.wall
+        if wall is None and routine is not None and routine.model is not None:
+            await self._model_outcome(user_id, routine, ok=outcome == "done")
         if wall is not None:
             await self.finish(user_id, run, "error", note="Stuck")
             await self._go_stuck(user_id, run, routine, wall.host)
@@ -252,6 +269,19 @@ class RoutineHooks:
             return post and await self._fail(user_id, run, routine, "error", result, text=UNFINISHED_TEXT)
         await self.finish(user_id, run, "done")
         return post and routine is not None and await self._report_reply(user_id, run, routine, result)
+
+    async def _model_outcome(self, user_id: str, routine: Routine, *, ok: bool) -> None:
+        """The routine's own model (owner, 2026-11-09): after ``ROUTINE_MODEL_FAILURES_MAX`` failed runs in a row it
+        goes back to the bot's model, and the bot's chat says so. A Stuck run is not the model's fault: not counted."""
+        counted = await self._routines.note_model_run(user_id, routine.id, ok=ok)
+        if ok or counted is None or counted.model is None or counted.model_failures < ROUTINE_MODEL_FAILURES_MAX:
+            return
+        await self._routines.update(user_id, routine.id, RoutinePatch({"model": None}))
+        thread, _ = await self._talk.ensure_main_thread(user_id, routine.bot_id)
+        text = MODEL_FALLBACK_TEXT.format(name=routine.name, model=model_label(counted.model))
+        await post_routine_note(self._talk, self._events, user_id, thread.id, routine.bot_id, "model_fallback",
+                                routine.name, routine_id=routine.id, text=text)
+        await self._events.publish(user_id, {"type": "routines_changed", "bot_id": routine.bot_id})
 
     async def _retry(self, user_id: str, run: RoutineRun, item: WorkItem) -> bool:
         """R1: an errored run is tried once more, as a new work item on the same run row. ``False`` when it can't be."""
@@ -304,7 +334,21 @@ class RoutineHooks:
         changed = await self._runs.set_state(user_id, run.id, state, expected=_OPEN, note=note)
         if changed is not None:
             await publish_run(self._events, user_id, changed)
+            await self._note_last_error(user_id, changed, state)
         return changed
+
+    async def watch_missing(self, user_id: str, routine: Routine, text: str) -> None:
+        """One quiet line in the bot's chat: the watched part is not on the page, so nothing is compared."""
+        thread, _ = await self._talk.ensure_main_thread(user_id, routine.bot_id)
+        await post_routine_note(self._talk, self._events, user_id, thread.id, routine.bot_id, "watch_missing",
+                                routine.name, routine_id=routine.id, text=text)
+
+    async def _note_last_error(self, user_id: str, run: RoutineRun, state: RunState) -> None:
+        """v47: a run that did not finish is the routine's last error; one that finished clears it."""
+        if state == "error":
+            await self._routines.set_last_error(user_id, run.routine_id, ROUTINE_ERROR_RUN, self._clock())
+        elif state == "done":
+            await self._routines.set_last_error(user_id, run.routine_id, None, None)
 
     async def publish(self, user_id: str, run: RoutineRun) -> None:
         await publish_run(self._events, user_id, run)

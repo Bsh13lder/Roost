@@ -20,6 +20,13 @@ function renderRow(overrides: Partial<MessageRowProps> = {}) {
 }
 
 describe("MessageRow (redesign P2)", () => {
+  it("draws a computer_restart line as plain words (self-healing, 2026-11-10)", () => {
+    const body = "My computer stopped answering, so I restarted it.";
+    const { container } = renderRow({ message: makeMessage({ role: "system", kind: "computer_restart", body }) });
+    expect(container.querySelector("li")).toHaveClass("message--notice", "message--notice-computer_restart");
+    expect(screen.getByText(body)).toBeInTheDocument();
+  });
+
   it("draws a memory_note as the Remembered line", () => {
     const body = JSON.stringify({ memory_id: "mem-1", kind: "fact", text: "Lives in Madrid" });
     const { container } = renderRow({ message: makeMessage({ role: "activity", kind: "memory_note", author_bot_id: "bot-1", body }) });

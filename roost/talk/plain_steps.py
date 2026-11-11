@@ -90,11 +90,13 @@ _WORDS: Mapping[str, tuple[str, str]] = MappingProxyType({
     "list_projects": ("money", "Checked the projects"),
     # time and routines
     "get_time": ("calendar", "Checked the time"), "create_routine": ("calendar", "Set up a routine"),
+    "load_tools": ("other", "Got more tools ready"),
     "update_routine": ("calendar", "Changed a routine"), "pause_routine": ("calendar", "Paused a routine"),
     "resume_routine": ("calendar", "Resumed a routine"), "delete_routine": ("calendar", "Deleted a routine"),
     "list_routines": ("calendar", "Checked its routines"), "propose_routine": ("calendar", "Suggested a routine"),
     "propose_routine_change": ("calendar", "Suggested a routine change"),
     "propose_routine_pause": ("calendar", "Suggested pausing a routine"),
+    "finish_routine": ("calendar", "Finished this routine"),
     # the team
     "list_bots": ("bots", "Checked the team"), "create_bot": ("bots", "Made a new bot"),
     "suggest_bot": ("bots", "Suggested a new bot"), "suggest_model": ("bots", "Suggested a model"),

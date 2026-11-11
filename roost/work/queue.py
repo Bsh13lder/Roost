@@ -197,6 +197,13 @@ class WorkQueue:
                 f"AND state IN {_OPEN} LIMIT 1", (user_id, bot_id, thread_id, kind.value))).fetchone()
         return row is not None
 
+    async def oldest_open(self, user_id: str, bot_id: str, thread_id: str, kind: WorkKind) -> WorkItem | None:
+        """The oldest item of ``kind`` that waits or runs in ``thread_id`` (the page watch asks how old it is)."""
+        rows = await self._select(
+            f"WHERE user_id = ? AND bot_id = ? AND thread_id = ? AND kind = ? AND state IN {_OPEN} "
+            "ORDER BY rowid LIMIT 1", (user_id, bot_id, thread_id, kind.value))
+        return (await self._decrypt(user_id, rows))[0] if rows else None
+
     async def newest_queued_message_at(self, user_id: str, bot_id: str) -> str | None:
         """When your newest waiting message to ``bot_id`` was queued (UTC ISO), for the burst debounce."""
         async with db_session(self._config) as db:

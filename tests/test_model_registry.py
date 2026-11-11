@@ -35,3 +35,10 @@ def test_resolve_accepts_a_seen_model():
     seen = "claude-opus-6-0"
     assert resolve_bot_model(seen) == DEFAULT_BOT_MODEL
     assert resolve_bot_model(seen, frozenset({seen})) == seen
+
+
+def test_fable_5_2_is_offered_and_a_bot_on_fable_5_1_keeps_it():
+    from roost.llm.registry import BOT_MODELS, FABLE, FABLE_51, model_label, resolve_bot_model
+
+    assert FABLE.id == "claude-fable-5-2" and FABLE in BOT_MODELS and FABLE_51 not in BOT_MODELS
+    assert resolve_bot_model(FABLE_51.id) == FABLE_51.id and model_label(FABLE_51.id) == "Fable 5.1"

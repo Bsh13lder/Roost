@@ -15,6 +15,11 @@ a check never overlaps the bot's runs, and hands it to ``check``, which calls no
    the same fingerprint folds into one quiet "No change" run-log line; a new one queues the routine's run with what
    changed (``RoutineHooks`` tells it, escaped as page content, and the run is tainted).
 
+A check that can't read the page is never silent (owner, 2026-11-10; ``roost/routines/watch_fails.py``): failures
+in a row fold into one "Couldn't check" run-log line, the routine keeps its last error, and at ``WATCH_FAILS_STUCK``
+the bot's chat says so once. A waiting check older than ``WATCH_STALE_TRIGGER_INTERVALS`` intervals (one leased by a
+drain that died, say) is dropped and queued again, so checks resume.
+
 The computer sleeps again on its own (the keeper's idle pause)."""
 
 from __future__ import annotations
@@ -24,12 +29,15 @@ import logging
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any, Literal
 
 from roost.bots.models import Bot
 from roost.bots.store import BotStore
 from roost.config import RoostConfig
-from roost.constants import WATCH_READY_TIMEOUT_S
+from roost.constants import (
+    ROUTINE_ERROR_NO_ANSWER, ROUTINE_ERROR_NO_ROOM, WATCH_READY_TIMEOUT_S, WATCH_STALE_TRIGGER_INTERVALS,
+)
 from roost.crypto.key_manager import get_user_dek
 from roost.desk import Desk, DeskBusy
 from roost.desk.ready import wait_ready
@@ -37,17 +45,19 @@ from roost.desk.stuck import Block, detect_block
 from roost.routines.models import Clock, Routine
 from roost.routines.runs import RoutineRunStore, SlotAlreadyRecorded, utc_now
 from roost.routines.store import RoutineStore
+from roost.routines.watch_fails import WatchFailures
 from roost.routines.watch_models import Watch
-from roost.routines.watch_part import AreaText, WatchedPart, changed_lines, fingerprint, normalise, pick_part
+from roost.routines.watch_part import AreaText, WatchedPart, changed_lines, compared, fingerprint, pick_part
 from roost.routines.watch_store import Snapshot, WatchStore
 from roost.routines.watch_texts import (
-    BASELINE_NOTE, BLOCKED_NOTE, CHANGED_NOTE, no_change_note, watch_origin,
+    BASELINE_NOTE, BLOCKED_NOTE, CHANGED_NOTE, MISSING_CHAT_TEXT, MISSING_NOTE, no_change_note, watch_origin,
 )
 from roost.work.models import WorkDraft, WorkItem, WorkKind
 
 logger = logging.getLogger(__name__)
 
-CheckResult = Literal["gone", "busy", "no_room", "failed", "blocked", "still_blocked", "baseline", "same", "changed"]
+CheckResult = Literal["gone", "busy", "no_room", "failed", "blocked", "still_blocked", "baseline", "same", "changed",
+                      "missing"]
 
 
 @dataclass(frozen=True)
@@ -79,6 +89,7 @@ class WatchChecker:
         self._sleep = sleep
         self._monotonic = monotonic
         self._ready_timeout_s = ready_timeout_s
+        self._fails = WatchFailures(runs=runs, snapshots=snapshots, routines=routines, hooks=hooks, clock=clock)
 
     async def queue_check(self, user_id: str, routine: Routine) -> bool:
         """Queue one check of ``routine``'s page; False when it watches nothing, its bot is gone or off duty, or a
@@ -88,12 +99,22 @@ class WatchChecker:
         bot = await self._bots.get(user_id, routine.bot_id)
         if bot is None or bot.off_duty:
             return False
-        if await self._turns.queue.has_open(user_id, routine.bot_id, routine.thread_id, WorkKind.TRIGGER):
-            return False
+        waiting = await self._turns.queue.oldest_open(user_id, routine.bot_id, routine.thread_id, WorkKind.TRIGGER)
+        if waiting is not None:
+            if not self._stale(waiting, routine.watch):
+                return False
+            logger.warning("A page watch check of routine %s sat open too long; replacing it", routine.id)
+            await self._turns.queue.drop_items(user_id, (waiting.id,))
         await self._turns.submit(user_id, WorkDraft(
             bot_id=routine.bot_id, thread_id=routine.thread_id, kind=WorkKind.TRIGGER,
             origin=watch_origin(routine.name), body=routine.id))
         return True
+
+    def _stale(self, item: WorkItem, watch: Watch) -> bool:
+        """An open check older than ``WATCH_STALE_TRIGGER_INTERVALS`` intervals would block every later one (a lease
+        held by a drain that died, say); by then it is stale."""
+        age = self._clock() - datetime.fromisoformat(item.created_at)
+        return age >= timedelta(minutes=watch.every_min * WATCH_STALE_TRIGGER_INTERVALS)
 
     async def check(self, user_id: str, bot: Bot, item: WorkItem) -> CheckResult:
         """One check of the routine whose run log ``item`` is in. Never raises for a page that can't be read."""
@@ -106,11 +127,14 @@ class WatchChecker:
         try:
             read = await self._read(desk, routine.watch)
         except DeskBusy:
+            await self._fails.note(user_id, routine, ROUTINE_ERROR_NO_ROOM)
             return "no_room"
         except Exception as exc:
             logger.warning("A page watch check failed for routine %s bot %s user %s: %s",
                            routine.id, bot.id, user_id, type(exc).__name__)
+            await self._fails.note(user_id, routine, ROUTINE_ERROR_NO_ANSWER)
             return "failed"
+        await self._fails.clear(user_id, routine)
         return await self._decide(user_id, routine, read)
 
     # --- reading the page ------------------------------------------------------------------------------------
@@ -146,8 +170,10 @@ class WatchChecker:
         snap = await self._snapshots.get(user_id, routine.id)
         if read.block is not None or read.part is None:
             return await self._blocked(user_id, routine, snap)
+        if read.part.where == "missing":
+            return await self._missing(user_id, routine, snap)
         text = read.part.text
-        fp = fingerprint(await get_user_dek(self._config, user_id), routine.id, normalise(text))
+        fp = fingerprint(await get_user_dek(self._config, user_id), routine.id, compared(text))
         if snap is None or not snap.fingerprint:
             await self._snapshots.save(user_id, routine.id, snapshot=text, fingerprint=fp, changed=False)
             await self._quiet(user_id, routine, None, BASELINE_NOTE)
@@ -164,6 +190,20 @@ class WatchChecker:
         await self._snapshots.save(user_id, routine.id, snapshot=text, fingerprint=fp, changed=True,
                                    change_text=change, change_run_id=run.id if run is not None else None)
         return "changed"
+
+    async def _missing(self, user_id: str, routine: Routine, snap: Snapshot | None) -> CheckResult:
+        """The named part is not on the page (owner, 2026-11-09): no model run and no whole-page compare. The first
+        miss forgets the old snapshot (a found part starts a fresh baseline), notes it once and tells the chat."""
+        if snap is not None and snap.blocked and not snap.fingerprint:
+            await self._snapshots.checked(user_id, routine.id)
+            return "missing"
+        await self._snapshots.save(user_id, routine.id, snapshot="", fingerprint="", changed=False)
+        await self._snapshots.set_blocked(user_id, routine.id, True)
+        await self._quiet(user_id, routine, None, MISSING_NOTE)
+        if self._hooks is not None and routine.watch is not None:
+            await self._hooks.watch_missing(user_id, routine, MISSING_CHAT_TEXT.format(
+                name=routine.name, part=routine.watch.part, host=routine.watch.host))
+        return "missing"
 
     async def _blocked(self, user_id: str, routine: Routine, snap: Snapshot | None) -> CheckResult:
         """A wall: the routine runs as usual once (the model meets the Sign-in or Stuck flow), then stays quiet."""

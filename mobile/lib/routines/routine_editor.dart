@@ -5,6 +5,7 @@ import '../profile/format.dart';
 import '../theme/tokens.dart';
 import '../widgets/profile_kit.dart';
 import 'routines_repo.dart';
+import 'routine_model_field.dart';
 import 'watch_fields.dart';
 
 /// Opens the editor; `routine` null creates one for `botId`. True when saved.
@@ -48,6 +49,7 @@ class _RoutineEditorState extends ConsumerState<RoutineEditor> {
   late final Map<String, dynamic>? _watch =
       (widget.routine?['watch'] as Map?)?.cast<String, dynamic>();
   late bool _watchOn = _watch != null;
+  late String? _model = widget.routine?['model'] as String?;
   late final _watchUrl = TextEditingController(text: _watch?['url'] as String? ?? '');
   late final _watchPart = TextEditingController(text: _watch?['part'] as String? ?? '');
   late final _watchEvery =
@@ -103,6 +105,7 @@ class _RoutineEditorState extends ConsumerState<RoutineEditor> {
       'instructions': _instructions.text.trim(),
       'schedule': _schedule,
       if (watch != null || _watch != null) 'watch': watch,
+      'model': _model,
     };
     setState(() => _busy = true);
     final repo = ref.read(routinesRepoProvider);
@@ -151,6 +154,9 @@ class _RoutineEditorState extends ConsumerState<RoutineEditor> {
                 url: _watchUrl,
                 part: _watchPart,
                 every: _watchEvery),
+            const SizedBox(height: Tokens.space3),
+            RoutineModelField(
+                value: _model, onChanged: (m) => setState(() => _model = m)),
             const SizedBox(height: Tokens.space3),
             if (!_watchOn) ..._scheduleFields(),
             Row(children: [

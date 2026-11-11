@@ -71,6 +71,12 @@ final stayConnectedSyncProvider = Provider<void>((ref) {
   ref.listen<AppFocus>(appFocusProvider, (_, focus) => control.send(focusMessage(focus)), fireImmediately: true);
   ref.listen<AsyncValue<NotifyPrefs>>(notifyPrefsProvider, (was, now) {
     final first = was?.valueOrNull == null;
-    if (first && (now.valueOrNull?.stayConnected ?? false)) unawaited(control.start());
+    if (first && (now.valueOrNull?.stayConnected ?? false)) {
+      // A service that starts after the app missed the first focus message: tell it again, or it thinks you
+      // are away and alerts about the chat you are reading (owner, 2026-11-10: "noisy when I am in the chat").
+      unawaited(control.start().then((on) {
+        if (on) control.send(focusMessage(ref.read(appFocusProvider)));
+      }));
+    }
   }, fireImmediately: true);
 });

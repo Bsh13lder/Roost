@@ -260,6 +260,30 @@ void main() {
     expect(store.saved[screenTasks]!.botMade, isFalse);
   });
 
+  testWidgets('Tasks: Show › Done adds the done tasks under the open ones (owner, 2026-11-11)',
+      (tester) async {
+    final calls = <String>[];
+    await pumpWorkspace(tester, const WorkspaceScreen(), calls,
+        size: tall,
+        toggleStore: MemoryScreenToggleStore(),
+        extra: (RequestOptions o) {
+          if ('${o.method} ${o.uri.path}' != 'GET /api/tasks') return null;
+          if (o.uri.query == 'sort=due') return FakeAdapter.json([wtask('t1', 'Pay rent')]);
+          if (o.uri.query == 'view=done') {
+            return FakeAdapter.json([{...wtask('t3', 'Filed taxes'), 'status': 'done'}]);
+          }
+          return null;
+        });
+    expect(find.text('Filed taxes'), findsNothing);
+    await tapKey(tester, 'show-menu-tasks');
+    final item = tester.widget<CheckedPopupMenuItem<ShowToggle>>(find.byKey(const Key('show-done')));
+    expect(item.checked, isFalse);
+    await tester.tap(find.byKey(const Key('show-done')));
+    await tester.pumpAndSettle();
+    expect(find.text('Filed taxes'), findsOneWidget);
+    expect(find.text('Pay rent'), findsOneWidget);
+  });
+
   testWidgets('the Workspace calendar shows routine runs; Show › Routines hides them',
       (tester) async {
     final calls = <String>[];

@@ -14,8 +14,8 @@
     ],
     [{ "tool": "ask_bot", "args": { "bot": "HiMap SEO", "task": "List three quick SEO fixes for himap.app" } }],
     [{ "text": "Created HiMap SEO and HiMap Social. HiMap SEO suggests: titles, meta descriptions, alt text." }],
-    [{ "tool": "suggest_model", "args": { "bot": "Scout", "model": "claude-fable-5-1", "effort": "high", "reason": "Long price hunts need deeper reasoning." } }],
-    [{ "text": "I suggested Fable 5.1 for Scout." }],
+    [{ "tool": "suggest_model", "args": { "bot": "Scout", "model": "claude-fable-5-2", "effort": "high", "reason": "Long price hunts need deeper reasoning." } }],
+    [{ "text": "I suggested Fable 5.2 for Scout." }],
     [
       { "tool": "ask_bot", "args": { "bot": "Scout", "task": "Price a grocery basket under 60 EUR" } },
       { "tool": "ask_bot", "args": { "bot": "Quill", "task": "Write the shopping list" } }

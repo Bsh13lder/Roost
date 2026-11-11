@@ -12,6 +12,13 @@ vi.mock("../src/api/routines", () => ({
   previewSchedule: (...a: unknown[]) => api.previewSchedule(...a),
 }));
 
+vi.mock("../src/lib/models", () => ({
+  fetchModels: () => Promise.resolve({ choices: [
+    { id: "claude-sonnet-5-5", label: "Sonnet 5.5", line: "sonnet", new: false },
+    { id: "claude-haiku-5-5", label: "Haiku 5.5", line: "haiku", new: false },
+  ] }),
+  modelHint: () => undefined,
+}));
 const standing = { listPermissions: vi.fn() };
 vi.mock("../src/api/standing", () => ({ listPermissions: (...a: unknown[]) => standing.listPermissions(...a) }));
 
@@ -58,6 +65,7 @@ describe("RoutineEditor", () => {
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(api.createRoutine).toHaveBeenLastCalledWith("bot-1", {
       name: "Digest", instructions: "Summarise", schedule: { kind: "times", days: [1, 2, 3, 4, 5], times: ["09:00"] },
+      model: null,
     });
   });
 
@@ -92,5 +100,21 @@ describe("RoutineEditor on another zone", () => {
     render(<RoutineEditor botId="bot-1" routine={null} onClose={vi.fn()} onSaved={vi.fn()} />);
     expect(await screen.findByText("Wed 21 Oct 03:00")).toBeInTheDocument();
     expect(screen.queryByText(/New York/)).not.toBeInTheDocument();
+  });
+});
+
+// A routine's own model (owner, 2026-11-09): Same as the bot by default; the saved routine's model is kept.
+describe("RoutineEditor model", () => {
+  it("shows Same as the bot for a new routine and keeps a routine's own model on save", async () => {
+    api.previewSchedule.mockResolvedValue(PREVIEW);
+    standing.listPermissions.mockResolvedValue([]);
+    render(<RoutineEditor botId="bot-1" routine={null} onClose={vi.fn()} onSaved={vi.fn()} />);
+    expect(screen.getByText("Same as the bot")).toBeInTheDocument();
+    cleanup();
+    api.patchRoutine.mockResolvedValue({ ...routine, model: "claude-haiku-5-5" });
+    render(<RoutineEditor botId="bot-1" routine={{ ...routine, model: "claude-haiku-5-5" }} onClose={vi.fn()} onSaved={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(api.patchRoutine).toHaveBeenCalled());
+    expect(api.patchRoutine.mock.calls.at(-1)?.[1]).toMatchObject({ model: "claude-haiku-5-5" });
   });
 });

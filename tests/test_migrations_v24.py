@@ -86,7 +86,10 @@ async def test_v25_adds_the_routine_and_plan_tables_and_keeps_every_row():
     assert _columns(db_path, "routines") == {
         "id", "user_id", "bot_id", "thread_id", "name", "instructions", "schedule", "builtin", "enabled", "tainted",
         "created_by", "next_run_at", "last_run_at", "created_at", "updated_at",
-        "watch_url", "watch_part", "watch_every_min"}     # v40: the routine watch
+        "watch_url", "watch_part", "watch_every_min",   # v40: the routine watch
+        "model", "model_failures",     # v46: a routine's own model
+        "last_error_kind", "last_error_at",     # v47: its last error
+        "finished_at", "finished_reason"}       # v48: the bot finished it (finish_routine)
     assert _columns(db_path, "routine_runs") == {
         "id", "user_id", "routine_id", "bot_id", "slot_at", "work_item_id", "state", "missed_count", "note",
         "started_at", "finished_at", "created_at"}

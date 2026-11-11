@@ -11,11 +11,12 @@ import asyncio
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from roost.bots.store import BotStore
 from roost.constants import (
     REPORT_LOOKUP_MESSAGES,
+    ROUTINE_FINISHED_KEEP_DAYS,
     ROUTINE_INSTRUCTIONS_MAX,
     ROUTINE_NAME_MAX,
     ROUTINE_PREVIEW_COUNT,
@@ -24,6 +25,8 @@ from roost.constants import (
     ROUTINES_PER_USER_MAX,
 )
 from roost.events.hub import EventHub
+from roost.llm.registry import BOT_MODELS
+from roost.routines.finished import clean_reason, post_finished_line
 from roost.routines.launcher import RoutineLauncher
 from roost.routines.models import Clock, Routine, RoutineDraft, RoutinePatch, RoutineRun
 from roost.routines.reports import post_routine_note
@@ -47,8 +50,22 @@ _TEXT_RUNNING = "It's still running."
 _TEXT_CAP = "Daily limit reached."
 _TEXT_OFF_DUTY = "This bot is off duty."
 _TEXT_BUILTIN_WATCH = "The end-of-day summary can't watch a page."
-_FIELDS = frozenset({"name", "instructions", "schedule", "enabled", "watch"})
+_TEXT_BUILTIN_FINISH = "The end-of-day summary can't be finished; switch it off instead."
+_FIELDS = frozenset({"name", "instructions", "schedule", "enabled", "watch", "model"})
+_TEXT_MODEL = "Pick Same as the bot, Fable, Sonnet, Opus or Haiku."
 _BUILTIN_FIELDS = frozenset({"schedule", "enabled"})
+
+
+def routine_model(value: object) -> str | None:
+    """A routine's model from the wire or a tool: a model id or its short name ("opus"); None, "" or "same" for the
+    bot's own. Raises ``Refused`` for anything else."""
+    if value is None or (isinstance(value, str) and value.strip().lower() in ("", "same", "bot")):
+        return None
+    word = str(value).strip().lower()
+    for choice in BOT_MODELS:
+        if word in (choice.id, choice.key):
+            return choice.id
+    raise Refused(_TEXT_MODEL)
 
 
 class NoSuchBot(LookupError):
@@ -145,6 +162,7 @@ class RoutineService:
     async def create(
         self, user_id: str, bot_id: str, name: str, instructions: str, schedule: Mapping, enabled: bool = True,
         *, created_by: str = "user", tainted: bool = False, watch: Mapping | WatchIn | None = None,
+        model: str | None = None,
     ) -> Routine:
         await self._bot(user_id, bot_id)
         clean_name, clean_text = _name(name), _instructions(instructions)
@@ -155,7 +173,7 @@ class RoutineService:
             raise Refused(f"You already have {ROUTINES_PER_USER_MAX} routines.")
         routine = await self._routines.create(user_id, RoutineDraft(
             bot_id=bot_id, name=clean_name, instructions=clean_text, schedule=parsed, created_by=created_by,  # type: ignore[arg-type]
-            tainted=tainted, enabled=enabled, watch=watching))
+            tainted=tainted, enabled=enabled, watch=watching, model=routine_model(model)))
         await self._changed(user_id, routine, "created")
         return routine
 
@@ -186,6 +204,38 @@ class RoutineService:
         await self._events.publish(user_id, {"type": "routines_changed", "bot_id": routine.bot_id})
         thread, _created = await self._talk.ensure_main_thread(user_id, routine.bot_id)
         await post_routine_note(self._talk, self._events, user_id, thread.id, routine.bot_id, "deleted", routine.name)
+
+    async def finish(self, user_id: str, routine_id: str, reason: str, *, tainted: bool = False) -> Routine:
+        """v48: the bot finished it in its own run. Paused and marked finished, with the one chat line that offers
+        Resume and Delete now; the sweep deletes it ``ROUTINE_FINISHED_KEEP_DAYS`` later."""
+        current = await self._routine(user_id, routine_id)
+        if current.builtin is not None:
+            raise Refused(_TEXT_BUILTIN_FINISH)
+        finished = await self._routines.finish(user_id, routine_id, clean_reason(reason)) or current
+        await self._events.publish(user_id, {"type": "routines_changed", "bot_id": finished.bot_id})
+        thread, _created = await self._talk.ensure_main_thread(user_id, finished.bot_id)
+        await post_finished_line(self._talk, self._events, user_id, thread.id, finished, tainted=tainted)
+        return finished
+
+    async def resume_finished(self, user_id: str, routine_id: str) -> Routine:
+        """Resume on the finished line: no longer finished, on again and planned from now. A watch compares from a
+        new first look, never with the page it finished on."""
+        current = await self._routine(user_id, routine_id)
+        if self._watches is not None and current.watch is not None:
+            await self._watches.reset(user_id, routine_id)
+        resumed = await self._routines.set_enabled(user_id, routine_id, True) or current
+        await self._changed(user_id, resumed, "resumed")
+        return resumed
+
+    async def sweep_finished(self, user_id: str, now: datetime) -> int:
+        """The scheduler's tick: delete every routine still finished ``ROUTINE_FINISHED_KEEP_DAYS`` after it was
+        finished (the same path as Delete now), and say how many went."""
+        cutoff = now - timedelta(days=ROUTINE_FINISHED_KEEP_DAYS)
+        gone = 0
+        for routine in await self._routines.finished_before(user_id, cutoff):
+            await self.delete(user_id, routine.id)
+            gone += 1
+        return gone
 
     async def run_now(self, user_id: str, routine_id: str) -> RoutineRun:
         """Start a run at once. It counts against the daily cap like any run, and never overlaps an open one."""
@@ -238,6 +288,8 @@ class RoutineService:
             fields["schedule"] = self._schedule(fields["schedule"])
         if "watch" in fields:
             fields["watch"] = _watch(fields["watch"])
+        if "model" in fields:
+            fields["model"] = routine_model(fields["model"])
         return fields
 
     async def _new_baseline(self, user_id: str, before: Routine, after: Routine) -> None:

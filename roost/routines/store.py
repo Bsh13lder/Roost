@@ -24,11 +24,13 @@ from roost.routines.watch_models import Watch, next_check
 from roost.talk.store import TalkStore
 
 _COLUMNS = ("id, user_id, bot_id, thread_id, name, instructions, schedule, builtin, enabled, tainted, created_by, "
-            "next_run_at, last_run_at, created_at, updated_at, watch_url, watch_part, watch_every_min")
+            "next_run_at, last_run_at, created_at, updated_at, watch_url, watch_part, watch_every_min, model, model_failures")
+# v47 and v48: set by the watch, the hooks and ``finish``, never inserted.
+_READ_COLUMNS = f"{_COLUMNS}, last_error_kind, last_error_at, finished_at, finished_reason"
 _SCHEDULE = TypeAdapter(Schedule)
 DAY_SUMMARY_BUILTIN = "day_summary"
 DAY_SUMMARY_NAME = "End-of-day summary"
-_PATCHABLE = frozenset({"name", "instructions", "schedule", "tainted", "watch"})
+_PATCHABLE = frozenset({"name", "instructions", "schedule", "tainted", "watch", "model"})
 
 
 def _aad(user_id: str, column: str) -> bytes:
@@ -55,7 +57,17 @@ def _to_routine(row: aiosqlite.Row, dek: bytes) -> Routine:
         schedule=_SCHEDULE.validate_json(schedule_json), builtin=row["builtin"], enabled=bool(row["enabled"]),
         tainted=bool(row["tainted"]), created_by=row["created_by"], next_run_at=parse_iso(row["next_run_at"]),
         last_run_at=parse_iso(row["last_run_at"]), created_at=parse_iso(row["created_at"]),
-        updated_at=parse_iso(row["updated_at"]), watch=_watch_of(row, dek))
+        updated_at=parse_iso(row["updated_at"]), watch=_watch_of(row, dek), model=row["model"],
+        model_failures=int(row["model_failures"] or 0),
+        last_error_kind=row["last_error_kind"] or None, last_error_at=parse_iso(row["last_error_at"]),
+        finished_at=parse_iso(row["finished_at"]), finished_reason=_reason_of(row, dek))
+
+
+def _reason_of(row: aiosqlite.Row, dek: bytes) -> str | None:
+    """A finished routine's sealed reason; None when it is not finished."""
+    if not row["finished_at"] or not row["finished_reason"]:
+        return None
+    return decrypt_field(row["finished_reason"], dek, _aad(row["user_id"], "finished_reason"), fallback="") or None
 
 
 def _watch_values(user_id: str, watch: Watch | None, dek: bytes) -> tuple:
@@ -91,14 +103,14 @@ class RoutineStore:
         try:
             async with db_session(self._config) as db:
                 await db.execute(
-                    f"INSERT INTO routines ({_COLUMNS}) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    f"INSERT INTO routines ({_COLUMNS}) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (routine_id, user_id, draft.bot_id, thread.id,
                      encrypt(draft.name, dek, _aad(user_id, "name")),
                      encrypt(draft.instructions, dek, _aad(user_id, "instructions")),
                      encrypt(draft.schedule.model_dump_json(), dek, _aad(user_id, "schedule")),
                      draft.builtin, int(draft.enabled), int(draft.tainted), draft.created_by,
                      iso(next_run) if next_run else None, None, iso(now), iso(now),
-                     *_watch_values(user_id, draft.watch, dek)))
+                     *_watch_values(user_id, draft.watch, dek), draft.model, 0))
                 await db.commit()
         except Exception:
             await self._drop_thread(user_id, thread.id)
@@ -162,9 +174,33 @@ class RoutineStore:
             return None
         now = self._clock()
         next_run = first_run_at(routine_id, current.schedule, now, current.watch) if enabled else None
-        await self._write(user_id, routine_id, "enabled = ?, next_run_at = ?",
+        # Switching a finished routine back on is its Resume: it is no longer finished, so it is never swept.
+        cleared = ", finished_at = NULL, finished_reason = NULL" if enabled else ""
+        await self._write(user_id, routine_id, f"enabled = ?, next_run_at = ?{cleared}",
                           (int(enabled), iso(next_run) if next_run else None), now)
         return await self.get(user_id, routine_id)
+
+    async def finish(self, user_id: str, routine_id: str, reason: str) -> Routine | None:
+        """v48: the bot finished it. Off, no next run, ``finished_at`` now and the reason sealed."""
+        if await self.get(user_id, routine_id) is None:
+            return None
+        dek, now = await get_user_dek(self._config, user_id), self._clock()
+        await self._write(user_id, routine_id, "enabled = 0, next_run_at = NULL, finished_at = ?, finished_reason = ?",
+                          (iso(now), encrypt(reason, dek, _aad(user_id, "finished_reason"))), now)
+        return await self.get(user_id, routine_id)
+
+    async def finished_before(self, user_id: str, cutoff: datetime) -> tuple[Routine, ...]:
+        """The user's routines finished at or before ``cutoff`` and still finished, oldest first."""
+        return await self._select(
+            user_id, "WHERE user_id = ? AND finished_at IS NOT NULL AND finished_at <= ? ORDER BY finished_at, rowid",
+            (user_id, iso(cutoff)))
+
+    async def set_last_error(
+        self, user_id: str, routine_id: str, kind: str | None, at: datetime | None,
+    ) -> None:
+        """Keep a routine's last failure (a ``ROUTINE_ERROR_*`` word and when), or clear it with ``None``."""
+        await self._write(user_id, routine_id, "last_error_kind = ?, last_error_at = ?",
+                          (kind, iso(at) if at is not None and kind is not None else None), self._clock())
 
     async def replan_all(self, user_id: str) -> int:
         """After the install's time zone changed: plan every enabled timed routine of the user again from now, so
@@ -210,8 +246,21 @@ class RoutineStore:
         if "tainted" in patch.changes:
             sets.append("tainted = ?")
             params.append(int(bool(patch.changes["tainted"])))
+        if "model" in patch.changes:
+            sets.append("model = ?, model_failures = 0")
+            params.append(patch.changes["model"])
         if sets:
             await self._write(user_id, routine_id, ", ".join(sets), tuple(params), now)
+        return await self.get(user_id, routine_id)
+
+    async def note_model_run(self, user_id: str, routine_id: str, *, ok: bool) -> Routine | None:
+        """Count a run on the routine's own model: a good run starts the count over, a failed one adds to it."""
+        assignments = "model_failures = 0" if ok else "model_failures = model_failures + 1"
+        async with db_session(self._config) as db:
+            await db.execute(
+                f"UPDATE routines SET {assignments} WHERE id = ? AND user_id = ? AND model IS NOT NULL",
+                (routine_id, user_id))
+            await db.commit()
         return await self.get(user_id, routine_id)
 
     async def delete(self, user_id: str, routine_id: str) -> bool:
@@ -248,5 +297,5 @@ class RoutineStore:
     async def _select(self, user_id: str, where: str, params: tuple) -> tuple[Routine, ...]:
         dek = await get_user_dek(self._config, user_id)
         async with db_session(self._config) as db:
-            rows = await (await db.execute(f"SELECT {_COLUMNS} FROM routines {where}", params)).fetchall()
+            rows = await (await db.execute(f"SELECT {_READ_COLUMNS} FROM routines {where}", params)).fetchall()
         return tuple(_to_routine(row, dek) for row in rows)

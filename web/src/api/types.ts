@@ -285,7 +285,9 @@ export type MessageKind =
   | "stuck" | "card_answer" | "memory_note" | "memory_offer" | "model_suggestion" | "approval" | "approval_result" | "mac_activity" | "reaction"
   | "program_activity"
   | "routine" | "report" | "routine_note" | "routine_proposal" | "question_note" | "skill_proposal"
-  | "instructions_proposal" | "instruction_change" | "fresh_start" | "task_cards" | "english_fix";
+  | "routine_finished" // "Finished routine · name: reason" with Resume · Delete now (owner, 2026-11-11)
+  | "instructions_proposal" | "instruction_change" | "fresh_start" | "task_cards" | "english_fix"
+  | "computer_restart"; // self-healing: "My computer stopped answering, so I restarted it." (role system, plain words)
 
 export interface MessageOut {
   id: string;

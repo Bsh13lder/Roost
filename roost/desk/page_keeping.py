@@ -15,6 +15,10 @@ any retry, and the bot said "My browser didn't answer"; disarming the guards the
   crashed has the browser probed (``browser_answers``); a browser that does not answer, or a page that keeps crashing,
   has the desk restart its computer (``_restart_hung``: Linux only, never while you hold it, once per cooldown) and
   the call runs once more on the fresh browser, its result saying so.
+- **A tab that stops answering counts too** (owner, 2026-11-10): the probe above said bot 1016fb46's browser was
+  fine while every page call timed out for half an hour. So ``DESK_UNANSWERED_STREAK`` failed page calls within
+  ``DESK_UNANSWERED_WINDOW_S`` (``_answer_fails``) are a hung browser as well, through the same restart and
+  cooldown; a call that completes resets the streak, and a restart tells the desk's ``on_healed`` hook once.
 - **Armed guards follow the page.** The armed fence is remembered; a replacement page made while it is armed is
   guarded with the same fence before the call runs on it, and the old guards are let go (``disarm`` never raises on
   a closed connection).
@@ -29,7 +33,9 @@ from typing import Any, Awaitable, Callable, TypeVar
 
 import websockets
 
-from roost.constants import BROWSER_RESTARTED_TEXT, CRASHED_TAB_RECOVERED_TEXT
+from roost.constants import (
+    BROWSER_RESTARTED_TEXT, CRASHED_TAB_RECOVERED_TEXT, DESK_UNANSWERED_STREAK, DESK_UNANSWERED_WINDOW_S,
+)
 from roost.desk import DeskUnavailable, PageText
 from roost.desk.browser import DeskBrowserPage
 from roost.desk.cdp import CdpClientError, CdpReplyError, session_gone
@@ -83,6 +89,8 @@ class PageKeeping:
     _seen_mark: ControlMark
     _connect_page: Callable[[str, str], Awaitable[DeskBrowserPage]]
     _control_mark: Callable[[], ControlMark]
+    _clock: Callable[[], float]              # monotonic seconds
+    _answer_fails: tuple[float, ...]         # when the page calls of the current streak failed
 
     async def _connect_once(self, relay_url: str, token: str) -> DeskBrowserPage:
         """The page, connected by one caller only: whoever comes while it connects gets the same page."""
@@ -114,20 +122,44 @@ class PageKeeping:
         return False
 
     async def _run_on_page(self, call: PageCall[T]) -> T:
-        """``_run_on_page_once``; a browser that stopped answering, or a page that keeps crashing, restarts the
-        computer and the call runs once more on the fresh browser."""
+        """``_run_on_page_once``; a browser that stopped answering (the probe, or a streak of unanswered calls), or
+        a page that keeps crashing, restarts the computer and the call runs once more on the fresh browser."""
         try:
-            return await self._run_on_page_once(call)
-        except (CdpReplyError, PageKeepsCrashing) as exc:
-            if not await self._browser_hung(exc) or not await self._restart_hung():
+            result = await self._run_on_page_once(call)
+        except (CdpReplyError, PageKeepsCrashing, DeskUnavailable) as exc:
+            hung = await self._browser_hung(exc) or self._streak_hung()
+            if not hung:
                 raise
-        return with_notice(await self._run_on_page_once(call), BROWSER_RESTARTED_TEXT)
+            if not await self._restart_hung():
+                self._answer_fails = ()     # refused (cooldown, held, Mac Brave): a later streak starts from zero
+                raise
+        else:
+            self._answer_fails = ()
+            return result
+        self._answer_fails = ()
+        try:
+            result = await self._run_on_page_once(call)
+        except (CdpReplyError, PageKeepsCrashing, DeskUnavailable):
+            self._note_unanswered()
+            raise
+        return with_notice(result, BROWSER_RESTARTED_TEXT)
 
     async def _browser_hung(self, exc: BaseException) -> bool:
+        self._note_unanswered()
         if isinstance(exc, PageKeepsCrashing):
             return True
         probe = getattr(self._page, "browser_answers", None)     # a page stand-in without the probe is taken as alive
         return probe is not None and not await probe()
+
+    def _note_unanswered(self) -> None:
+        """One more page call that failed, kept with the others still inside the window."""
+        now = self._clock()
+        recent = tuple(at for at in self._answer_fails if now - at <= DESK_UNANSWERED_WINDOW_S)
+        self._answer_fails = (*recent, now)
+
+    def _streak_hung(self) -> bool:
+        """The browser counts as hung once ``DESK_UNANSWERED_STREAK`` calls failed within the window."""
+        return len(self._answer_fails) >= DESK_UNANSWERED_STREAK
 
     async def _run_on_page_once(self, call: PageCall[T]) -> T:
         """Run ``call`` on the bot's page; a dead connection, or a tab session still gone after one re-attach, gets

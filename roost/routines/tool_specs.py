@@ -9,7 +9,8 @@ proposal is flagged ``allowed_when_tainted`` (the card is marked) and ``no_ask``
 from __future__ import annotations
 
 from roost.constants import (
-    ROUTINE_INSTRUCTIONS_MAX, ROUTINE_NAME_MAX, WATCH_EVERY_MAX_MINUTES, WATCH_EVERY_MIN_MINUTES,
+    ROUTINE_FINISHED_KEEP_DAYS, ROUTINE_FINISHED_REASON_MAX, ROUTINE_INSTRUCTIONS_MAX, ROUTINE_NAME_MAX,
+    WATCH_EVERY_MAX_MINUTES, WATCH_EVERY_MIN_MINUTES,
 )
 from roost.llm.types import ToolSpec
 from roost.routines.direct_texts import TAINTED_TEXT
@@ -89,6 +90,15 @@ _ROUTINE_ID = {"routine_id": {"type": "string", "description": "The routine's id
 _DIRECT_NOTE = (" Only when the user asked for it in their own message to you; elsewhere it is refused and you "
                 "use the propose tools.")
 
+# A routine's own model (owner, 2026-11-09): leave it out to run on your own model. Pick a cheaper one only for a
+# simple, repeated job, and say why in your reply; the user changes it in one tap, and two failed runs in a row on it
+# go back to your model.
+_MODEL_PROPERTY: dict = {
+    "type": "string", "enum": ["same", "haiku", "sonnet", "opus", "fable"],
+    "description": ("The model this routine runs on. Leave it out (or 'same') for your own model. Pick 'haiku' or "
+                    "'sonnet' only for a simple, repeated check, and tell the user which and why."),
+}
+
 CREATE_ROUTINE_SPEC = ToolSpec(
     name="create_routine",
     description=("Create a routine for yourself when the user asked for one: it runs on its schedule from now on. "
@@ -99,6 +109,7 @@ CREATE_ROUTINE_SPEC = ToolSpec(
                          "description": f"What to do each time, up to {ROUTINE_INSTRUCTIONS_MAX} characters."},
         "schedule": _SCHEDULE_PROPERTY,
         "watch": _WATCH_PROPERTY,
+        "model": _MODEL_PROPERTY,
     }, "required": ["name", "instructions", "schedule"]},
 )
 
@@ -108,7 +119,7 @@ UPDATE_ROUTINE_SPEC = ToolSpec(
                  + _DIRECT_NOTE),
     input_schema={"type": "object", "properties": {
         **_ROUTINE_ID, "name": {"type": "string"}, "instructions": {"type": "string"},
-        "schedule": _SCHEDULE_PROPERTY, "watch": _WATCH_PROPERTY,
+        "schedule": _SCHEDULE_PROPERTY, "watch": _WATCH_PROPERTY, "model": _MODEL_PROPERTY,
     }, "required": ["routine_id"]},
 )
 
@@ -121,6 +132,22 @@ def _by_id(name: str, what: str) -> ToolSpec:
 PAUSE_ROUTINE_SPEC = _by_id("pause_routine", "Pause one of your routines as the user asked.")
 RESUME_ROUTINE_SPEC = _by_id("resume_routine", "Switch one of your paused routines back on as the user asked.")
 DELETE_ROUTINE_SPEC = _by_id("delete_routine", "Delete one of your routines and its history as the user asked.")
+
+
+# Finishing (owner, 2026-11-11): only in a routine's own run, only for that routine; it reduces what runs, so a
+# tainted change run may call it and no Ask card stands in front of it. Outside a routine run the handler refuses.
+FINISH_ROUTINE = "finish_routine"
+FINISH_ROUTINE_SPEC = ToolSpec(
+    name=FINISH_ROUTINE,
+    description=("Only inside a routine's own run: end this routine because its purpose is complete (what it "
+                 "waited for happened, or its one-off job is done). It is paused and deleted after "
+                 f"{ROUTINE_FINISHED_KEEP_DAYS} days unless the user resumes it. Never for a run that merely found "
+                 "nothing new."),
+    input_schema={"type": "object", "properties": {
+        "reason": {"type": "string",
+                   "description": f"Why it is done, in one short line (up to {ROUTINE_FINISHED_REASON_MAX} characters)."},
+    }, "required": ["reason"]},
+)
 
 
 def _direct(spec: ToolSpec, kind) -> ToolDef:
@@ -141,5 +168,6 @@ ROUTINE_TOOL_DEFS: tuple[ToolDef, ...] = (
     ToolDef(PROPOSE_ROUTINE_SPEC, "write_create", allowed_when_tainted=True, no_ask=True),
     ToolDef(PROPOSE_ROUTINE_CHANGE_SPEC, "write_change", allowed_when_tainted=True, no_ask=True),
     ToolDef(PROPOSE_ROUTINE_PAUSE_SPEC, "write_change", allowed_when_tainted=True, no_ask=True),
+    ToolDef(FINISH_ROUTINE_SPEC, "write_change", allowed_when_tainted=True, no_ask=True),
     *DIRECT_ROUTINE_TOOL_DEFS,
 )

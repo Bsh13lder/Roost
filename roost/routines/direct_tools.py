@@ -22,6 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from roost.approvals.models import PendingCall
 from roost.constants import ROUTINE_INSTRUCTIONS_MAX, ROUTINE_NAME_MAX
+from roost.llm.registry import model_label
 from roost.records.tool_text import ToolText
 from roost.routines.direct_texts import (
     ACTIVITY, BAD_ARGS_TEXT, CARD_VERBS, CHANGED_TEXT, CREATED_TEXT, DELETED_TEXT, NOT_HERE_TEXT, NOT_YOURS_TEXT,
@@ -29,7 +30,7 @@ from roost.routines.direct_texts import (
 )
 from roost.routines.models import Routine
 from roost.routines.schedule import ScheduleRefused, parse_schedule, readable, slot_for
-from roost.routines.service import NoSuchBot, NoSuchRoutine, Refused, RoutineService
+from roost.routines.service import NoSuchBot, NoSuchRoutine, Refused, RoutineService, routine_model
 from roost.routines.store import RoutineStore
 from roost.routines.runs import utc_now
 from roost.routines.watch_models import WatchRefused, parse_watch, watch_words
@@ -44,12 +45,16 @@ _TOPIC = "routines"
 OwnerTexts = Callable[[str, str], Awaitable[tuple[str, ...]]]   # (user_id, thread_id) -> your own messages there
 
 
+MODEL_ARG_MAX = 64
+
+
 class CreateArgs(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: ToolText = Field(min_length=1, max_length=ROUTINE_NAME_MAX)
     instructions: ToolText = Field(min_length=1, max_length=ROUTINE_INSTRUCTIONS_MAX)
     schedule: dict[str, Any]
     watch: dict[str, Any] | None = None
+    model: str | None = Field(default=None, max_length=MODEL_ARG_MAX)
 
 
 class UpdateArgs(BaseModel):
@@ -59,6 +64,7 @@ class UpdateArgs(BaseModel):
     instructions: ToolText | None = Field(default=None, min_length=1, max_length=ROUTINE_INSTRUCTIONS_MAX)
     schedule: dict[str, Any] | None = None
     watch: dict[str, Any] | None = None
+    model: str | None = Field(default=None, max_length=MODEL_ARG_MAX)
 
 
 class IdArgs(BaseModel):
@@ -195,7 +201,7 @@ class RoutineWrites:
     async def _create(self, args: CreateArgs, ctx: RecordContext) -> ToolOutcome:
         routine = await self._service.create(
             ctx.user_id, ctx.bot_id, args.name, args.instructions, args.schedule, created_by="bot", tainted=False,
-            watch=args.watch)
+            watch=args.watch, model=args.model)
         return ToolOutcome(CREATED_TEXT.format(name=_esc(routine.name), next=_next_words(routine)), created=True)
 
     async def _change(self, name: str, args: BaseModel, routine: Routine, ctx: RecordContext) -> ToolOutcome:
@@ -218,7 +224,16 @@ def _detail(stored: dict[str, Any]) -> str:
     found = parse_watch(raw) if isinstance(raw, dict) else None
     line = (f"Only runs when the page changes: {found.url} ({found.part or 'the whole page'}), checked every "
             f"{found.every_min} min.") if found is not None else ""
-    return "\n\n".join(part for part in (text, line) if part)
+    return "\n\n".join(part for part in (text, line, _model_line(stored.get("model"))) if part)
+
+
+def _model_line(value: object) -> str:
+    """The card's model line: "Runs on Haiku 5.5." for a routine with its own model, "" for the bot's."""
+    try:
+        chosen = routine_model(value)
+    except Refused:
+        return ""
+    return f"Runs on {model_label(chosen)}." if chosen is not None else ""
 
 
 def _next_words(routine: Routine) -> str:

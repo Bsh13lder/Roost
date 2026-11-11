@@ -71,6 +71,7 @@ from roost.talk.plain_address import plain_address
 from roost.talk.server_error import reload_on_server_error
 from roost.talk.stuck_check import AskForHelpArgs, Fetch, check_page
 from roost.talk.tool_catalog import CATALOG
+from roost.talk.tool_groups import COMPUTER_GROUP, LOAD_TOOLS, group_of, load_tools_result, parse_groups
 from roost.talk.team_tools import TeamTools
 from roost.timezones import local_tz
 
@@ -172,8 +173,10 @@ class ToolRunner:
         screen: ScreenKit | None = None,
         user_started: bool = False, steer: RunSteer | None = None, run_steps: RunSteps | None = None,
         site_fresh: bool = False, owner: OwnerSource | None = None, check_model: str | None = None,
-        own_sites: frozenset[str] = frozenset(),
+        own_sites: frozenset[str] = frozenset(), groups: frozenset[str] | None = None,
     ) -> None:
+        self._groups = groups   # tool groups (owner, 2026-11-09): the run's loaded groups; None offers every tool
+        self._used_groups: frozenset[str] = frozenset()   # the groups of the tools this run called (§4: preload)
         self._own_sites = own_sites   # sites the gate let this run open itself, or a card's continue item carried
         self._check_model = check_model   # the bot's own model: the gate's model checks run on it (owner, 2026-11-03)
         self._owner = owner   # the create check reads your newest own messages here (None: no check, refused)
@@ -221,6 +224,21 @@ class ToolRunner:
     @property
     def tainted(self) -> bool:
         return self._tainted
+
+    @property
+    def loaded_groups(self) -> frozenset[str] | None:
+        """The tool groups this run has loaded so far; ``None`` when the run is offered every tool."""
+        return self._groups
+
+    def load_groups(self, groups: frozenset[str]) -> None:
+        """Groups stay loaded for the rest of the run."""
+        if self._groups is not None:
+            self._groups = self._groups | groups
+
+    @property
+    def used_groups(self) -> frozenset[str]:
+        """The groups of the tools this run called (a core tool is in none): the thread's next run starts with them."""
+        return self._used_groups
 
     @tainted.setter
     def tainted(self, value: bool) -> None:
@@ -310,6 +328,9 @@ class ToolRunner:
         return text
 
     async def _run_call(self, call: ToolCallRequested) -> str:
+        group = group_of(call.name)
+        if group is not None:
+            self._used_groups = self._used_groups | {group}
         if self.block is not None:
             return STUCK_NOT_PERFORMED_TEXT   # R1: the turn stops after this step, and nothing more runs in it
         if self.parked is not None:
@@ -426,10 +447,16 @@ class ToolRunner:
         if call.name == "get_time":
             await self._announce("checking the time")
             return datetime.now(local_tz()).isoformat()
+        if call.name == LOAD_TOOLS:
+            groups, unknown = parse_groups(call.arguments)
+            self.load_groups(groups)
+            return load_tools_result(self._allowed, groups, unknown=unknown)
         if call.name in ("open_page", "read_page"):
             refusal = await self._hands_refusal()
             if refusal is not None:
                 return refusal
+            if call.name == "open_page":
+                self.load_groups(frozenset({COMPUTER_GROUP}))   # a page opened: looking and clicking come next
             return await (self._open_page(call.arguments) if call.name == "open_page" else self._read_page())
         if call.name == "web_search":
             return await self._hands_refusal() or await self._web_search(call.arguments)

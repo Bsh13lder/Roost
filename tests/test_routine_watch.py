@@ -3,6 +3,7 @@ the watched part changed (owner, 2026-11-04)."""
 
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
@@ -20,13 +21,14 @@ from roost.events.hub import EventHub
 from roost.gateway.auth import register_user
 from roost.routines.hooks import RoutineHooks
 from roost.routines.launcher import RoutineLauncher
-from roost.routines.models import RoutineDraft
+from roost.routines.models import RoutineDraft, RoutinePatch
 from roost.routines.runs import RoutineRunStore
 from roost.routines.schedule import parse_schedule
 from roost.routines.store import RoutineStore
 from roost.routines.watch import WatchChecker
 from roost.routines.watch_models import Watch
 from roost.routines.watch_store import WatchStore
+from roost.routines.watch_texts import MISSING_NOTE
 from roost.talk.runner import TurnRunner
 from roost.talk.store import TalkStore
 from roost.work.models import WorkKind
@@ -212,7 +214,8 @@ async def test_no_free_computer_skips_the_check_quietly(cfg, user_id, rig):
     desk.force_busy = True
     await rig.check(user_id, routine)
     assert desk.open_page_calls == [] and await rig.notes(user_id, routine.id) == []
-    assert await rig.snaps.get(user_id, routine.id) is None
+    snap = await rig.snaps.get(user_id, routine.id)
+    assert snap.fingerprint is None and snap.fail_count == 1      # no baseline; the skip is counted (2026-11-10)
 
 
 async def test_a_watch_check_is_no_run_of_the_day(cfg, user_id, rig):
@@ -247,13 +250,42 @@ async def test_your_message_is_never_batched_with_a_check(cfg, user_id, rig):
     assert (await rig.snaps.get(user_id, routine.id)) is not None
 
 
-async def test_a_page_part_not_found_falls_back_to_the_whole_page(cfg, user_id, rig):
+async def _chat_notes(rig: Rig, user_id: str, bot) -> list[dict]:
+    thread, _ = await rig.talk.ensure_main_thread(user_id, bot.id)
+    return [json.loads(m.body) for m in await rig.talk.list_messages(user_id, thread.id) if m.kind == "routine_note"]
+
+
+async def test_a_page_part_not_found_never_watches_the_whole_page(cfg, user_id, rig, clock):
+    """Owner, 2026-11-09 (token savings): a part that isn't on the page used to fall back to the whole page, so any
+    chat's news started a model run. Now the check stays quiet, and the chat says once to name it as the page does."""
     bot = await _linux_bot(cfg, user_id)
     routine = await _watching(rig, user_id, bot, part="the price box")
     rig.desks.for_bot(bot.id, "linux").serve_screen(_chat_screen())
     await rig.check(user_id, routine)
+    clock.now += timedelta(minutes=5)
+    rig.desks.for_bot(bot.id, "linux").serve_screen(_chat_screen("Francis: new message"))
+    await rig.check(user_id, routine)
+
+    assert rig.model.requests == []
     snap = await rig.snaps.get(user_id, routine.id)
-    assert "Mum" in snap.snapshot and "Francis" in snap.snapshot
+    assert not snap.fingerprint and not snap.snapshot
+    notes = [n for n in await _chat_notes(rig, user_id, bot) if n["verb"] == "watch_missing"]
+    assert len(notes) == 1 and "the price box" in notes[0]["text"]
+    assert [note for _, note in await rig.notes(user_id, routine.id)] == [MISSING_NOTE]
+
+
+async def test_a_part_found_again_starts_a_fresh_baseline(cfg, user_id, rig, clock):
+    bot = await _linux_bot(cfg, user_id)
+    routine = await _watching(rig, user_id, bot, part="the price box")
+    desk = rig.desks.for_bot(bot.id, "linux")
+    desk.serve_screen(_chat_screen())
+    await rig.check(user_id, routine)
+    routine = await rig.routines.update(user_id, routine.id, RoutinePatch(
+        {"watch": Watch(url=CHATS_URL, part="Francis Dentist", every_min=5)}))
+    clock.now += timedelta(minutes=5)
+    await rig.check(user_id, routine)
+    assert rig.model.requests == []
+    assert (await rig.snaps.get(user_id, routine.id)).fingerprint
 
 
 async def test_the_scheduler_queues_a_check_every_interval_and_never_a_model_run(cfg, user_id, rig, clock):

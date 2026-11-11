@@ -58,6 +58,13 @@ _SQL_NAME = {"estimate_minutes": "estimate"}   # a patch names the field, the ta
 _TEXT = frozenset({"title", "description", "category"})
 _ORDER = ("CASE priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, "
           "due_date IS NULL, due_date, created_at DESC")
+# Owner, 2026-11-11: closed tasks come last done first, after the open ones (by priority, then due).
+_CLOSED_LAST = "status NOT IN ('todo','in_progress')"
+_CLOSED_ORDER = "COALESCE(completed_at, updated_at) DESC, created_at DESC"
+_ORDERS = {
+    "open": _ORDER, "done": _CLOSED_ORDER, "failed": _CLOSED_ORDER,
+    "all": f"{_CLOSED_LAST}, CASE WHEN {_CLOSED_LAST} THEN COALESCE(completed_at, updated_at) END DESC, {_ORDER}",
+}
 _OPEN_STATUSES = ("todo", "in_progress")
 _OPEN_SQL = " AND status IN ('todo','in_progress')"
 _FILTERS = {"open": _OPEN_SQL, "done": " AND status = 'done'", "failed": " AND status = 'failed'", "all": ""}
@@ -236,7 +243,7 @@ class TaskStore:
         if no_project:
             project_sql, params = _NO_PROJECT_SQL, (user_id,)
         return await self._select(
-            user_id, f"WHERE user_id = ? AND deleted_at IS NULL{_FILTERS[status]}{project_sql} ORDER BY {_ORDER}",
+            user_id, f"WHERE user_id = ? AND deleted_at IS NULL{_FILTERS[status]}{project_sql} ORDER BY {_ORDERS[status]}",
             params,
         )
 

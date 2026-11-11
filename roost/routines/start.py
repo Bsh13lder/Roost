@@ -25,6 +25,7 @@ def build_scheduler(state) -> RoutineScheduler:
         state.config, clock=utc_now, launcher=launcher, runs=runs, routines=routines, turns=state.turns,
         bots=state.bots, waiting=waiting, hooks=state.routine_hooks,
         jobs=jobs_for(state), watch=getattr(state, "watch_checker", None),
+        finished=state.routines.sweep_finished,
     )
 
 

@@ -208,6 +208,7 @@ class RoomHooks:
     busy: Callable[[], frozenset[str]] = frozenset
     on_wait: Callable[[str], Awaitable[None]] = _no_wait_line
     control_mark: Callable[[str], ControlMark] = _never_held   # Take control / Give it back, per bot
+    on_healed: Callable[[str], Awaitable[None]] = _no_wait_line   # one chat line after a hung browser's restart
 
 
 class DeskFactory:
@@ -254,6 +255,7 @@ class DeskFactory:
                 on_wait=lambda: self.room_hooks.on_wait(bot_id),
                 control_mark=lambda: self.room_hooks.control_mark(bot_id),
                 on_fresh=lambda: self.boot_hook(bot_id),
+                on_healed=lambda: self.room_hooks.on_healed(bot_id),
             )
 
         self._desks = {**self._desks, key: desk}

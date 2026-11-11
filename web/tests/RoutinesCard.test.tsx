@@ -112,4 +112,13 @@ describe("RoutinesCard", () => {
     await userEvent.click(await screen.findByRole("menuitem", { name: "History" }));
     expect(await screen.findByRole("link", { name: "See the Report" })).toBeInTheDocument();
   });
+
+  it("history leads with the routine's last error and its time (self-healing, 2026-11-10)", async () => {
+    api.listRoutines.mockResolvedValue([routine({ last_error: { kind: "no_answer", at: "2026-10-20T10:40:00Z" } })]);
+    view();
+    await userEvent.click(await screen.findByRole("button", { name: "More for Morning digest" }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: "History" }));
+    const sheet = await screen.findByRole("dialog");
+    expect(await within(sheet).findByRole("status")).toHaveTextContent(/^Couldn't check \(computer didn't answer\) · .*12:40$/);
+  });
 });

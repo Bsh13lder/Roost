@@ -15,6 +15,19 @@ String appShort(String iso) {
   }
 }
 
+/// "12:40" when [iso] is today on the account's clock, else "22 Oct, 12:40"
+/// (the web's zoneClock); empty text if unreadable.
+String appClockOrShort(String iso, {DateTime? now}) {
+  if (iso.isEmpty) return '';
+  try {
+    final moment = parseServerTime(iso);
+    final today = appDay(now ?? DateTime.now().toUtc()) == appDay(moment);
+    return today ? appClock(iso) : appShort(iso);
+  } on FormatException {
+    return '';
+  }
+}
+
 /// A decision memory is stored as {"q","a"} JSON, or "question Decision: answer".
 ({String question, String answer})? parseDecision(String text) {
   final t = text.trim();

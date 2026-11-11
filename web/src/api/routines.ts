@@ -36,6 +36,22 @@ export interface RoutineOut {
   last_run_at: string | null;
   last_state: RunState | null;
   watch?: WatchOut | null; // next_run_at is then the next check
+  model?: string | null; // its own model id; null: the bot's (owner, 2026-11-09)
+  last_error?: LastErrorOut | null; // v47: the last failure, cleared by the next good check or finished run
+  finished?: FinishedOut | null; // v48: the bot finished it in its own run; deleted on delete_at unless resumed
+}
+
+// A finished routine (owner, 2026-11-11): when, the bot's short reason, and when the server deletes it.
+export interface FinishedOut {
+  at: string;
+  reason: string;
+  delete_at: string;
+}
+
+// A routine's last error: a fixed word (the server's ROUTINE_ERROR_*) and when, shown in its History.
+export interface LastErrorOut {
+  kind: string;
+  at: string;
 }
 
 export interface RoutineRunOut {
@@ -55,6 +71,7 @@ export interface RoutineDraftIn {
   schedule: ScheduleIn;
   enabled?: boolean;
   watch?: WatchIn | null;
+  model?: string | null; // null: the bot's own model
 }
 
 export interface SchedulePreview {
@@ -71,6 +88,8 @@ export const createRoutine = (botId: string, draft: RoutineDraftIn) =>
 export const patchRoutine = (id: string, changes: Partial<RoutineDraftIn>) =>
   apiRequest<RoutineOut>("PATCH", routinePath(id), changes);
 export const deleteRoutine = (id: string) => apiRequest<void>("DELETE", routinePath(id));
+// Resume on a "Finished routine" line: no longer finished, on again and planned from now.
+export const resumeRoutine = (id: string) => apiRequest<RoutineOut>("POST", `${routinePath(id)}/resume`);
 export const runRoutineNow = (id: string) => apiRequest<{ run: RoutineRunOut }>("POST", `${routinePath(id)}/run-now`);
 export const listRuns = (id: string, before?: string) =>
   apiRequest<{ runs: RoutineRunOut[] }>("GET", `${routinePath(id)}/runs${before ? `?before=${encodeURIComponent(before)}` : ""}`)

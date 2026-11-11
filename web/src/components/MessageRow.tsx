@@ -19,6 +19,7 @@ import { ProjectText } from "./chat/ProjectText";
 import { TaskCards } from "./chat/TaskCards";
 import { WebMark } from "./chat/WebMark";
 import { RoutineNoteLine } from "./chat/RoutineNoteLine";
+import { RoutineFinishedRow } from "./chat/RoutineFinishedRow";
 import { ReplyQuote } from "./chat/ReplyQuote";
 import { MessageActions } from "./chat/MessageActions";
 import { PlainText } from "./chat/PlainText";
@@ -217,6 +218,7 @@ export function MessageRow({
   if (kind === "program_activity") return <ProgramActivityRow message={message} />;
   if (kind === "instruction_change") return <InstructionChangeRow message={message} />;
   if (kind === "routine_note" || kind === "question_note") return <RoutineNoteLine message={message} />;
+  if (kind === "routine_finished") return <RoutineFinishedRow message={message} />;
   if (kind === "handoff" || message.role === "activity" || message.role === "system") {
     return <QuietRow message={message} kind={kind} />;
   }

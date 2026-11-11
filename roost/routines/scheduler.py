@@ -55,6 +55,7 @@ logger = logging.getLogger(__name__)
 _ONE_SECOND = timedelta(seconds=1)
 
 WaitingCheck = Callable[[str, str], Awaitable[bool]]
+FinishedSweep = Callable[[str, datetime], Awaitable[int]]   # (user_id, now) -> finished routines deleted
 
 
 class _Turns:
@@ -70,7 +71,9 @@ class RoutineScheduler:
         self, config: RoostConfig, *, clock: Clock, launcher: RoutineLauncher, runs: RoutineRunStore,
         routines: RoutineStore, turns: _Turns, bots: BotStore, usage=None, jobs: Sequence[Job] = (),
         waiting: WaitingCheck | None = None, hooks: RoutineHooks | None = None, watch: WatchChecker | None = None,
+        finished: FinishedSweep | None = None,
     ) -> None:
+        self._finished = finished   # None: finished routines are never swept (RoutineService.sweep_finished)
         self._watch = watch     # None: a watching routine's checks are planned but never queued
         self._config = config
         self._clock = clock
@@ -108,6 +111,8 @@ class RoutineScheduler:
         try:
             if self._hooks is not None:
                 await self._hooks.sweep_asks(user_id, self._clock())   # a card past its deadline is a no
+            if self._finished is not None:
+                await self._finished(user_id, self._clock())   # a routine finished a week ago goes away
             fired = await self._fire_due(user_id, remaining)
             await self._reconcile(user_id)
             await self._run_jobs(user_id)

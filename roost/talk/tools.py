@@ -61,6 +61,7 @@ HELPER_DENIED = frozenset({
     "update_my_instructions",        # A2: nor changes them
     "request_connector",   # a card for the user is the bot's to raise, never a helper's
     "install_app", "remove_app",   # Install an app: only the bot itself asks, never a helper
+    "load_tools",   # tool groups: a helper is offered its read tools whole
 })
 
 

@@ -129,3 +129,29 @@ async def test_retiring_the_creating_bot_keeps_the_task(cfg, store, user_id):
     await BotStore(cfg).delete(user_id, bot.id)
     kept = await store.get(user_id, task.id)
     assert (kept.created_by_bot, kept.tainted) == (None, True)
+
+
+async def _closed(cfg, store, user_id, title: str, priority: str, completed_at: str) -> str:
+    task = await store.create(user_id, TaskDraft(title=title, priority=priority), created_by_bot=None, tainted=False)
+    await store.complete(user_id, task.id)
+    async with db_session(cfg) as db:
+        await db.execute("UPDATE tasks SET completed_at = ? WHERE id = ?", (completed_at, task.id))
+        await db.commit()
+    return task.id
+
+
+async def test_done_tasks_come_last_done_first(cfg, store, user_id):
+    """Owner, 2026-11-11: done tasks by priority made their dates impossible to follow."""
+    await _closed(cfg, store, user_id, "old urgent", "urgent", "2026-06-26T10:00:00+00:00")
+    await _closed(cfg, store, user_id, "yesterday", "low", "2026-11-10T10:00:00+00:00")
+    await _closed(cfg, store, user_id, "last week", "high", "2026-11-03T10:00:00+00:00")
+    assert [t.title for t in await store.list(user_id, status="done")] == ["yesterday", "last week", "old urgent"]
+
+
+async def test_all_tasks_are_open_ones_by_priority_then_closed_ones_last_done_first(cfg, store, user_id):
+    await _closed(cfg, store, user_id, "old urgent", "urgent", "2026-06-26T10:00:00+00:00")
+    await _closed(cfg, store, user_id, "yesterday", "low", "2026-11-10T10:00:00+00:00")
+    for title, priority in (("open low", "low"), ("open high", "high")):
+        await store.create(user_id, TaskDraft(title=title, priority=priority), created_by_bot=None, tainted=False)
+    assert [t.title for t in await store.list(user_id, status="all")] == [
+        "open high", "open low", "yesterday", "old urgent"]

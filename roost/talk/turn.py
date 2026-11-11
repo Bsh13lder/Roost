@@ -26,7 +26,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, replace
 from collections.abc import Awaitable, Sequence
-from typing import Callable, Mapping
+from typing import Any, Callable, Mapping
 from uuid import uuid4
 
 from roost.approvals.models import ApprovalState, PendingCall
@@ -41,7 +41,7 @@ from roost.desk.control import ControlLock
 from roost.desk.stuck import Block
 from roost.events.hub import EventHub
 from roost.helpers.tools import HelperTools
-from roost.llm.registry import model_label, resolve_bot_model, resolve_call_model
+from roost.llm.registry import model_label, resolve_bot_model, resolve_call_model, resolve_routine_model
 from roost.mac.models import FolderLine
 from roost.money.models import Project
 from roost.models_check.store import SeenModelStore
@@ -74,6 +74,9 @@ from roost.talk.tool_runner import InflightRecorder, ToolRunner
 from roost.talk.tool_runner import wrap_page as _wrap_page  # noqa: F401 — tests/test_claude_sdk_options.py imports it from here
 from roost.talk.fresh_start import last_fresh_start
 from roost.talk.tools import tool_specs_for
+from roost.talk.run_groups import RECENT_MESSAGES, start_groups
+from roost.talk.run_request import offered_specs, request_turns, system_for
+from roost.talk.tool_groups import COMPUTER_GROUP, index_text
 from roost.work.models import WorkItem, WorkKind
 
 _STEP_LIMIT_TEXT = "I hit my step limit — say continue."
@@ -118,6 +121,7 @@ class RunInputs:
     routine_sites: tuple[str, ...] = ()   # a routine run: sites it names that its bot opened from your own chat
     chat_thread: bool = False   # the run's thread is a bot's 1:1 chat (never a routine's run log)
     pictures: tuple[ImagePart, ...] = ()   # chat pictures (owner, 2026-11-05): the ones on your claimed messages
+    recent_groups: tuple[frozenset[str], ...] = ()   # the tool groups this thread's last runs used (§4: start loaded)
 
 
 @dataclass(frozen=True)
@@ -132,6 +136,7 @@ class TurnResult:
     plan: tuple[PendingCall, ...] = ()   # Review first: the steps this run collected for one Proposal card
     wall: Block | None = None   # a block met in a run that may not open a Stuck card (a routine): loud result only
     stopped: bool = False   # you pressed Stop: the run ended at a boundary and kept what it said
+    used_groups: frozenset[str] = frozenset()   # the tool groups this run called tools from (§4: the next run's preload)
 
 
 EMPTY_RESULT = TurnResult(reply="", tainted=False, capped=False)
@@ -538,6 +543,11 @@ class _Prepared:
     memory_tainted: bool = False
     spoken: bool = False   # a voice call's run of the user's own message: the voice rule and the call model
     pictures: tuple[ImagePart, ...] = ()   # your attached pictures, shown with every step of the run
+    groups: frozenset[str] | None = None   # tool groups loaded at the start (None: every tool is offered)
+    routine_model: str | None = None   # a routine run's own model (owner, 2026-11-09); None: the bot's
+    # §4: the system prompt with a Linux bot's screen prose, for the steps after the computer group loads mid-run
+    # (None: ``system`` already holds it, or the bot has no screen).
+    screen_system: str | None = None
 
 
 def _fresh_user_texts(history: "_History") -> tuple[str, ...]:
@@ -593,21 +603,38 @@ async def _prepare(
     # Skills: only clean skills are named (marked ones are counted), so the index adds no taint either.
     skills = (skills_section(await inputs.skills.on_for_bot(user_id, bot.id), query=_newest_user_text(history))
               if inputs.skills is not None else None)
-    system = build_instructions(
-        bot, origins=_origins(inputs.items), interrupted=_interrupted(inputs.items), teammates=teammates,
-        outside_content=outside, room=inputs.room, can_create=can_create,
+    tools = tool_specs_for(bot, team=team is not None, in_room=inputs.room is not None, user_started=started)
+    recent = tuple(message.body for message in history.messages[-RECENT_MESSAGES:])
+    groups = start_groups(inputs.items, recent, stuck_reply=inputs.stuck_reply is not None,
+                          recent_groups=inputs.recent_groups)
+    system, screen_system = _systems(
+        bot, groups, inputs, origins=_origins(inputs.items), interrupted=_interrupted(inputs.items),
+        teammates=teammates, outside_content=outside, room=inputs.room, can_create=can_create,
         memory=section.text if section is not None else None, mac_folders=inputs.mac_folders,
         approval=bot.approval if inputs.approval is not None else None, site_logins=logins,
         routine=inputs.routine_section.text if inputs.routine_section is not None else None, plan=plan_text,
         skills=skills.text if skills is not None else None,
         projects=await _projects_section(user_id, inputs, history), spoken=spoken, stuck_reply=inputs.stuck_reply,
+        tools_index=index_text(tools, groups) if groups is not None else None,
     )
-    tools = tool_specs_for(bot, team=team is not None, in_room=inputs.room is not None, user_started=started)
+    return _Prepared(system, tools, team, outside,
+                     memory_tainted=(section is not None and section.tainted) or (
+                         inputs.routine_section is not None and inputs.routine_section.tainted), spoken=spoken,
+                     pictures=inputs.pictures, groups=groups,
+                     routine_model=inputs.routine_section.model if inputs.routine_section is not None else None,
+                     screen_system=screen_system)
+
+
+def _systems(bot: Bot, groups: frozenset[str] | None, inputs: RunInputs, **sections: Any) -> tuple[str, str | None]:
+    """The run's system prompt, and (§4) the one with the screen prose for when the computer group loads mid-run.
+    With groups off, or the computer group loaded from the start, the first already holds the prose."""
+    prose_now = groups is None or COMPUTER_GROUP in groups
+    system = build_instructions(bot, screen_prose=prose_now, **sections)
+    later = None if prose_now else build_instructions(bot, screen_prose=True, **sections)
     if inputs.pictures:
         system = f"{system}\n\n{PICTURES_PROMPT_LINE}"
-    return _Prepared(system, tools, team, outside, memory_tainted=(section is not None and section.tainted) or (
-        inputs.routine_section is not None and inputs.routine_section.tainted), spoken=spoken,
-        pictures=inputs.pictures)
+        later = f"{later}\n\n{PICTURES_PROMPT_LINE}" if later is not None else None
+    return system, None if later == system else later
 
 
 async def run_turn(
@@ -647,7 +674,7 @@ async def run_turn(
         from_routine=_routine_run(inputs), run_id=inputs.run_id, screen=inputs.screen,
         user_started=_user_chat(inputs), steer=inputs.steer, run_steps=run_steps, site_fresh=_site_fresh(inputs),
         owner=gate.owner_source(user_id, thread_id), check_model=resolve_bot_model(bot.model_override, seen_ids),
-        own_sites=carried_sites(inputs.items),
+        own_sites=carried_sites(inputs.items), groups=prepared.groups,
     )
     try:
         return await _run_steps(
@@ -658,6 +685,20 @@ async def run_turn(
     finally:
         await tool_runner.close_screen()   # C3: the lease and the browser guards never outlive the run
         await run_steps.finish()
+
+
+def _request_for(prepared: "_Prepared", tool_runner: ToolRunner, history: "_History", *, model_id: str, bot: Bot,
+                 pictures: tuple[ImagePart, ...]) -> Callable[[tuple[ChatTurn, ...]], ModelRequest]:
+    """Each step's request (``roost/talk/run_request.py``): the tools and system prompt for the groups loaded so
+    far, and the chat's turns before the run's own steps with their old results folded."""
+    def request(added: tuple[ChatTurn, ...]) -> ModelRequest:
+        loaded = tool_runner.loaded_groups
+        return ModelRequest(
+            system=system_for(prepared.system, prepared.screen_system, loaded),
+            turns=request_turns(history.turns, added), tools=offered_specs(prepared.tools, loaded),
+            model=model_id, agent=bot.name, effort=bot.effort, images=pictures,
+        )
+    return request
 
 
 async def _run_steps(
@@ -675,15 +716,12 @@ async def _run_steps(
 
     try:
         model_id = (resolve_call_model(bot.model_override, seen_ids) if prepared.spoken
-                    else resolve_bot_model(bot.model_override, seen_ids))
+                    else resolve_routine_model(prepared.routine_model, bot.model_override, seen_ids))
         # Your pictures ride right after the chat's turns, before the run's own steps (a stable prompt prefix).
         pictures = tuple(replace(p, after_turn=len(history.turns) - 1) for p in prepared.pictures)
         reply_text, capped = await step_loop(
             model=model, tool_runner=tool_runner, max_steps=MAX_STEPS, deadline_s=MAX_RUN_SECONDS,
-            request_for=lambda added: ModelRequest(
-                system=prepared.system, turns=history.turns + added, tools=prepared.tools, model=model_id,
-                agent=bot.name, effort=bot.effort, images=pictures,
-            ),
+            request_for=_request_for(prepared, tool_runner, history, model_id=model_id, bot=bot, pictures=pictures),
             on_delta=_delta_publisher(events, user_id, thread_id, reply_id, draft, run_steps), steer=steer,
             on_progress=note if progress and run_steps is not None else None,
         )
@@ -695,7 +733,8 @@ async def _run_steps(
         await _keep_cut_short(talk=talk, events=events, user_id=user_id, thread_id=thread_id, reply_id=reply_id,
                               bot_id=bot.id, text=text, tainted=tool_runner.tainted)
         return TurnResult(reply=text, tainted=tool_runner.tainted, capped=False,
-                          link_scope=tool_runner.link_scope.as_tuple(), stopped=True)
+                          link_scope=tool_runner.link_scope.as_tuple(), stopped=True,
+                          used_groups=tool_runner.used_groups)
     except BaseException:
         # BaseException, not Exception: a Stop cancels the task, and the
         # placeholder bubble must still be closed (it also closes the bubble
@@ -713,4 +752,4 @@ async def _run_steps(
     return TurnResult(reply=reply_text, tainted=tool_runner.tainted, capped=capped,
                       link_scope=tool_runner.link_scope.as_tuple(), own_sites=tuple(sorted(tool_runner.own_sites)),
                       block=tool_runner.block, parked=tool_runner.parked, plan=tool_runner.plan.steps,
-                      wall=tool_runner.wall)
+                      wall=tool_runner.wall, used_groups=tool_runner.used_groups)

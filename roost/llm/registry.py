@@ -22,7 +22,9 @@ class ModelChoice:
     line: str
 
 
-FABLE = ModelChoice("fable", "claude-fable-5-1", "Fable 5.1", "fable")
+FABLE = ModelChoice("fable", "claude-fable-5-2", "Fable 5.2", "fable")
+# The Fable before 5.2 (owner, 2026-11-10): no longer offered, but a bot or routine set to it keeps running on it.
+FABLE_51 = ModelChoice("fable", "claude-fable-5-1", "Fable 5.1", "fable")
 OPUS = ModelChoice("opus", "claude-opus-5-5", "Opus 5.5", "opus")
 SONNET = ModelChoice("sonnet", "claude-sonnet-5-5", "Sonnet 5.5", "sonnet")
 HAIKU = ModelChoice("haiku", "claude-haiku-5-5", "Haiku 5.5", "haiku")
@@ -37,13 +39,13 @@ HELPER_MODELS = {"haiku": HAIKU.id, "sonnet": SONNET.id}
 DEFAULT_HELPER_MODEL = "haiku"
 EFFORTS = ("low", "medium", "high", "max")
 # Display only: what each model does when no effort is set.
-DEFAULT_EFFORT = {FABLE.id: "high", OPUS.id: "medium", SONNET.id: "high", HAIKU.id: "medium"}
+DEFAULT_EFFORT = {FABLE.id: "high", FABLE_51.id: "high", OPUS.id: "medium", SONNET.id: "high", HAIKU.id: "medium"}
 KNOWN_MODEL_IDS = frozenset(
-    {FABLE.id, OPUS.id, SONNET.id, HAIKU.id, "claude-sonnet-5", "claude-haiku-4-5-20251001"}
+    {FABLE.id, FABLE_51.id, OPUS.id, SONNET.id, HAIKU.id, "claude-sonnet-5", "claude-haiku-4-5-20251001"}
 )
 
-_BOT_MODEL_IDS = frozenset(choice.id for choice in BOT_MODELS)
-_LABELS = {choice.id: choice.label for choice in (FABLE, OPUS, SONNET, HAIKU)}
+_BOT_MODEL_IDS = frozenset(choice.id for choice in (*BOT_MODELS, FABLE_51))
+_LABELS = {choice.id: choice.label for choice in (FABLE, FABLE_51, OPUS, SONNET, HAIKU)}
 
 
 def pickable_model_ids(extra_ids: frozenset[str] = frozenset()) -> frozenset[str]:
@@ -56,6 +58,15 @@ def resolve_bot_model(override: str | None, extra_ids: frozenset[str] = frozense
     if override and override in pickable_model_ids(extra_ids):
         return override
     return DEFAULT_BOT_MODEL
+
+
+def resolve_routine_model(
+    routine_model: str | None, bot_override: str | None, extra_ids: frozenset[str] = frozenset(),
+) -> str:
+    """A routine run's model: the routine's own if pickable, else the bot's (owner, 2026-11-09)."""
+    if routine_model and routine_model in pickable_model_ids(extra_ids):
+        return routine_model
+    return resolve_bot_model(bot_override, extra_ids)
 
 
 def check_model(model_id: str | None) -> str:

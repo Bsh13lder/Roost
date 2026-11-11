@@ -40,6 +40,7 @@ class TaskFilter {
     this.high = false,
     this.done = false,
     this.projects = const {},
+    this.withDone = false,
   });
 
   /// Anything unreadable is no filter, so a bad value never hides tasks.
@@ -55,6 +56,7 @@ class TaskFilter {
       high: raw['high'] == true,
       done: raw['done'] == true,
       projects: {for (final p in projects) if (p is String && p.isNotEmpty) p},
+      withDone: raw['with_done'] == true,
     );
   }
 
@@ -62,6 +64,13 @@ class TaskFilter {
   final bool high;
   final bool done;
   final Set<String> projects;
+
+  /// Show › Done (owner, 2026-11-11): the done tasks under the open ones. A
+  /// show choice, not a chip, so Clear filters keeps it.
+  final bool withDone;
+
+  /// Whether the done list is shown (the Done chip alone, or Show › Done).
+  bool get showsDone => done || withDone;
 
   bool get isEmpty => dates.isEmpty && !high && !done && projects.isEmpty;
 
@@ -75,18 +84,22 @@ class TaskFilter {
   TaskFilter toggleHigh() => _copy(high: !high);
   TaskFilter toggleDone() => _copy(done: !done);
   TaskFilter toggleProject(String id) => _copy(projects: _flip(projects, id));
+  TaskFilter toggleWithDone() => _copy(withDone: !withDone);
+  TaskFilter cleared() => TaskFilter(withDone: withDone);
 
   TaskFilter _copy({
     Set<DateFilter>? dates,
     bool? high,
     bool? done,
     Set<String>? projects,
+    bool? withDone,
   }) =>
       TaskFilter(
         dates: dates ?? this.dates,
         high: high ?? this.high,
         done: done ?? this.done,
         projects: projects ?? this.projects,
+        withDone: withDone ?? this.withDone,
       );
 
   /// The narrowing chips (priority and project) for any task, open or done.
@@ -104,6 +117,7 @@ class TaskFilter {
         'high': high,
         'done': done,
         'projects': [...projects]..sort(),
+        'with_done': withDone,
       };
 
   @override
@@ -112,6 +126,7 @@ class TaskFilter {
       setEquals(other.dates, dates) &&
       other.high == high &&
       other.done == done &&
+      other.withDone == withDone &&
       setEquals(other.projects, projects);
 
   @override
@@ -120,6 +135,7 @@ class TaskFilter {
         high,
         done,
         Object.hashAllUnordered(projects),
+        withDone,
       );
 }
 
@@ -127,7 +143,7 @@ Set<T> _flip<T>(Set<T> set, T value) => Set.unmodifiable(
     set.contains(value) ? set.difference({value}) : {...set, value});
 
 /// The tasks the list shows: open ones the chips keep, then done ones when
-/// Done is on, narrowed by the words typed in the bottom bar.
+/// Done or Show › Done is on (done ones last done first, as the server sends them), narrowed by the words typed in the bottom bar.
 List<TaskItem> applyFilter(
   TaskFilter f, {
   required List<TaskItem> open,
@@ -137,7 +153,7 @@ List<TaskItem> applyFilter(
     [
       for (final t in open)
         if (f.keepsOpen(t) && matchesQuery(t.title, typed)) t,
-      if (f.done)
+      if (f.showsDone)
         for (final t in done)
           if (f.narrows(t) && matchesQuery(t.title, typed)) t,
     ];

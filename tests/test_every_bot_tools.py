@@ -23,6 +23,7 @@ from roost.money.months import current_month
 from roost.talk.domain_tools import build_domain_tools
 from roost.talk.gate import LINK_REFUSAL_TEXT, REFUSAL_TEXT
 from roost.talk.tool_catalog import CATALOG
+from roost.talk.tool_groups import CORE_TOOLS
 from roost.talk.tools import (
     CREATOR_TOOLS, DESK_TOOLS, EVERY_BOT_TOOLS, LEAD_TOOLS, SCREEN_TOOLS, TEAM_TOOLS, run_tool_names,
 )
@@ -148,7 +149,9 @@ async def test_an_old_role_row_changes_nothing(cfg, user_id):
                          (user_id, bot.id, "web", "2026-10-14T00:00:00+00:00"))
         await db.commit()
     rig = await _talk(cfg, user_id, bot, [say("hi")], "hello")
-    assert {spec.name for spec in rig.model.requests[0].tools} == EVERY_BOT_TOOLS | {"ask_bot", "list_bots"}
+    every = EVERY_BOT_TOOLS | {"ask_bot", "list_bots"}
+    # Tool groups (owner, 2026-11-09): a plain "hello" is offered the core tools; the rest wait to be loaded.
+    assert {spec.name for spec in rig.model.requests[0].tools} == {n for n in every if n in CORE_TOOLS}
 
 
 async def test_after_a_page_read_any_bot_opens_only_links_it_was_given(cfg, user_id):
@@ -182,7 +185,7 @@ def test_create_bot_is_the_main_bots_in_a_users_own_1to1_message_only():
 # The tools the run answers itself (roost/talk/tool_runner.py): the clock, the bot's
 # own browser, the Stuck card and the team. Every other catalog tool is a record tool.
 RUNNER_TOOLS = DESK_TOOLS | TEAM_TOOLS | LEAD_TOOLS | CREATOR_TOOLS | SCREEN_TOOLS | {
-    "get_time", "ask_for_help", "request_sign_in", "ask_secret_field", "ask_choice", "send_helpers"}
+    "get_time", "ask_for_help", "request_sign_in", "ask_secret_field", "ask_choice", "send_helpers", "load_tools"}
 
 
 async def test_every_record_tool_in_the_catalog_has_a_handler(cfg):

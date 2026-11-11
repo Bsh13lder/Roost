@@ -41,6 +41,7 @@ from roost.research.tool_specs import RESEARCH_TOOL_DEFS
 from roost.talk.tool_def import ToolDef
 from roost.tasks.step_specs import COMMENT_TOOL_DEFS, STEP_TOOL_DEFS
 from roost.tasks.tool_specs import TASK_TOOL_DEFS
+from roost.talk.tool_groups import LOAD_TOOLS_SPEC
 from roost.voice.tool_specs import VOICE_TOOL_DEFS
 
 OPEN_PAGE_SPEC = ToolSpec(
@@ -191,7 +192,7 @@ TAINTED_CREATE_BOT_TEXT = (
 
 _MODEL_PROPERTIES = {
     "bot": {"type": "string", "description": "The teammate's name."},
-    "model": {"type": "string", "description": "A model's name, such as Opus 5.5, Sonnet 5.5 or Fable 5.1."},
+    "model": {"type": "string", "description": "A model's name, such as Opus 5.5, Sonnet 5.5 or Fable 5.2."},
     "effort": {"type": "string", "enum": list(EFFORTS), "description": "Optional: how hard it thinks."},
 }
 
@@ -339,4 +340,5 @@ CATALOG: Mapping[str, ToolDef] = _catalog((
     *CONNECTOR_TOOL_DEFS,
     *APP_TOOL_DEFS,
     *VOICE_TOOL_DEFS,
+    ToolDef(LOAD_TOOLS_SPEC, "read"),          # tool groups (owner, 2026-11-09): more tools for this run
 ))

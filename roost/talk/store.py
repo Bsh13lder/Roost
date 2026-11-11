@@ -61,6 +61,8 @@ MessageKind = Literal[
     "routine",          # Routines: a routine's instructions + slot line in its run-log thread (role "user"); the model reads it
     "report",           # Routines: a bot's Report in its main chat; body = ReportBody JSON; the model reads it as text
     "routine_note",     # Routines: "Created routine · {name}" (role "activity"); never replayed
+    "routine_finished", # Routines: "Finished routine · {name}: {reason}" with Resume · Delete now (role "activity");
+                        # body = JSON {routine_id, name, reason, delete_at, text}; never replayed
     "routine_proposal", # Routines: a routine proposal card; body = JSON {proposal_id}; never replayed
     "question_note",    # Routines: "Picked: ..." in the question book (role "activity"); never replayed
     "skill_proposal",   # Skills: a skill proposal card; body = JSON {proposal_id, name}; never replayed
@@ -75,6 +77,7 @@ MessageKind = Literal[
                         # {task_ids, verb, more}; never replayed
     "english_fix",      # Correct my English: a spoken message's corrected copy (role "activity"); body = JSON
                         # {message_id, said, corrected, fixes}; never replayed, never a chat-list preview
+    "computer_restart", # Self-healing: "My computer stopped answering, so I restarted it." (role "system"); plain words
 ]
 
 # Kinds that never lead a chat's row in the chat list (a tapback, a correction of your own words).

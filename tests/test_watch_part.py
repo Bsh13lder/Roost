@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from roost.constants import WATCH_CHANGE_MAX_CHARS, WATCH_SNAPSHOT_MAX_CHARS, WATCH_TAIL_LINES
 from roost.routines.watch_part import (
-    AreaText, changed_lines, fingerprint, normalise, pick_part,
+    AreaText, changed_lines, compared, fingerprint, normalise, pick_part,
 )
 
 DEK = b"k" * 32
@@ -38,9 +38,16 @@ def test_only_meaningful_words_count():
     assert part.where == "rows"
 
 
-def test_words_found_nowhere_fall_back_to_the_main_text():
+def test_words_found_nowhere_are_missing_never_the_whole_page():
+    """Owner, 2026-11-09: the whole page as a fallback made every other chat's news a model run."""
     main = AreaText(role="main", name="", text="Headline\nBody")
     part = pick_part("the price box", (LIST, main), "Top\nHeadline\nBody")
+    assert part.where == "missing" and part.text == ""
+
+
+def test_no_words_watch_the_main_text():
+    main = AreaText(role="main", name="", text="Headline\nBody")
+    part = pick_part("", (LIST, main), "Top\nHeadline\nBody")
     assert part.where == "page" and part.text == "Headline\nBody"
 
 
@@ -91,3 +98,97 @@ def test_changed_lines_with_nothing_new_is_the_whole_part():
 def test_changed_lines_are_capped():
     new = "\n".join(f"line {n} " + "x" * 50 for n in range(200))
     assert len(changed_lines("", new)) <= WATCH_CHANGE_MAX_CHARS
+
+
+def test_counters_with_thousands_are_noise():
+    assert normalise("Group\n1,234 unread messages\n2.345\n(1 234)") == "group"
+
+
+def test_rows_that_only_move_compare_the_same():
+    assert compared("Mum\nsee you\nAna\nok") == compared("Ana\nok\nMum\nsee you")
+    assert compared("ok\nok") != compared("ok")
+
+
+def test_a_name_in_quotes_is_the_part_and_the_rest_of_the_sentence_is_ignored():
+    """Owner, 2026-11-10: "new messages from Ana in her chat \"Physio Ana\"" never stood on one line."""
+    part = pick_part('new messages from Ana in her direct chat "Physio Ana"', (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.where == "rows" and part.text.startswith("Physio Ana")
+
+
+def test_curly_and_angle_quotes_count_too():
+    for said in ("watch “Physio Ana” please", "mensajes de «Physio Ana»"):
+        assert pick_part(said, (LIST,), "WhatsApp\n" + LIST.text).where == "rows"
+
+
+def test_several_quoted_names_watch_each_row():
+    part = pick_part('"Mum" or "Physio Ana"', (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.where == "rows" and "Mum" in part.text and "Physio Ana" in part.text
+
+
+def test_request_words_do_not_have_to_be_on_the_page():
+    part = pick_part("new messages from Physio Ana", (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.where == "rows" and part.text.startswith("Physio Ana")
+
+
+def test_a_quoted_name_found_nowhere_is_missing():
+    assert pick_part('"Nobody Here"', (LIST,), "WhatsApp\n" + LIST.text).where == "missing"
+
+
+def test_a_name_in_brackets_counts_like_quotes():
+    part = pick_part("new messages from Ana on her phone chat (Physio Ana)", (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.where == "rows" and part.text.startswith("Physio Ana")
+
+
+def test_a_phone_number_is_a_name_of_its_own():
+    rows = AreaText(role="grid", name="Chat list", text="+34 612 34 56 78\n14:02\nhola\nMum\nok")
+    part = pick_part("new messages from +34 612 34 56 78 (Nobody Here) on the work chat", (rows,), rows.text)
+    assert part.where == "rows" and part.text.startswith("+34 612 34 56 78")
+
+
+def test_a_row_stops_where_the_next_chat_starts():
+    """Owner, 2026-11-10: the next chat's news ran the watch of the chat above it."""
+    rows = AreaText(role="grid", name="Chat list", text="Physio Ana\n14:50\nok\nGroup one\n14:51\nhi all\nMum\nYesterday\nbye")
+    part = pick_part("(Physio Ana)", (rows,), rows.text)
+    assert part.text == "Physio Ana\n14:50\nok"
+
+
+def test_a_row_with_an_unread_counter_keeps_it():
+    part = pick_part("(Physio Ana)", (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.text == "Physio Ana\n14:50\nTomorrow at 10?\n2"
+
+
+WA_LIST = AreaText(role="grid", name="Chat list", text="Physio Ana\n14:50\nok\nGroup one\n14:51\nhi all")
+
+
+def test_all_chats_watches_the_whole_chat_list():
+    """Owner, 2026-11-11: "(not groups)" was taken for a chat's name, so the general watch never changed."""
+    part = pick_part("new incoming messages on WhatsApp Web (DM + all chats) (not groups)", (WA_LIST, PANE),
+                     "WhatsApp\nnot groups here\n" + WA_LIST.text)
+    assert part.where == "area" and part.text == WA_LIST.text
+
+
+def test_the_chat_list_by_name_and_in_spanish():
+    for said in ("the chat list", "todos los chats", "every chat"):
+        assert pick_part(said, (WA_LIST,), WA_LIST.text).text == WA_LIST.text
+
+
+def test_all_chats_with_no_named_list_takes_the_largest_list():
+    rows = AreaText(role="grid", name="", text=WA_LIST.text)
+    assert pick_part("all chats", (rows,), "Top\n" + rows.text).text == WA_LIST.text
+
+
+def test_a_lowercase_bracket_is_not_a_name():
+    part = pick_part("Physio Ana (not groups)", (LIST,), "WhatsApp\nnot groups\n" + LIST.text)
+    assert part.text.startswith("Physio Ana")
+
+
+def test_chats_in_the_plural_with_no_name_watch_the_whole_chat_list():
+    """Owner, 2026-11-11: "new incoming messages in personal one-to-one chats (not groups)"."""
+    for said in ("new incoming messages in personal one-to-one chats (not groups)", "my DMs",
+                 "conversaciones privadas"):
+        assert pick_part(said, (WA_LIST,), WA_LIST.text).text == WA_LIST.text, said
+
+
+def test_a_named_chat_in_the_plural_sentence_is_still_that_chat():
+    part = pick_part('new messages in my chats from "Physio Ana"', (LIST,), "WhatsApp\n" + LIST.text)
+    assert part.where == "rows" and part.text.startswith("Physio Ana")

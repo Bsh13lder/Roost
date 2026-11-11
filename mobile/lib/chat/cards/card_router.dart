@@ -10,6 +10,7 @@ import 'model_card.dart';
 import 'note_lines.dart';
 import 'proposal_cards.dart';
 import 'report_bubble.dart';
+import 'routine_finished_line.dart';
 import 'stuck_card.dart';
 import 'suggestion_card.dart';
 import 'task_cards.dart';
@@ -69,6 +70,8 @@ Widget? cardFor(Message m,
     case 'question_note':
       final line = decodeBody(m.body)?['text'];
       return line is String ? QuietLine(line, key: key) : null;
+    case 'routine_finished':
+      return RoutineFinishedLine(key: key, message: m);
     case 'handoff':
       return QuietLine('⇄ ${m.body}', key: key);
     case 'approval_result':

@@ -150,4 +150,20 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     expect(control.started, 1);
   });
+
+  test('a service that starts after the app hears the open chat again (no alerts for the chat you read)', () async {
+    final control = FakeControl();
+    final c = ProviderContainer(overrides: [
+      notifyStoreProvider.overrideWithValue(MemoryNotifyStore(const NotifyPrefs(stayConnected: true))),
+      stayConnectedProvider.overrideWithValue(control),
+    ]);
+    addTearDown(c.dispose);
+    c.read(openChatProvider.notifier).state = 'b1';
+    c.read(stayConnectedSyncProvider);
+    await c.read(notifyPrefsProvider.future);
+    await Future<void>.delayed(Duration.zero);
+    expect(control.started, 1);
+    expect(control.sent.last, focusMessage(const AppFocus(visible: true, openChatBotId: 'b1')));
+    expect(control.sent.length, 2);
+  });
 }

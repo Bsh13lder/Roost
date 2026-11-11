@@ -32,7 +32,7 @@ R1_PLACES = (
     "web/src/lib/chatMarks.ts", "web/tests/stylesheets.test.ts",
 )
 MODELS_DOCS = ("docs/plans/2026-10-20-roost-models-helpers-design.md", "docs/plans/2026-10-20-roost-models-helpers.md")
-MODEL_IDS = ("claude-fable-5-1", "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5")
+MODEL_IDS = ("claude-fable-5-2", "claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5")
 MODELS_PLACES = (
     "roost/llm/registry.py", "roost/models_check/", "roost/helpers/", "send_helpers", "suggest_model", "schema v20",
 )

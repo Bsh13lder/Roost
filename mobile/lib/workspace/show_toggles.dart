@@ -144,10 +144,16 @@ final screenTogglesProvider =
 
 /// The Show button: a menu of ticked switches for one screen's [options].
 class ShowMenuButton extends ConsumerWidget {
-  const ShowMenuButton({super.key, required this.screen, required this.options});
+  const ShowMenuButton(
+      {super.key, required this.screen, required this.options, this.done, this.onDone});
 
   final String screen;
   final List<ShowToggle> options;
+
+  /// A screen whose Done lives elsewhere (the Tasks list's Done chip): its
+  /// state and its flip, in place of this screen's kept choice.
+  final bool? done;
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -156,13 +162,15 @@ class ShowMenuButton extends ConsumerWidget {
       key: Key('show-menu-$screen'),
       tooltip: 'Show',
       icon: const Icon(Icons.tune),
-      onSelected: (t) => ref.read(screenTogglesProvider(screen).notifier).flip(t),
+      onSelected: (t) => t == ShowToggle.done && onDone != null
+          ? onDone!()
+          : ref.read(screenTogglesProvider(screen).notifier).flip(t),
       itemBuilder: (_) => [
         for (final t in options)
           CheckedPopupMenuItem(
             key: Key('show-${t.name}'),
             value: t,
-            checked: toggles.shows(t),
+            checked: t == ShowToggle.done && done != null ? done! : toggles.shows(t),
             child: Text(t.label),
           ),
       ],

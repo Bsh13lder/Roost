@@ -32,6 +32,9 @@ class StayConnectedHandler extends TaskHandler {
   NotifyPrefs _prefs = const NotifyPrefs(stayConnected: true);
   AlertPump? _pump;
 
+  /// Where you are, kept even before the pump exists (a focus message can come while it starts).
+  AppFocus _focus = AppFocus.away;
+
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     await _reload();
@@ -40,7 +43,9 @@ class StayConnectedHandler extends TaskHandler {
       open: (uri, headers) => IOWebSocketChannel.connect(uri, headers: headers),
       presenter: DeviceAlertPresenter(),
       prefs: () => _prefs,
-    )..start();
+    )
+      ..focus = _focus
+      ..start();
   }
 
   @override
@@ -49,7 +54,10 @@ class StayConnectedHandler extends TaskHandler {
   @override
   void onReceiveData(Object data) {
     if (data is! Map) return;
-    if (data.containsKey('focus')) _pump?.focus = AppFocus.fromJson(data['focus']);
+    if (data.containsKey('focus')) {
+      _focus = AppFocus.fromJson(data['focus']);
+      _pump?.focus = _focus;
+    }
     if (data.containsKey('prefs')) unawaited(_reload());
   }
 

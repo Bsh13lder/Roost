@@ -11,7 +11,7 @@ void main() {
   testWidgets('the Model picker lists four models', (tester) async {
     final models = ModelsOut.fromJson({
       'choices': [
-        {'id': 'claude-fable-5-1', 'label': 'Fable 5.1', 'new': false},
+        {'id': 'claude-fable-5-2', 'label': 'Fable 5.2', 'new': false},
         {'id': 'claude-sonnet-5-5', 'label': 'Sonnet 5.5', 'new': false},
         {'id': 'claude-opus-5-5', 'label': 'Opus 5.5', 'new': false},
         {'id': 'claude-haiku-5-5', 'label': 'Haiku 5.5', 'new': false},
@@ -25,7 +25,7 @@ void main() {
       ),
     ));
     expect(find.byType(ListTile), findsNWidgets(4));
-    for (final label in ['Fable 5.1', 'Sonnet 5.5', 'Opus 5.5', 'Haiku 5.5']) {
+    for (final label in ['Fable 5.2', 'Sonnet 5.5', 'Opus 5.5', 'Haiku 5.5']) {
       expect(find.text(label), findsOneWidget);
     }
   });

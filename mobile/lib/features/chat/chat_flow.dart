@@ -199,6 +199,7 @@ _Row? _classify(Message m, Map<String, String> answers, Map<String, String> text
       return _Row(m); // the corrected copy of your words: a card under them
     case 'routine_note':
     case 'question_note':
+    case 'routine_finished':
       return _Row(m); // a routine's or the question book's own quiet line, never a step of a run
     case 'approval':
       final ref = parseApprovalMessage(m.body);

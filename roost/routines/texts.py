@@ -63,6 +63,8 @@ def paused_for_reserve(reset: str) -> str:
 STILL_GOING = "the last run was still going"
 STILL_WAITING = "still waiting for you"
 OFF_DUTY_NOTE = "Off duty"
+MODEL_FALLBACK_TEXT = ("{name} didn't finish twice in a row on {model}, so it runs on the bot's own model again. "
+                       "You can pick its model in the routine.")
 
 FOLDED_LINE = "More reports this hour than the limit; this one is in the log"
 STOPPED_NOTE = "Stopped"

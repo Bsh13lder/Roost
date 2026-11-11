@@ -91,6 +91,13 @@ CRASHED_TAB_KEEPS_CRASHING_TEXT = "The page keeps crashing on this computer; it 
 # and started again (the profile stays) and the call runs once more. At most once per this long per bot.
 COMPUTER_HUNG_RESTART_COOLDOWN_S = 600.0
 BROWSER_RESTARTED_TEXT = "The browser had stopped answering, so I restarted the computer and tried again."
+# A tab that stops answering while the browser still does (owner, 2026-11-10, docs/plans/2026-11-10-roost-self-healing.md:
+# bot 1016fb46's Page.enable timed out for 30+ minutes and the probe above said the browser was fine): this many
+# failed page calls within this window count as hung too, and restart the computer under the same cooldown.
+DESK_UNANSWERED_STREAK: Final = 3
+DESK_UNANSWERED_WINDOW_S: Final = 1200.0   # wide enough for a 5-minute watch alone (3 checks)
+# The one quiet line in the bot's main chat after such a restart (kind ``computer_restart``; at most one per cooldown).
+COMPUTER_RESTARTED_LINE = "My computer stopped answering, so I restarted it."
 
 # Fix round 1, finding 4: `websockets.connect`'s own default `max_size`
 # (1 MiB) is smaller than a real page's `Accessibility.getFullAXTree`
@@ -689,6 +696,7 @@ ROUTINE_TICK_MAX_FIRES: Final = 50
 SCHEDULER_TICK_TIMEOUT_SECONDS: Final = 20
 SCHEDULER_TICK_OVERRIDE_MAX_SECONDS: Final = 3600   # the scripted E2E's ROOST_SCHEDULER_TICK_SECONDS upper bound
 ROUTINES_PER_BOT_MAX: Final = 20
+ROUTINE_MODEL_FAILURES_MAX: Final = 2   # a routine's own model: failed runs in a row before it goes back to the bot's
 ROUTINES_PER_USER_MAX: Final = 100
 ROUTINE_NAME_MAX: Final = 80
 ROUTINE_INSTRUCTIONS_MAX: Final = 4000
@@ -700,6 +708,10 @@ ROUTINE_RECENT_RUNS_MAX: Final = 100
 RUN_LOG_RETENTION_DAYS: Final = 90
 ROUTINE_ASK_MAX_WAIT_HOURS: Final = 24
 ROUTINE_PROPOSALS_OPEN_PER_BOT_MAX: Final = 5
+# A routine the bot finished (owner, 2026-11-11, docs/plans/2026-11-11-roost-routine-finish.md): paused and deleted
+# by the scheduler after this many days unless the user resumes it; its reason is one short sealed line.
+ROUTINE_FINISHED_KEEP_DAYS: Final = 7
+ROUTINE_FINISHED_REASON_MAX: Final = 200
 REPORT_HEADLINE_MAX: Final = 80
 REPORT_TEXT_MAX_CHARS: Final = 8000
 REPORT_QUIET_SENTINEL: Final = "[nothing new]"
@@ -745,15 +757,41 @@ WATCH_PART_MAX: Final = 120
 WATCH_TAIL_LINES: Final = 12                  # the newest lines of a message pane
 WATCH_CONTEXT_LINES: Final = 3                # lines kept after a line that names the part (a row's time, preview)
 WATCH_HITS_MAX: Final = 3                     # at most this many such lines
+# A chat list row's stamp (its time or day), which marks where the next row starts (owner, 2026-11-10).
+WATCH_DAY_WORDS: Final = frozenset({
+    "yesterday", "today", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+    "ayer", "hoy", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo",
+})
 WATCH_SNAPSHOT_MAX_CHARS: Final = 6000        # the stored part, cut to this
 WATCH_CHANGE_MAX_CHARS: Final = 2000          # what the change run is told, cut to this
 WATCH_READY_TIMEOUT_S: Final = 8.0
+# A check that can't read the page (owner, 2026-11-10, docs/plans/2026-11-10-roost-self-healing.md): failures in a
+# row fold into one "Couldn't check" run-log line; at this many the bot's chat says so once (a good read clears it).
+WATCH_FAILS_STUCK: Final = 3
+WATCH_NO_ROOM_NOTE_AFTER: Final = 2           # one skip for room stays quiet; from the second in a row it is a line
+WATCH_STALE_TRIGGER_INTERVALS: Final = 2      # a waiting check older than this many intervals is dropped and queued again
+# A routine's last error, a fixed word in ``routines.last_error_kind`` (plaintext, no user content; v47).
+ROUTINE_ERROR_NO_ANSWER: Final = "no_answer"  # the computer didn't answer
+ROUTINE_ERROR_NO_ROOM: Final = "no_room"      # no free computer
+ROUTINE_ERROR_RUN: Final = "run_error"        # a run didn't finish
 # Words in "what part to watch" that name no part ("the physio chat" looks for "physio").
 WATCH_STOP_WORDS: Final = frozenset({
     "the", "a", "an", "my", "our", "of", "on", "in", "el", "la", "los", "las", "mi", "de", "del", "en",
     "chat", "conversation", "box", "section", "part", "page", "area",
+    # what the owner asks for, never on the page (owner, 2026-11-10: "new messages from …" was never found)
+    "new", "message", "messages", "from", "any", "unread", "mensaje", "mensajes", "nuevo", "nuevos", "nueva", "nuevas",
 })
+# A name in quotes or brackets, or a phone number, is the watched part on its own, the rest of the sentence aside
+# (owner, 2026-11-10).
+WATCH_QUOTED: Final = r'"([^"]+)"|“([^”]+)”|«([^»]+)»|\(([^()]+)\)|(\+?\d[\d ().-]{6,}\d)'
 WATCH_PANE_ROLES: Final = frozenset({"log", "feed", "application"})   # a chat's message pane
+# A part that names every chat watches the whole chat list (owner, 2026-11-11): its area by name, else the largest list.
+WATCH_ALL_CHATS: Final = ("all chats", "all my chats", "all the chats", "every chat", "chat list", "all messages",
+                          "all my messages", "all conversations", "todos los chats", "todos mis chats",
+                          "lista de chats", "todos los mensajes")
+WATCH_LIST_ROLES: Final = frozenset({"grid", "list", "listbox", "treegrid"})
+# Chats in the plural with no name in the part mean every chat too ("personal one-to-one chats").
+WATCH_CHATS_PLURAL: Final = frozenset({"chats", "conversations", "dms", "conversaciones"})
 WATCH_PAGE_ROLES: Final = ("main", "article", "document")              # the main text, when no part is found
 # Words that change on a page without anything new (a chat's "online", "typing…"), dropped before comparing.
 WATCH_NOISE_WORDS: Final = ("online", "typing…", "typing...", "escribiendo…", "escribiendo...", "en línea",
@@ -849,6 +887,15 @@ COMPUTER_STEPS_KEPT: Final = 40
 # A finished run's steps stay too (one per chat, the newest), so a restarted phone still shows the kept card.
 COMPUTER_KEPT_RUNS_PER_BOT: Final = 5
 RUN_STEPS_KEPT: Final = 60          # the activity pill: a bot's current run's newest steps in the live snapshot
+# Keeping the cache warm (docs/plans/2026-11-09-roost-tool-groups.md §4, 2026-11-10): the prompt cache's prefix is
+# tools → system → messages, so the tool list never shrinks mid-run, a thread's recent groups start loaded, and old
+# tool results fold to a stub in batches (one cache break per batch, not one per step).
+RECENT_GROUP_RUNS: Final = 3                    # a thread's last runs whose used tool groups its next run starts with
+RECENT_GROUP_THREADS: Final = 500               # threads the runner keeps recent groups for (in memory, oldest dropped)
+COMPACT_AFTER_STEPS: Final = 12                 # a tool result with this many results after it may fold to a stub
+COMPACT_BATCH_STEPS: Final = 10                 # the fold moves in batches of this many results
+COMPACT_KEEP_RESULTS: Final = 3                 # the newest results always stay whole
+COMPACT_MIN_CHARS: Final = 400                  # a shorter result (an error, an id, "Done") never folds
 CU_SCROLL_MAX_NOTCHES: Final = 25               # fast pages: one scroll call (sent in pieces, below)
 CU_SCROLL_NOTCHES_PER_INPUT: Final = 10         # one scroll input: the keeper and roost-input's MAX_NOTCHES
 CU_SCROLL_DEFAULT_NOTCHES: Final = 5

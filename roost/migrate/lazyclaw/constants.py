@@ -97,7 +97,7 @@ LEFTOVER_WAL_HINT = ("If LazyClaw is already stopped (docker compose stop), its 
 STAGE_FILE_NAME = "lazyclaw-stage.db"
 # Schemas this tool was written and tested against: 18 (import_links) and 19 (bots.pinned) and 20 (bots.effort, seen_models,
 # dismissals), 21 (money income) 22 (day notes, project pins) and 23 (approval modes, Mac folders); the last three touch no imported rows. Any other version is refused.
-SUPPORTED_SCHEMA_VERSIONS = (18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45)   # 27-45: sign-in, teach, replies, tags/journal/export, connectors, bot apps, routine permissions, workspace internet, secret field, auto review, bot voice, stuck card replied, token usage, routine watch, chat media, payment cards, task client ids, vault passwords, account time zone; the importer writes none of them
+SUPPORTED_SCHEMA_VERSIONS = (18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48)   # 27-48: sign-in, teach, replies, tags/journal/export, connectors, bot apps, routine permissions, workspace internet, secret field, auto review, bot voice, stuck card replied, token usage, routine watch, chat media, payment cards, task client ids, vault passwords, account time zone, routine model, routine last error, finished routines; the importer writes none of them
 SERVER_SECRET_FILE = "server.secret"
 KEEPER_SECRET_FILE = "keeper.secret"
 RESTORE_STEPS = ("stop Roost, delete roost.db-wal and roost.db-shm next to roost.db, then copy {backup} over "

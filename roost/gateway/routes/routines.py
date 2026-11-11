@@ -4,6 +4,8 @@
 - ``PATCH`` and ``DELETE /api/routines/{id}``: edit, switch on or off (``enabled``), delete. A built-in routine can
   be re-timed and switched only, and never deleted (422).
 - ``POST /api/routines/{id}/run-now``: start a run at once (202), or 409 when one is open or the daily limit is used.
+- ``POST /api/routines/{id}/resume``: Resume on a "Finished routine" line (v48): no longer finished, on again and
+  planned from now; Delete now is the plain ``DELETE``. A routine's ``finished`` is ``{at, reason, delete_at}`` or null.
 - ``GET /api/routines/{id}/runs?before=<run id>``: the run history, newest first, a page at a time.
 - ``POST /api/routines/preview``: the words and the next five local times for a schedule, with no write.
 - A routine may carry ``watch`` (``{url, part, every_min}``; null stops it): Roost reads that page itself every few
@@ -23,6 +25,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from roost.constants import ROUTINE_INSTRUCTIONS_MAX, ROUTINE_NAME_MAX
 
 from roost.gateway.deps import CurrentUser, RequireOrigin
+from roost.routines.finished import finished_out
 from roost.routines.models import Routine, RoutineRun
 from roost.routines.runs import iso
 from roost.routines.service import Conflict, NoSuchBot, NoSuchRoutine, Refused, RoutineService, RoutineView
@@ -35,6 +38,7 @@ ROUTINE_NOT_FOUND = "Routine not found"
 
 # A hard wire cap well above the service's own limits (which keep their friendly messages).
 WIRE_SLACK = 2
+MODEL_WIRE_MAX = 64
 
 
 class RoutineIn(BaseModel):
@@ -45,6 +49,7 @@ class RoutineIn(BaseModel):
     schedule: dict[str, Any]
     enabled: bool = True
     watch: WatchIn | None = None        # "Only run when the page changes"; None: runs on its schedule
+    model: str | None = Field(default=None, max_length=MODEL_WIRE_MAX)   # None: the bot's own model
 
 
 class RoutinePatchIn(BaseModel):
@@ -55,6 +60,7 @@ class RoutinePatchIn(BaseModel):
     schedule: dict[str, Any] | None = None
     enabled: bool | None = None
     watch: WatchIn | None = None        # sent as null: stop watching
+    model: str | None = Field(default=None, max_length=MODEL_WIRE_MAX)   # sent as null: the bot's own model
 
 
 class PreviewIn(BaseModel):
@@ -79,8 +85,16 @@ def routine_out(view: RoutineView) -> dict[str, Any]:
         "builtin": routine.builtin, "tainted": routine.tainted, "created_by": routine.created_by,
         "thread_id": routine.thread_id,
         "next_run_at": _text(view.slot), "last_run_at": _text(routine.last_run_at), "last_state": view.last_state,
-        "watch": _watch_out(view),
+        "watch": _watch_out(view), "model": routine.model, "last_error": _last_error_out(routine),
+        "finished": finished_out(routine),
     }
+
+
+def _last_error_out(routine: Routine) -> dict[str, Any] | None:
+    """v47: the routine's last failure, a fixed word and its time ("Couldn't check (computer didn't answer) · 12:40")."""
+    if routine.last_error_kind is None or routine.last_error_at is None:
+        return None
+    return {"kind": routine.last_error_kind, "at": iso(routine.last_error_at)}
 
 
 def _watch_out(view: RoutineView) -> dict[str, Any] | None:
@@ -122,7 +136,7 @@ async def list_routines(bot_id: str, request: Request, user: CurrentUser) -> dic
 async def create_routine(bot_id: str, body: RoutineIn, request: Request, user: CurrentUser) -> dict[str, Any]:
     service = _service(request)
     routine = await _guarded(service.create(user.id, bot_id, body.name, body.instructions, body.schedule,
-                                            body.enabled, watch=body.watch))
+                                            body.enabled, watch=body.watch, model=body.model))
     return routine_out(await service.view(user.id, routine))
 
 
@@ -143,6 +157,13 @@ async def delete_routine(routine_id: str, request: Request, user: CurrentUser) -
 async def run_routine_now(routine_id: str, request: Request, user: CurrentUser) -> dict[str, Any]:
     run = await _guarded(_service(request).run_now(user.id, routine_id))
     return {"run": run_out(run)}
+
+
+@routines_router.post("/routines/{routine_id}/resume", dependencies=[RequireOrigin])
+async def resume_routine(routine_id: str, request: Request, user: CurrentUser) -> dict[str, Any]:
+    service = _service(request)
+    routine = await _guarded(service.resume_finished(user.id, routine_id))
+    return routine_out(await service.view(user.id, routine))
 
 
 @routines_router.get("/routines/{routine_id}/runs")

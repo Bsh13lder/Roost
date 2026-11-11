@@ -47,6 +47,9 @@ class RunLogScreen extends ConsumerWidget {
               child: Text('${log.routine['name'] ?? 'Routine'}',
                   style: const TextStyle(fontSize: Tokens.fsLead)),
             ),
+            if (finishedLine(log.routine) case final done?) _Pad(Quiet(done)),
+            if (lastErrorLine(log.routine) case final problem?)
+              _Pad(Quiet(problem, bad: true)),
             if (log.runs.isEmpty) const _Pad(Quiet('No runs yet.')),
             for (final r in log.runs)
               ListTile(

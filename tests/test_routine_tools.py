@@ -29,7 +29,8 @@ from team_helpers import make_bot
 NOW = datetime(2026, 10, 21, 8, 0, tzinfo=timezone.utc)
 TIMES = {"kind": "times", "days": [1, 2, 3, 4, 5, 6, 7], "times": ["10:07"]}
 OTHER = {"kind": "times", "days": [1], "times": ["09:00"]}
-ROUTINE_NAMES = {"list_routines", "propose_routine", "propose_routine_change", "propose_routine_pause"}
+ROUTINE_NAMES = {"list_routines", "propose_routine", "propose_routine_change", "propose_routine_pause",
+                 "finish_routine"}    # finish_routine: a routine's own run ends it (2026-11-11), tainted or not
 PLAN_NAMES = {"plan_read", "plan_add", "plan_update", "plan_complete"}
 
 

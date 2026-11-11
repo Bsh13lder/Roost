@@ -187,6 +187,7 @@ def build_domain_tools(
     tasks = TaskService(task_store, events)
     comments = CommentStore(config)
     routine_store = RoutineStore(config, TalkStore(config))
+    routine_writer = _routine_service(config, events, routine_store, bots)
     plans = plan if plan is not None else PlanService(PlanStore(config), events, bots, TalkStore(config))
     runs = journal if journal is not None else JournalRuns(JournalService(JournalStore(config), events))
 
@@ -206,8 +207,8 @@ def build_domain_tools(
         ProjectTools(projects, bots),
         QuestionTools(QuestionService(QuestionStore(config), TalkStore(config), events), routine_store),
         RoutineTools(routine_store, ProposalService(ProposalStore(config), routine_store, TalkStore(config), events)),
-        RoutineWrites(routine_store, _routine_service(config, events, routine_store, bots),
-                      owner_texts=partial(your_messages, config)),
+        RoutineWrites(routine_store, routine_writer, owner_texts=partial(your_messages, config)),
+        _routine_finish(routine_store, routine_writer),
         PlanTools(plans),
         JournalTools(runs.journal),
         TeamSteps(bots, TalkStore(config), events, SeenModelStore(config)),
@@ -318,6 +319,13 @@ def _routine_service(config: Config, events: EventHub, routine_store: Any, bots:
 
     return RoutineService(routine_store, RoutineRunStore(config), bots, TalkStore(config), events, None, None,
                           watches=WatchStore(config))
+
+
+def _routine_finish(routine_store: Any, writer: Any) -> DomainHandler:
+    """``finish_routine`` (owner, 2026-11-11): a routine's own run ends the routine that started it."""
+    from roost.routines.finish import RoutineFinish
+
+    return RoutineFinish(routine_store, writer)
 
 
 def _mac_handlers(config: Config, events: EventHub, mac_files: Any, grants: Any, sessions: Any,

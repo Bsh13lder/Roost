@@ -46,7 +46,7 @@ from roost.choices.decisions import DecisionBook
 from roost.bots.store import BotStore
 from roost.config import Config
 from roost.constants import (
-    COMPUTER_WAITING_LINE,
+    COMPUTER_RESTARTED_LINE, COMPUTER_WAITING_LINE,
     DAILY_RUN_CAP, HANDOFF_TIMEOUT_S, MAX_HANDOFF_DEPTH, MAX_RUN_SECONDS, STEER_DEBOUNCE_SECONDS,
     STUCK_REQUEST_MAX_CHARS,
 )
@@ -82,6 +82,7 @@ from roost.talk.domain_tools import DomainTools, build_domain_tools
 from roost.talk.gate import Gate
 from roost.talk.limits import LimitState
 from roost.talk.notices import daily_limit_note, interrupted_note, off_duty_note, post_notice, restart_dropped_note
+from roost.talk.recent_groups import RecentGroups
 from roost.talk.steer import RunRestart, RunSteer
 from roost.talk.stop_flow import StopFlow
 from roost.talk.store import TalkStore
@@ -184,7 +185,7 @@ class TurnRunner(StopFlow):
         self._control = control if control is not None else ControlLock()
         if hasattr(desks, "set_room_hooks"):
             desks.set_room_hooks(RoomHooks(busy=self.busy_ids, on_wait=self._say_waiting,
-                                           control_mark=self._control.mark))
+                                           control_mark=self._control.mark, on_healed=self._say_restarted))
         self._domain = domain if domain is not None else build_domain_tools(config, events, desks=desks)
         self._queue = queue if queue is not None else WorkQueue(config)
         self._runs = runs if runs is not None else RunLog(config)
@@ -196,6 +197,7 @@ class TurnRunner(StopFlow):
         # Bots in a Stuck stay: announced as Stuck and not settled to anything else since (M8).
         self._stuck_bots: frozenset[str] = frozenset()
         self._lock = asyncio.Lock()
+        self._recent_groups = RecentGroups()   # the tool groups each thread's last runs used (§4, in memory only)
         self._limit_noticed: dict[str, str] = {}
         self._waiters: dict[str, _Waiter] = {}
 
@@ -325,6 +327,16 @@ class TurnRunner(StopFlow):
         await self._events.publish(user_id, {
             "type": "bot_status", "bot_id": bot_id, "status": BotStatus.ON_IT.value, "activity": COMPUTER_WAITING_LINE,
         })
+
+    async def _say_restarted(self, bot_id: str) -> None:
+        """One plain line in the bot's main chat after its hung computer was restarted (owner, 2026-11-10). The desk
+        says it at most once per restart cooldown; with nobody's run to tell, nothing is said."""
+        user_id = self._run_users.get(bot_id)
+        if user_id is None:
+            return
+        thread, _created = await self._talk.ensure_main_thread(user_id, bot_id)
+        await post_notice(self._talk, self._events, user_id, thread.id, COMPUTER_RESTARTED_LINE,
+                          kind="computer_restart")
 
     async def cancel(self, bot_id: str) -> None:
         """``delete_bot``: stop the bot's run and answer everyone waiting on
@@ -464,6 +476,7 @@ class TurnRunner(StopFlow):
     async def _check_watch(self, user_id: str, batch: ClaimedBatch) -> None:
         """A routine's page check, in the bot's own drain loop so it never overlaps the bot's runs (no model)."""
         self._watching = self._watching | {batch.bot.id}
+        self.note_run_user(user_id, batch.bot.id)      # a restart during a check still gets its chat line
         try:
             if self._watch is not None:
                 await self._watch.check(user_id, batch.bot, batch.items[0])
@@ -503,6 +516,7 @@ class TurnRunner(StopFlow):
             routine_sites=await self._routine_sites(user_id, batch),
             chat_thread=await self._chat_thread(user_id, batch.thread_id),
             pictures=await owner_pictures(ChatMediaStore(self._config), user_id, batch.items),
+            recent_groups=self._recent_groups.for_thread(batch.thread_id),
         )
         return await self._with_approval(user_id, batch.bot, inputs)
 
@@ -569,6 +583,7 @@ class TurnRunner(StopFlow):
         finally:
             self._steers = {k: v for k, v in self._steers.items() if k != batch.bot.id}
         batch = replace(batch, items=_with_taken(batch.items, steer.taken))
+        self._recent_groups = self._recent_groups.noted(batch.thread_id, result.used_groups)   # §4: the next run's preload
         done_ids = await self._queue.complete(user_id, batch.run_id, result.reply, result.tainted)
         await self._runs.finish(user_id, batch.run_id, outcome)
         answered = outcome in ("done", "step_cap")

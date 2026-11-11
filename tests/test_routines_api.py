@@ -306,3 +306,13 @@ async def test_a_builtin_is_retimed_or_deleted_but_never_renamed(app, alice, bot
         assert (await client.delete(f"/api/routines/{routine.id}", headers=O)).status_code == 204
         listed = (await client.get(f"/api/bots/{bot.id}/routines")).json()["routines"]
         assert all(r["id"] != routine.id for r in listed)
+
+
+async def test_a_routine_model_is_set_shown_and_cleared(app, alice, bot):
+    async with signed_in(app, "alice") as client:
+        made = await _make(client, bot, model="haiku")
+        assert made["model"] == "claude-haiku-5-5"
+        patched = await client.patch(f"/api/routines/{made['id']}", json={"model": None}, headers=O)
+        assert patched.status_code == 200 and patched.json()["model"] is None
+        bad = await client.patch(f"/api/routines/{made['id']}", json={"model": "gpt-5"}, headers=O)
+        assert bad.status_code == 422 and "Same as the bot" in bad.json()["detail"]

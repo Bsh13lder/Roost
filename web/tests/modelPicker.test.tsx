@@ -9,7 +9,7 @@ import { makeBot } from "./fixtures";
 
 const MODELS: ModelsOut = {
   choices: [
-    { id: "fable-id", label: "Fable 5.1", line: "fable", new: false },
+    { id: "fable-id", label: "Fable 5.2", line: "fable", new: false },
     { id: "sonnet-id", label: "Sonnet 5.5", line: "sonnet", new: false },
     { id: "opus-id", label: "Opus 5.5", line: "opus", new: false },
     { id: "haiku-id", label: "Haiku 5.5", line: "haiku", new: false },
@@ -71,7 +71,7 @@ describe("ModelPicker", () => {
     await userEvent.click(model);
     const options = await screen.findAllByRole("option");
     expect(options.map((o) => o.textContent)).toEqual([
-      "Fable 5.1the most capable", "Sonnet 5.5balanced, the usual choice", "Opus 5.5careful, deep work", "Haiku 5.5fast and cheap",
+      "Fable 5.2the most capable", "Sonnet 5.5balanced, the usual choice", "Opus 5.5careful, deep work", "Haiku 5.5fast and cheap",
     ]);
   });
 

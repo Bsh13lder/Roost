@@ -17,6 +17,14 @@ export const WEEKDAY_CHIPS = [
   { day: 5, label: "Fri" }, { day: 6, label: "Sat" }, { day: 7, label: "Sun" },
 ] as const;
 
+// A routine's last error, by the server's fixed word (ROUTINE_ERROR_*); the History shows it with its time.
+export const LAST_ERROR_WORDS: Readonly<Record<string, string>> = {
+  no_answer: "Couldn't check (computer didn't answer)",
+  no_room: "Couldn't check (no free computer)",
+  run_error: "Didn't finish",
+};
+export const LAST_ERROR_FALLBACK = "Something went wrong";
+
 export const RUN_STATE_WORDS: Readonly<Record<RunState, string>> = {
   queued: "Waiting", running: "Running", done: "Done", missed: "Missed", skipped: "Skipped", held: "Held",
   expired: "Waited for you", error: "Didn't finish",

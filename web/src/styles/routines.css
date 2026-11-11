@@ -185,6 +185,13 @@
   color: var(--color-danger-text);
 }
 
+/* The routine's last error ("Couldn't check (computer didn't answer) · 12:40"), above its runs. */
+.routine-history__error {
+  margin: 0 0 var(--space-3);
+  color: var(--color-danger-text);
+  font-size: var(--fs-label);
+}
+
 .routine-history__when,
 .routine-history__note {
   color: var(--color-text-secondary);
